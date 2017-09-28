@@ -3,6 +3,7 @@ package taewon.navercorp.integratedsns.login;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -14,16 +15,25 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.Arrays;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private Button mFacebookLogin, mGoogleLogin, mInstaLogin;
     private CallbackManager mCallbackManager;
+
+    private GoogleApiClient mGoogleApiClient;
+    private static final int GOOGLE_SIGN_IN_REQ = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +41,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
 
         initView();
+        initGoogleSignInclient();
     }
 
-    private void initView(){
+    private void initView() {
 
         mFacebookLogin = (Button) findViewById(R.id.button_fb_login);
         mFacebookLogin.setOnClickListener(this);
@@ -45,10 +56,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mInstaLogin.setOnClickListener(this);
     }
 
+    private void initGoogleSignInclient() {
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(LoginActivity.this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+    }
+
     @Override
     public void onClick(View v) {
 
-        switch(v.getId()){
+        switch (v.getId()) {
 
             case R.id.button_fb_login:
                 getFacebookToken();
@@ -64,7 +87,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void getFacebookToken(){
+    private void getFacebookToken() {
 
         mCallbackManager = CallbackManager.Factory.create();
         final SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
@@ -77,7 +100,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                 editor.putString(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
                 editor.commit();
-                Log.d("CHECK_PREF", "Login Activity >>>>"+pref.getString(getString(R.string.facebook_token),""));
+                Log.d("CHECK_PREF", "Login Activity >>>>" + pref.getString(getString(R.string.facebook_token), ""));
 
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(intent);
@@ -96,12 +119,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
-    private void getGoogleToken(){
+    private void getGoogleToken() {
 
-
+        Intent intent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(intent, GOOGLE_SIGN_IN_REQ);
     }
 
-    private void getInstaToken(){
+    private void getInstaToken() {
 
 
     }
@@ -109,6 +133,46 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mCallbackManager.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == GOOGLE_SIGN_IN_REQ) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        } else {
+            // TODO - facebook callback manager 내부적으로 requestCode 를 어떻게 처리하는지 알아 볼 것
+            mCallbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    // TODO - SharedPreference 호출 로직과 Activity 이동로직 정리 할 것 (중복)
+    private void handleSignInResult(GoogleSignInResult result) {
+        if (result.isSuccess()) {
+
+            GoogleSignInAccount acct = result.getSignInAccount();
+
+            final SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+            final SharedPreferences.Editor editor = pref.edit();
+
+            if (acct.getId() != null) {
+                editor.putString(getString(R.string.google_token), acct.getId());
+                Log.d("CHECK_TOKEN", "Login Activity >>> " + acct.getId());
+
+                editor.commit();
+
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                startActivity(intent);
+                LoginActivity.this.finish();
+
+            } else {
+                Log.d("LOGIN_ERROR", "Login Activity >>> fail to get google ID");
+            }
+
+        } else {
+            Toast.makeText(LoginActivity.this, getString(R.string.google_login_fail), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e("LOGIN_ERROR", "Login Activity >>>> " + connectionResult.getErrorMessage());
     }
 }
