@@ -6,28 +6,53 @@
     android:layout_height="match_parent"
     tools:context="taewon.navercorp.integratedsns.home.HomeActivity">
 
-    <Button
-        android:id="@+id/button_insta_logout"
-        android:layout_width="200dp"
-        android:layout_height="40dp"
+    <view
+        android:id="@+id/viewPager"
+        class="android.support.v4.view.ViewPager"
+        id="@+id/view"
+        layout_centerHorizontal="true"
+        layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/tabLayout"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        app:elevation="0dp" />
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="14dp"
-        android:text="Logout Instagram" />
+        android:layout_alignParentStart="true"
+        android:elevation="4dp"
+        app:tabIndicatorColor="@android:color/transparent"
+        app:tabTextAppearance="@style/CustomTabItemTextSize">
 
-    <Button
-        android:id="@+id/button_google_logout"
-        android:layout_width="200dp"
-        android:layout_height="40dp"
-        android:layout_above="@+id/button_insta_logout"
-        android:layout_centerHorizontal="true"
-        android:text="Logout Google" />
+        <android.support.design.widget.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/facebook_icon"
+            android:text="Facebook" />
 
-    <Button
-        android:id="@+id/button_fb_logout"
-        android:layout_width="200dp"
-        android:layout_height="40dp"
-        android:layout_above="@+id/button_google_logout"
-        android:layout_centerHorizontal="true"
-        android:text="Logout Facebook" />
+        <android.support.design.widget.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/youtube_icon"
+            android:text="Youtube" />
+
+        <android.support.design.widget.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/instgram_icon"
+            android:text="Instagram" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/tabItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/settings_icon"
+            android:text="Setting" />
+
+    </android.support.design.widget.TabLayout>
 </RelativeLayout>

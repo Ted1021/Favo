@@ -1,31 +1,40 @@
 package taewon.navercorp.integratedsns.home;
 
-import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.facebook.FacebookFragment;
+import taewon.navercorp.integratedsns.settings.SettingsFragment;
+import taewon.navercorp.integratedsns.youtube.YoutubeFragment;
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
-    Button mFacebookLogout, mGoogleLogout, mInstaLogout;
+    TabLayout mTabLayout;
+    ViewPager mViewPager;
+
+    private static final int FRAG_COUNT = 4;
+
+    private static final int TAB_FACEBOOK = 0;
+    private static final int TAB_YOUTUBE = 1;
+    private static final int TAB_INSTA = 2;
+    private static final int TAB_SETTINGS = 3;
 
     // TODO - API Client 를 매 Activity 마다 호출해 주어야 하는가? 한곳에서 선언하고 외부에서 가져올 방법 고려해 보기
-    private GoogleApiClient mGoogleApiClient;
+    public static GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,88 +42,128 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_home);
 
         initView();
+        setAction();
         initGoogleSignInclient();
     }
 
-    private void initView() {
-
-        mFacebookLogout = (Button) findViewById(R.id.button_fb_logout);
-        mFacebookLogout.setOnClickListener(this);
-
-        mGoogleLogout = (Button) findViewById(R.id.button_google_logout);
-        mGoogleLogout.setOnClickListener(this);
-
-        mInstaLogout = (Button) findViewById(R.id.button_insta_logout);
-        mInstaLogout.setOnClickListener(this);
-    }
     private void initGoogleSignInclient(){
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        mGoogleApiClient = new GoogleApiClient.Builder(HomeActivity.this)
                 .enableAutoManage(HomeActivity.this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
     }
 
-    @Override
-    public void onClick(View v) {
+    private void initView() {
 
-        switch (v.getId()) {
-
-            case R.id.button_fb_logout:
-                deleteFacebookToken();
-                HomeActivity.this.finish();
-                break;
-
-            case R.id.button_google_logout:
-                deleteGoogleToken();
-                break;
-
-            case R.id.button_insta_logout:
-
-                break;
-        }
+        mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        mTabLayout.getTabAt(0).getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.facebook_color), PorterDuff.Mode.SRC_IN);
+        mViewPager = (ViewPager) findViewById(R.id.viewPager);
     }
 
-    private void deleteFacebookToken() {
+    private void setAction() {
 
-        SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-
-        if (AccessToken.getCurrentAccessToken() != null) {
-            LoginManager.getInstance().logOut();
-
-            editor.putString(getString(R.string.facebook_token), "");
-            editor.commit();
-        }
-        Toast.makeText(HomeActivity.this, "logout facebook successfully!!", Toast.LENGTH_SHORT).show();
-        Log.d("CHECK_TOKEN", "HomeActivity >>>>> " + pref.getString(getString(R.string.facebook_token), ""));
-    }
-
-    private void deleteGoogleToken() {
-        SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        final SharedPreferences.Editor editor = pref.edit();
-
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+        mViewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onResult(@NonNull Status status) {
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-                editor.putString(getString(R.string.google_token), "");
-                editor.commit();
+            }
 
-                HomeActivity.this.finish();
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
             }
         });
 
-        Toast.makeText(HomeActivity.this, "logout google successfully!!", Toast.LENGTH_SHORT).show();
-        Log.d("CHECK_TOKEN", "HomeActivity >>>>> " + pref.getString(getString(R.string.google_token), ""));
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+
+                    case TAB_FACEBOOK:
+                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.facebook_color), PorterDuff.Mode.SRC_IN);
+                        break;
+
+                    case TAB_YOUTUBE:
+                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.youtube_color), PorterDuff.Mode.SRC_IN);
+                        break;
+
+                    case TAB_INSTA:
+                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.insta_color), PorterDuff.Mode.SRC_IN);
+                        break;
+
+                    case TAB_SETTINGS:
+                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.settings_color), PorterDuff.Mode.SRC_IN);
+                        break;
+
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.unselected_color), PorterDuff.Mode.SRC_IN);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    private class ViewPagerAdapter extends FragmentStatePagerAdapter {
+
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            Fragment fragment = new FacebookFragment();
+
+            switch (position) {
+
+                case TAB_FACEBOOK:
+                    fragment = new FacebookFragment();
+                    break;
+
+                case TAB_YOUTUBE:
+                    fragment = new YoutubeFragment();
+                    break;
+
+                case TAB_INSTA:
+
+                    break;
+
+                case TAB_SETTINGS:
+                    fragment = new SettingsFragment();
+                    break;
+            }
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return FRAG_COUNT;
+        }
     }
 }

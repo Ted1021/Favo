@@ -3,4 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="facebook_color">#3b5998</color>
+    <color name="youtube_color">#cc181e</color>
+    <color name="insta_color">#fb3958</color>
+    <color name="settings_color">#000</color>
+    <color name="unselected_color">#aaa</color>
+
 </resources>

@@ -1,0 +1,35 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="taewon.navercorp.integratedsns.settings.SettingsFragment">
+
+    <Button
+        android:id="@+id/button_insta_logout"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="100dp"
+        android:layout_marginTop="4dp"
+        android:text="Logout Instagram" />
+
+    <Button
+        android:id="@+id/button_google_logout"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/button_insta_logout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="4dp"
+        android:text="Logout Google" />
+
+    <Button
+        android:id="@+id/button_fb_logout"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/button_google_logout"
+        android:layout_centerHorizontal="true"
+        android:text="Logout Facebook" />
+
+
+</RelativeLayout>

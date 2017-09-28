@@ -14,13 +14,15 @@
         android:layout_centerHorizontal="true"
         android:text="Connect to Facebook" />
 
+
     <Button
         android:id="@+id/button_google_login"
         android:layout_width="200dp"
         android:layout_height="40dp"
         android:layout_above="@+id/button_insta_login"
         android:layout_alignStart="@+id/button_fb_login"
-        android:text="Connect to Youtube" />
+        android:layout_marginTop="4dp"
+        android:text="Connect to Google" />
 
     <Button
         android:id="@+id/button_insta_login"
@@ -29,6 +31,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignStart="@+id/button_google_login"
         android:layout_marginBottom="100dp"
+        android:layout_marginTop="4dp"
         android:text="Connect to Instagram" />
 
 </RelativeLayout>

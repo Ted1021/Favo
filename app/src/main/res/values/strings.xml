@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IntegratedSNS</string>
+    <string name="app_name">Favo</string>
 
     <string name="facebook_app_id">265540180604990</string>
     <string name="fb_login_protocol_scheme">fb265540180604990</string>
@@ -10,5 +10,8 @@
 
     <string name="facebook_login_fail">페이스북 로그인에 실패 하였습니다.</string>
     <string name="google_login_fail">구글 로그인에 실패 하였습니다.</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
