@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">IntegratedSNS</string>
+
+    <string name="facebook_app_id">265540180604990</string>
+    <string name="fb_login_protocol_scheme">fb265540180604990</string>
+
+    <string name="tokens">taewon.navercorp.integratedsns.tokens</string>
+    <string name="facebook_token">facebook_token</string>
+    <string name="google_token">google_token</string>
+
+    <string name="facebook_login_fail">페이스북 로그인에 실패 하였습니다.</string>
+
 </resources>

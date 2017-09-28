@@ -1,18 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="taewon.navercorp.integratedsns.HomeActivity">
+    tools:context="taewon.navercorp.integratedsns.home.HomeActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/button_insta_logout"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="14dp"
+        android:text="Logout Instagram" />
 
-</android.support.constraint.ConstraintLayout>
+    <Button
+        android:id="@+id/button_google_logout"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/button_insta_logout"
+        android:layout_centerHorizontal="true"
+        android:text="Logout Google" />
+
+    <Button
+        android:id="@+id/button_fb_logout"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_above="@+id/button_google_logout"
+        android:layout_centerHorizontal="true"
+        android:text="Logout Facebook" />
+</RelativeLayout>
