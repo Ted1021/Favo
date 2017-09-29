@@ -18,8 +18,16 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.facebook.FacebookFragment;
+import taewon.navercorp.integratedsns.instagram.InstagramFragment;
 import taewon.navercorp.integratedsns.settings.SettingsFragment;
 import taewon.navercorp.integratedsns.youtube.YoutubeFragment;
+
+/**
+ * @author 김태원
+ * @file HomeActivity.java
+ * @brief Show multiple platforms on viewPager
+ * @date 2017.09.27
+ */
 
 public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -105,7 +113,6 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                     case TAB_SETTINGS:
                         tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.settings_color), PorterDuff.Mode.SRC_IN);
                         break;
-
                 }
             }
 
@@ -151,7 +158,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                     break;
 
                 case TAB_INSTA:
-
+                    fragment = new InstagramFragment();
                     break;
 
                 case TAB_SETTINGS:

@@ -10,6 +10,13 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 import taewon.navercorp.integratedsns.login.LoginActivity;
 
+/**
+ * @author 김태원
+ * @file SplashActivity.java
+ * @brief Check service tokens
+ * @date 2017.09.27
+ */
+
 public class SplashActivity extends AppCompatActivity {
 
     private static int SPLASH_DISPLAY_LENGTH = 2000;

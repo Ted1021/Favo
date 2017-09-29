@@ -27,6 +27,13 @@ import java.util.Arrays;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 
+/**
+ * @author 김태원
+ * @file LoginActivity.java
+ * @brief Login service from multiple platforms
+ * @date 2017.09.27
+ */
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private Button mFacebookLogin, mGoogleLogin, mInstaLogin;

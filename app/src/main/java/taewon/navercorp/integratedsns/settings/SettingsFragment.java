@@ -25,6 +25,13 @@ import taewon.navercorp.integratedsns.R;
 import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.home.HomeActivity.mGoogleApiClient;
 
+/**
+ * @author 김태원
+ * @file SettingsFragment.java
+ * @brief Managing multiple tokens
+ * @date 2017.09.28
+ */
+
 public class SettingsFragment extends Fragment implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     Button mFacebookLogout, mGoogleLogout, mInstaLogout;
