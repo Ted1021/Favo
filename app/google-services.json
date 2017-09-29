@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "939742218505",
+    "project_id": "ted-integratedsns"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:939742218505:android:1270cd461959ec19",
+        "android_client_info": {
+          "package_name": "taewon.navercorp.integratedsns"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "939742218505-m2s27klio03vvk078tl03h9jl6jhchuf.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "939742218505-h5qfsovp43qk30j2b9t2tmhgkrpehtue.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "taewon.navercorp.integratedsns",
+            "certificate_hash": "285f90669da2f37ed361a12f112304a00702cc33"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6VQVXg4TwfzrmZGGFdiehVhlQhsIfETQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
