@@ -9,5 +9,6 @@
     <color name="insta_color">#fb3958</color>
     <color name="settings_color">#000</color>
     <color name="unselected_color">#aaaaaa</color>
+    <color name="lightGray">#aaaaaa</color>
 
 </resources>
