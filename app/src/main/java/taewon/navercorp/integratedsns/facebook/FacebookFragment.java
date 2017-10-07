@@ -70,6 +70,7 @@ public class FacebookFragment extends Fragment {
     private void getFacebookFeed() {
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
+
         GraphRequest request = GraphRequest.newGraphPathRequest(
                 accessToken,
                 "/me/feed",
@@ -93,7 +94,6 @@ public class FacebookFragment extends Fragment {
                         } else {
                             Log.e("ERROR_FACEBOOK", "fail to connect facebook >>> " + response.getError().getErrorMessage());
                         }
-
                         mAdapter.notifyDataSetChanged();
                     }
                 });
