@@ -81,6 +81,7 @@ public class FacebookFragment extends Fragment {
                         if (response.getError() == null) {
                             JSONArray data;
                             JSONObject article;
+
                             try {
                                 data = response.getJSONObject().getJSONArray("data");
                                 for (int i = 0; i < data.length(); i++) {

@@ -81,6 +81,7 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
             holder.mUploadTime.setText(data.getString("created_time"));
             holder.mDescription.setText(data.getString("description"));
             Glide.with(mContext).load(data.getString("full_picture")).into(holder.mPicture);
+
         } catch (Exception e) {
             e.printStackTrace();
             Log.e("ERROR_FACEBOOK", "fail to load json object");

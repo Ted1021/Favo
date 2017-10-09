@@ -279,11 +279,8 @@ public class YoutubeFeedData {
                     public void setUrl(String url) {
                         this.url = url;
                     }
-
                 }
-
             }
-
         }
 
         public class ContentDetails {
@@ -321,9 +318,7 @@ public class YoutubeFeedData {
             public void setActivityType(String activityType) {
                 this.activityType = activityType;
             }
-
         }
-
     }
 
     public class PageInfo {
@@ -350,7 +345,5 @@ public class YoutubeFeedData {
         public void setResultsPerPage(Integer resultsPerPage) {
             this.resultsPerPage = resultsPerPage;
         }
-
     }
-
 }

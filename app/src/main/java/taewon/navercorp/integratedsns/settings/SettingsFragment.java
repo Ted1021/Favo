@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.settings;
 
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,6 +22,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.login.LoginActivity;
 
 import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.home.HomeActivity.mGoogleApiClient;
@@ -71,16 +73,12 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
             case R.id.button_fb_logout:
                 deleteFacebookToken();
-                getActivity().finish();
+                checkTokens();
                 break;
 
             case R.id.button_google_logout:
                 deleteGoogleToken();
-                getActivity().finish();
-                break;
-
-            case R.id.button_insta_logout:
-
+                checkTokens();
                 break;
         }
     }
@@ -116,6 +114,19 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
         Toast.makeText(getContext(), "logout google successfully!!", Toast.LENGTH_SHORT).show();
         Log.d("CHECK_TOKEN", "Settings Fragment >>>>> " + pref.getString(getString(R.string.google_token), ""));
+    }
+
+    private void checkTokens(){
+
+        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        String facebook_token = pref.getString(getString(R.string.facebook_token),"");
+        String google_token = pref.getString(getString(R.string.google_token),"");
+
+        if(facebook_token.equals("") && google_token.equals("")){
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            startActivity(intent);
+            getActivity().finish();
+        }
     }
 
     @Override

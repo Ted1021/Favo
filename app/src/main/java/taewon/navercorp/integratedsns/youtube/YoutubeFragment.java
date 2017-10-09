@@ -1,6 +1,8 @@
 package taewon.navercorp.integratedsns.youtube;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,10 +35,10 @@ public class YoutubeFragment extends Fragment {
 
     private RecyclerView mYoutubeList;
     private YoutubeListAdapter mAdapter;
-    private ArrayList<YoutubeFeedData> mDataset = new ArrayList<>();
+    private ArrayList<YoutubeFeedData.Item> mDataset = new ArrayList<>();
 
-    private static final String YOUTUBE_URL = "https://www.googleapis.com/youtube/v3";
-    private static final String YOUTUBE_KEY = "AIzaSyA6VQVXg4TwfzrmZGGFdiehVhlQhsIfETQ";
+    private static final String YOUTUBE_URL = "https://www.googleapis.com/";
+    private static final String YOUTUBE_KEY = "AIzaSyAItDFNQ9DAgr5ptcq8BpPvjQFFh1DhLbY";
 
     public YoutubeFragment() {
 
@@ -71,20 +73,27 @@ public class YoutubeFragment extends Fragment {
 
     private void getYoutubeFeed() {
 
+        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.tokens), Context.MODE_PRIVATE);
+        String accessToken = pref.getString(getString(R.string.google_token), "");
+        Log.d("CHECK_TOKEN", "Youtube Fragment >>>>> " + accessToken);
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeFeedData> call = service.subscriptionList("snippet%2CcontentDetails", true, YOUTUBE_KEY);
+        Call<YoutubeFeedData> call = service.subscriptionList("snippet", 20, true);
         call.enqueue(new Callback<YoutubeFeedData>() {
             @Override
             public void onResponse(Call<YoutubeFeedData> call, Response<YoutubeFeedData> response) {
                 if (response.isSuccessful()) {
+
+                    mDataset.addAll(response.body().getItems());
                     mAdapter.notifyDataSetChanged();
+
                 } else {
-                    Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to get json");
+                    Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to get json" + response.toString());
                     Toast.makeText(getContext(), "Fail to get json data", Toast.LENGTH_SHORT).show();
                 }
             }

@@ -47,8 +47,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        initView();
         initGoogleSignInclient();
+        initView();
     }
 
     private void initView() {
@@ -66,6 +66,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void initGoogleSignInclient() {
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.google_client_id))
                 .requestEmail()
                 .build();
 
@@ -89,7 +90,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.button_insta_login:
-                getInstaToken();
                 break;
         }
     }
@@ -132,36 +132,34 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         startActivityForResult(intent, GOOGLE_SIGN_IN_REQ);
     }
 
-    private void getInstaToken() {
-
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // google login
         if (requestCode == GOOGLE_SIGN_IN_REQ) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
-        } else {
-            // TODO - facebook callback manager 내부적으로 requestCode 를 어떻게 처리하는지 알아 볼 것
+        }
+
+        // facebook login
+        else {
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 
-    // TODO - SharedPreference 호출 로직과 Activity 이동로직 정리 할 것 (중복)
     private void handleSignInResult(GoogleSignInResult result) {
-        if (result.isSuccess()) {
 
-            GoogleSignInAccount acct = result.getSignInAccount();
+        if (result.isSuccess()) {
+            GoogleSignInAccount account = result.getSignInAccount();
 
             final SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
             final SharedPreferences.Editor editor = pref.edit();
 
-            if (acct.getId() != null) {
-                editor.putString(getString(R.string.google_token), acct.getId());
-                Log.d("CHECK_TOKEN", "Login Activity >>> " + acct.getId());
+            if (account.getId() != null) {
+
+                editor.putString(getString(R.string.google_token), account.getIdToken());
+                Log.d("CHECK_TOKEN", "Login Activity >>> " + account.getIdToken());
 
                 editor.commit();
 
@@ -178,6 +176,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    // google connection failure listener
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e("LOGIN_ERROR", "Login Activity >>>> " + connectionResult.getErrorMessage());
