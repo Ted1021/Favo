@@ -1,7 +1,6 @@
 package taewon.navercorp.integratedsns.youtube;
 
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,8 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
-import com.google.api.services.youtube.YouTubeScopes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +25,8 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.YoutubeFeedData;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * @author 김태원
  * @file YoutubeFragment.java
@@ -37,14 +36,11 @@ import taewon.navercorp.integratedsns.model.YoutubeFeedData;
 
 public class YoutubeFragment extends Fragment implements EasyPermissions.PermissionCallbacks{
 
-    private static final String[] SCOPES = {YouTubeScopes.YOUTUBE, YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBEPARTNER};
-
     private RecyclerView mYoutubeList;
     private YoutubeListAdapter mAdapter;
     private ArrayList<YoutubeFeedData.Item> mDataset = new ArrayList<>();
 
     private static final String YOUTUBE_URL = "https://www.googleapis.com/";
-    private static final String YOUTUBE_KEY = "AIzaSyAItDFNQ9DAgr5ptcq8BpPvjQFFh1DhLbY";
 
     public YoutubeFragment() {
 
@@ -79,8 +75,8 @@ public class YoutubeFragment extends Fragment implements EasyPermissions.Permiss
 
     private void getYoutubeFeed() {
 
-        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.tokens), Context.MODE_PRIVATE);
-        String accessToken = pref.getString(getString(R.string.google_token), "");
+        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        String accessToken = String.format("Bearer "+pref.getString(getString(R.string.google_token), ""));
         Log.d("CHECK_TOKEN", "Youtube Fragment >>>>> " + accessToken);
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -89,7 +85,7 @@ public class YoutubeFragment extends Fragment implements EasyPermissions.Permiss
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeFeedData> call = service.subscriptionList("snippet", 20, true);
+        Call<YoutubeFeedData> call = service.subscriptionList(accessToken, "snippet", 20, true);
         call.enqueue(new Callback<YoutubeFeedData>() {
             @Override
             public void onResponse(Call<YoutubeFeedData> call, Response<YoutubeFeedData> response) {
@@ -112,12 +108,6 @@ public class YoutubeFragment extends Fragment implements EasyPermissions.Permiss
         });
     }
 
-    // Youtube Permission callback methods
-
-    private void getResultFromApi(){
-
-
-    }
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
 

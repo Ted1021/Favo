@@ -1,7 +1,9 @@
 package taewon.navercorp.integratedsns.login;
 
+import android.accounts.Account;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -15,13 +17,18 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.services.youtube.YouTubeScopes;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import taewon.navercorp.integratedsns.R;
@@ -37,17 +44,28 @@ import taewon.navercorp.integratedsns.home.HomeActivity;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private Button mFacebookLogin, mGoogleLogin, mInstaLogin;
+
+    // Auth for facebook
     private CallbackManager mCallbackManager;
 
+    // Auth for google (Youtube)
     private GoogleApiClient mGoogleApiClient;
-    private static final int GOOGLE_SIGN_IN_REQ = 101;
+    private static final String[] SCOPES = {YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBEPARTNER};
+
+    // Auth Request Code
+    private static final int REQ_FACEBOOK_SIGN_IN = 100;
+    private static final int REQ_GOOGLE_SIGN_IN = 101;
+
+    // managing tokens
+    private SharedPreferences mPref;
+    private SharedPreferences.Editor mEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        initGoogleSignInclient();
+        initData();
         initView();
     }
 
@@ -63,10 +81,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mInstaLogin.setOnClickListener(this);
     }
 
-    private void initGoogleSignInclient() {
+    private void initData() {
 
+        // init google O'Auth client
+        // 여기서 Scope 를 지정하는것이 매우 중요!
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.google_client_id))
+                .requestScopes(new Scope(YouTubeScopes.YOUTUBE), new Scope(YouTubeScopes.YOUTUBE_READONLY), new Scope(YouTubeScopes.YOUTUBEPARTNER))
                 .requestEmail()
                 .build();
 
@@ -74,6 +95,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .enableAutoManage(LoginActivity.this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+
+        // init Preference
+        mPref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mEditor = mPref.edit();
     }
 
     @Override
@@ -97,17 +122,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void getFacebookToken() {
 
         mCallbackManager = CallbackManager.Factory.create();
-        final SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        final SharedPreferences.Editor editor = pref.edit();
 
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
-                editor.putString(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
-                editor.commit();
-                Log.d("CHECK_PREF", "Login Activity >>>>" + pref.getString(getString(R.string.facebook_token), ""));
+                mEditor.putString(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
+                mEditor.commit();
+                Log.d("CHECK_PREF", "Login Activity >>>>" + mPref.getString(getString(R.string.facebook_token), ""));
 
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(intent);
@@ -129,7 +152,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void getGoogleToken() {
 
         Intent intent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(intent, GOOGLE_SIGN_IN_REQ);
+        startActivityForResult(intent, REQ_GOOGLE_SIGN_IN);
     }
 
     @Override
@@ -137,7 +160,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onActivityResult(requestCode, resultCode, data);
 
         // google login
-        if (requestCode == GOOGLE_SIGN_IN_REQ) {
+        if (requestCode == REQ_GOOGLE_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
         }
@@ -147,31 +170,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
-    
+
     private void handleSignInResult(GoogleSignInResult result) {
 
         if (result.isSuccess()) {
+
             GoogleSignInAccount account = result.getSignInAccount();
-
-            final SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-            final SharedPreferences.Editor editor = pref.edit();
-
-            if (account.getId() != null) {
-
-                editor.putString(getString(R.string.google_token), account.getIdToken());
-                Log.d("CHECK_TOKEN", "Login Activity >>> " + account.getIdToken());
-
-                editor.commit();
-
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(intent);
-                LoginActivity.this.finish();
-
-            } else {
-                Log.d("LOGIN_ERROR", "Login Activity >>> fail to get google ID");
-            }
+            new GetGoogleTokenAsync().execute(account.getAccount());
 
         } else {
+
+            Log.d("LOGIN_ERROR", "Login Activity >>> fail to get google Account");
             Toast.makeText(LoginActivity.this, getString(R.string.google_login_fail), Toast.LENGTH_SHORT).show();
         }
     }
@@ -180,5 +189,38 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e("LOGIN_ERROR", "Login Activity >>>> " + connectionResult.getErrorMessage());
+    }
+
+    private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Account... params) {
+
+            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES));
+            credential.setSelectedAccount(params[0]);
+
+            try {
+
+                mEditor.putString(getString(R.string.google_token), credential.getToken());
+                mEditor.commit();
+                Log.d("CHECK_TOKEN", "Login Activity >>>>> " + credential.getToken());
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (GoogleAuthException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(intent);
+            LoginActivity.this.finish();
+        }
     }
 }
