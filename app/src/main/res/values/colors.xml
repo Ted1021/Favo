@@ -10,5 +10,6 @@
     <color name="settings_color">#000</color>
     <color name="unselected_color">#aaaaaa</color>
     <color name="lightGray">#aaaaaa</color>
+    <color name="transparent_dark">#8e8e8e</color>
 
 </resources>

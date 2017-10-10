@@ -120,6 +120,8 @@ public class HomeActivity extends AppCompatActivity
 
         // set viewPager action
         mViewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        mViewPager.setCurrentItem(0);
+//        mViewPager.setOffscreenPageLimit(3);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

@@ -76,6 +76,7 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
 
         JSONObject data = mDataset.get(position);
+
         try {
             holder.mUserName.setText(data.getString("name"));
             holder.mUploadTime.setText(data.getString("created_time"));
@@ -85,7 +86,7 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
         } catch (Exception e) {
 
             e.printStackTrace();
-            Log.e("ERROR_FACEBOOK", "fail to load json object");
+            Log.e("ERROR_FACEBOOK", "Facebook List Adapter >>>>> fail to load json object");
         }
     }
 

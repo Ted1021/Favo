@@ -117,19 +117,18 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
     private void getFeedList() {
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        GraphRequest request = GraphRequest.newGraphPathRequest(
+        GraphRequest request = GraphRequest.newMeRequest(
                 accessToken,
-                "/me/feed",
-                new GraphRequest.Callback() {
+                new GraphRequest.GraphJSONObjectCallback() {
                     @Override
-                    public void onCompleted(GraphResponse response) {
+                    public void onCompleted(JSONObject object, GraphResponse response) {
 
                         if (response.getError() == null) {
                             JSONArray data; // article list
                             JSONObject article; // single article
 
                             try {
-                                data = response.getJSONObject().getJSONArray("data");
+                                data = response.getJSONObject().getJSONObject("posts").getJSONArray("data");
                                 for (int i = 0; i < data.length(); i++) {
                                     article = data.getJSONObject(i);
                                     mDataset.add(article);
@@ -147,7 +146,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "full_picture,description,link,source,name,created_time");
+        parameters.putString("fields", "posts{name,created_time,description,source,full_picture}");
         request.setParameters(parameters);
         request.executeAsync();
     }

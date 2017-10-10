@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -98,7 +98,7 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
         mYoutubeList = (RecyclerView) view.findViewById(R.id.recyclerView_youtube);
         mAdapter = new YoutubeListAdapter(getContext(), mDataset);
         mYoutubeList.setAdapter(mAdapter);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
         mYoutubeList.setLayoutManager(layoutManager);
     }
 

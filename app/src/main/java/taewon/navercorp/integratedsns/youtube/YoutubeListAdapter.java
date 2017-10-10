@@ -1,12 +1,14 @@
 package taewon.navercorp.integratedsns.youtube;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,14 +43,14 @@ public class YoutubeListAdapter extends RecyclerView.Adapter<YoutubeListAdapter.
 
         private ImageView mThumbnail;
         private TextView mListName;
-        private LinearLayout mItemLayout;
+        private RelativeLayout mItemLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             mThumbnail = (ImageView) itemView.findViewById(R.id.imageView_thumbnail);
             mListName = (TextView) itemView.findViewById(R.id.textView_listName);
-            mItemLayout = (LinearLayout) itemView.findViewById(R.id.linearLayout_item);
+            mItemLayout = (RelativeLayout) itemView.findViewById(R.id.linearLayout_item);
             mItemLayout.setOnClickListener(this);
         }
 
@@ -80,6 +82,7 @@ public class YoutubeListAdapter extends RecyclerView.Adapter<YoutubeListAdapter.
         YoutubeSubscriptionData.Item.Snippet data = mDataset.get(position).getSnippet();
 
         Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).into(holder.mThumbnail);
+        holder.mThumbnail.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
         holder.mListName.setText(data.getTitle());
     }
 
