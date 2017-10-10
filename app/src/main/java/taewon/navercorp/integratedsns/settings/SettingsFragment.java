@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +59,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
     private void initData() {
 
+        // init preference
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
     }
@@ -99,7 +101,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
             LoginManager.getInstance().logOut();
 
             // delete facebook preference
-            mEditor.putString(getString(R.string.facebook_token), null);
+            mEditor.putString(getString(R.string.facebook_token), "");
             mEditor.commit();
 
             Toast.makeText(getContext(), "disconnect facebook successfully!!", Toast.LENGTH_SHORT).show();
@@ -114,7 +116,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
             public void onResult(@NonNull Status status) {
 
                 // delete google token
-                mEditor.putString(getString(R.string.google_token), null);
+                mEditor.putString(getString(R.string.google_token), "");
                 mEditor.commit();
 
                 Toast.makeText(getContext(), "disconnect google successfully!!", Toast.LENGTH_SHORT).show();
@@ -125,10 +127,10 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     // check remained token
     private void checkTokens() {
 
-        String facebook_token = mPref.getString(getString(R.string.facebook_token), null);
-        String google_token = mPref.getString(getString(R.string.google_token), null);
+        String facebook_token = mPref.getString(getString(R.string.facebook_token), "");
+        String google_token = mPref.getString(getString(R.string.google_token), "");
 
-        if (facebook_token == null && google_token == null) {
+        if (facebook_token.equals("") && google_token.equals("")) {
 
             // call Login Activity
             Intent intent = new Intent(getActivity(), LoginActivity.class);
@@ -139,6 +141,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        Log.e("ERROR_LOGOUT", "Settings Fragment >>>>> " + connectionResult.getErrorMessage());
     }
 }

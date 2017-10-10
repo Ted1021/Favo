@@ -2,6 +2,7 @@ package taewon.navercorp.integratedsns.home;
 
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -9,7 +10,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import taewon.navercorp.integratedsns.R;
@@ -25,28 +30,39 @@ import taewon.navercorp.integratedsns.youtube.YoutubeFragment;
  * @date 2017.09.27
  */
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener  {
 
     TabLayout mTabLayout;
     ViewPager mViewPager;
 
-    private static final int FRAG_COUNT = 4;
+    public static GoogleApiClient mGoogleApiClient;
 
+    private static final int FRAG_COUNT = 4;
     private static final int TAB_FACEBOOK = 0;
     private static final int TAB_YOUTUBE = 1;
     private static final int TAB_INSTA = 2;
     private static final int TAB_SETTINGS = 3;
-
-    // TODO - API Client 를 매 Activity 마다 호출해 주어야 하는가? 한곳에서 선언하고 외부에서 가져올 방법 고려해 보기
-    public static GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        initData();
         initView();
         setAction();
+    }
+
+    private void initData() {
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(HomeActivity.this)
+                .enableAutoManage(HomeActivity.this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
     }
 
     private void initView() {
@@ -58,7 +74,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setAction() {
 
-        // set action for viewPager
+        // set viewPager action
         mViewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -77,7 +93,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // set action for tabLayout
+        // set tabLayout action
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -127,7 +143,6 @@ public class HomeActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
 
             Fragment fragment = new FacebookFragment();
-
             switch (position) {
 
                 case TAB_FACEBOOK:
@@ -153,5 +168,10 @@ public class HomeActivity extends AppCompatActivity {
         public int getCount() {
             return FRAG_COUNT;
         }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e("ERROR_LOGOUT", "Home Activity >>>>> " + connectionResult.getErrorMessage());
     }
 }

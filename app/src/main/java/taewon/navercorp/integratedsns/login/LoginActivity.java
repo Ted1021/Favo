@@ -41,7 +41,7 @@ import taewon.navercorp.integratedsns.home.HomeActivity;
  * @date 2017.09.27
  */
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener{
 
     private Button mFacebookLogin, mGoogleLogin, mInstaLogin;
 
@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void initData() {
 
-        // init google O'Auth client
+        // init google client
         // 여기서 Scope 를 지정하는것이 매우 중요!
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.google_client_id))
@@ -221,7 +221,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    // google connection failure listener
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e("ERROR_LOGIN", "Login Activity >>>>> " + connectionResult.getErrorMessage());
