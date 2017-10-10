@@ -169,22 +169,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // google login
-        if (requestCode == REQ_GOOGLE_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-        }
-
-        // facebook login
-        else {
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
 
         @Override
@@ -218,6 +202,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
             LoginActivity.this.finish();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // google login
+        if (requestCode == REQ_GOOGLE_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }
+
+        // facebook login
+        else {
+            mCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 

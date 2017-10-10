@@ -1,6 +1,8 @@
 package taewon.navercorp.integratedsns.facebook;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,8 +11,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 
@@ -22,6 +27,8 @@ import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * @author 김태원
  * @file FacebookFragment.java
@@ -29,11 +36,33 @@ import taewon.navercorp.integratedsns.R;
  * @date 2017.09.28
  */
 
-public class FacebookFragment extends Fragment {
+public class FacebookFragment extends Fragment implements View.OnClickListener {
+
+    private SharedPreferences mPref;
+    private SharedPreferences.Editor mEditor;
+
+    private CallbackManager mCallbackManager;
 
     private RecyclerView mFacebookList;
+    private RelativeLayout mLayoutDisconnection;
+    private Button mConnectFacebook;
+
     private ArrayList<JSONObject> mDataset = new ArrayList<>();
     private FacebookListAdapter mAdapter;
+
+    private OnRequestFacebookTokenListener mCallback;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mCallback = (OnRequestFacebookTokenListener) context;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("ERROR_CALLBACK", "Facebook Fragment >>>>> check callback logic");
+        }
+    }
 
     public FacebookFragment() {
     }
@@ -44,27 +73,45 @@ public class FacebookFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_facebook, container, false);
 
+        initData();
         initView(view);
-        setRecyclerView();
-        getFeedList();
+        checkToken();
 
         return view;
     }
 
-    private void initView(View view) {
+    private void initData() {
 
-        mFacebookList = (RecyclerView) view.findViewById(R.id.recyclerView_facebook);
+        // get preference
+        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mEditor = mPref.edit();
     }
 
-    private void setRecyclerView() {
+    private void initView(View view) {
 
-        // set adapter
+        // view for disconnection
+        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
+        mConnectFacebook = (Button) view.findViewById(R.id.button_connect_facebook);
+        mConnectFacebook.setOnClickListener(this);
+
+        // set recyclerView
+        mFacebookList = (RecyclerView) view.findViewById(R.id.recyclerView_facebook);
         mAdapter = new FacebookListAdapter(getContext(), mDataset);
         mFacebookList.setAdapter(mAdapter);
-
-        // set layout manager
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mFacebookList.setLayoutManager(layoutManager);
+    }
+
+    private void checkToken() {
+
+        String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
+        if (!facebookToken.equals("")) {
+            mLayoutDisconnection.setVisibility(View.GONE);
+            getFeedList();
+
+        } else {
+            mLayoutDisconnection.setVisibility(View.VISIBLE);
+        }
     }
 
     private void getFeedList() {
@@ -103,5 +150,16 @@ public class FacebookFragment extends Fragment {
         parameters.putString("fields", "full_picture,description,link,source,name,created_time");
         request.setParameters(parameters);
         request.executeAsync();
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+
+            case R.id.button_connect_facebook:
+                mCallback.onRequestFacebookToken();
+                break;
+        }
     }
 }

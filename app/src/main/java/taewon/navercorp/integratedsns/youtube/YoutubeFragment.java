@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.youtube;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -32,14 +35,34 @@ import static android.content.Context.MODE_PRIVATE;
  * @date 2017.10.07
  */
 
-public class YoutubeFragment extends Fragment {
+public class YoutubeFragment extends Fragment implements View.OnClickListener {
+
+    private SharedPreferences mPref;
+    private SharedPreferences.Editor mEditor;
 
     private RecyclerView mYoutubeList;
+    private RelativeLayout mLayoutDisconnection;
+    private Button mConnectYoutube;
+
     private YoutubeListAdapter mAdapter;
     private ArrayList<YoutubeSubscriptionData.Item> mDataset = new ArrayList<>();
 
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
     private static final int MAX_COUNTS = 20;
+
+    private OnRequestYoutubeTokenListener mCallback;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mCallback = (OnRequestYoutubeTokenListener) context;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("ERROR_CALLBACK", "Youtube Fragment >>>>> check callback logic");
+        }
+    }
 
     public YoutubeFragment() {
     }
@@ -50,34 +73,52 @@ public class YoutubeFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_youtube, container, false);
 
+        initData();
         initView(view);
-        setRecyclerView();
-        getSubscriptionList();
+        checkToken();
 
         return view;
     }
 
-    private void initView(View view) {
+    private void initData() {
 
-        mYoutubeList = (RecyclerView) view.findViewById(R.id.recyclerView_youtube);
+        // get preference
+        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mEditor = mPref.edit();
     }
 
-    private void setRecyclerView() {
+    private void initView(View view) {
 
-        // set adapter
+        // view for disconnection
+        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
+        mConnectYoutube = (Button) view.findViewById(R.id.button_connect_youtube);
+        mConnectYoutube.setOnClickListener(this);
+
+        // set recyclerView
+        mYoutubeList = (RecyclerView) view.findViewById(R.id.recyclerView_youtube);
         mAdapter = new YoutubeListAdapter(getContext(), mDataset);
         mYoutubeList.setAdapter(mAdapter);
-
-        // set layout manager
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mYoutubeList.setLayoutManager(layoutManager);
+    }
+
+    // check youtube token state
+    private void checkToken() {
+
+        String youtubeToken = mPref.getString(getString(R.string.google_token), "");
+        if (!youtubeToken.equals("")) {
+            mLayoutDisconnection.setVisibility(View.GONE);
+            getSubscriptionList();
+
+        } else {
+            mLayoutDisconnection.setVisibility(View.VISIBLE);
+        }
     }
 
     private void getSubscriptionList() {
 
         // get google credential access token
-        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        String accessToken = String.format("Bearer " + pref.getString(getString(R.string.google_token), null));
+        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), null));
 
         // set retrofit
         Retrofit retrofit = new Retrofit.Builder()
@@ -108,5 +149,16 @@ public class YoutubeFragment extends Fragment {
                 Toast.makeText(getContext(), "Fail to access youtube server", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+
+            case R.id.button_connect_youtube:
+                mCallback.onRequestYoutubeToken();
+                break;
+        }
     }
 }
