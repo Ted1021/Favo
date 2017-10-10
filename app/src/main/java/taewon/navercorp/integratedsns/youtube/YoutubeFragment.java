@@ -13,8 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.google.api.services.youtube.YouTubeScopes;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -31,7 +35,9 @@ import taewon.navercorp.integratedsns.model.YoutubeFeedData;
  * @date 2017.10.07
  */
 
-public class YoutubeFragment extends Fragment {
+public class YoutubeFragment extends Fragment implements EasyPermissions.PermissionCallbacks{
+
+    private static final String[] SCOPES = {YouTubeScopes.YOUTUBE, YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBEPARTNER};
 
     private RecyclerView mYoutubeList;
     private YoutubeListAdapter mAdapter;
@@ -104,5 +110,21 @@ public class YoutubeFragment extends Fragment {
                 Toast.makeText(getContext(), "Fail to access youtube server", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    // Youtube Permission callback methods
+
+    private void getResultFromApi(){
+
+
+    }
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+
     }
 }

@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
-
+    
     private void handleSignInResult(GoogleSignInResult result) {
 
         if (result.isSuccess()) {
