@@ -13,7 +13,7 @@ import java.util.List;
  * @date 2017.10.07
  */
 
-public class YoutubeFeedData {
+public class YoutubeSubscriptionData {
 
     @SerializedName("kind")
     @Expose

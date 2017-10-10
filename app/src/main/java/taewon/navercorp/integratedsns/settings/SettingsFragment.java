@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,12 +35,13 @@ import static taewon.navercorp.integratedsns.home.HomeActivity.mGoogleApiClient;
 
 public class SettingsFragment extends Fragment implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
-    Button mFacebookLogout, mGoogleLogout, mInstaLogout;
+    // managing tokens
+    private SharedPreferences mPref;
+    private SharedPreferences.Editor mEditor;
 
-    private static final String GOOGLE_CLIENT = "google_api_client";
+    private Button mFacebookLogout, mGoogleLogout, mInstaLogout;
 
     public SettingsFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -49,10 +49,18 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
+
+        initData();
         initView(view);
+
         return view;
     }
 
+    private void initData() {
+
+        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mEditor = mPref.edit();
+    }
 
     private void initView(View view) {
 
@@ -83,46 +91,46 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
-    // TODO - SharedPreference 로직 유틸로 분기하기
     private void deleteFacebookToken() {
 
-        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-
         if (AccessToken.getCurrentAccessToken() != null) {
+
+            // call expire facebook token
             LoginManager.getInstance().logOut();
 
-            editor.putString(getString(R.string.facebook_token), "");
-            editor.commit();
+            // delete facebook preference
+            mEditor.putString(getString(R.string.facebook_token), null);
+            mEditor.commit();
+
+            Toast.makeText(getContext(), "disconnect facebook successfully!!", Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(getContext(), "logout facebook successfully!!", Toast.LENGTH_SHORT).show();
-        Log.d("CHECK_TOKEN", "Settings Fragment >>>>> " + pref.getString(getString(R.string.facebook_token), ""));
     }
 
     private void deleteGoogleToken() {
-        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        final SharedPreferences.Editor editor = pref.edit();
 
+        // call expire google token
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
             @Override
             public void onResult(@NonNull Status status) {
 
-                editor.putString(getString(R.string.google_token), "");
-                editor.commit();
+                // delete google token
+                mEditor.putString(getString(R.string.google_token), null);
+                mEditor.commit();
+
+                Toast.makeText(getContext(), "disconnect google successfully!!", Toast.LENGTH_SHORT).show();
             }
         });
-
-        Toast.makeText(getContext(), "logout google successfully!!", Toast.LENGTH_SHORT).show();
-        Log.d("CHECK_TOKEN", "Settings Fragment >>>>> " + pref.getString(getString(R.string.google_token), ""));
     }
 
-    private void checkTokens(){
+    // check remained token
+    private void checkTokens() {
 
-        SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        String facebook_token = pref.getString(getString(R.string.facebook_token),"");
-        String google_token = pref.getString(getString(R.string.google_token),"");
+        String facebook_token = mPref.getString(getString(R.string.facebook_token), null);
+        String google_token = mPref.getString(getString(R.string.google_token), null);
 
-        if(facebook_token.equals("") && google_token.equals("")){
+        if (facebook_token == null && google_token == null) {
+
+            // call Login Activity
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             startActivity(intent);
             getActivity().finish();

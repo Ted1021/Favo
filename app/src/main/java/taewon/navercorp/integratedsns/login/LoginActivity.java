@@ -69,18 +69,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         initView();
     }
 
-    private void initView() {
-
-        mFacebookLogin = (Button) findViewById(R.id.button_fb_login);
-        mFacebookLogin.setOnClickListener(this);
-
-        mGoogleLogin = (Button) findViewById(R.id.button_google_login);
-        mGoogleLogin.setOnClickListener(this);
-
-        mInstaLogin = (Button) findViewById(R.id.button_insta_login);
-        mInstaLogin.setOnClickListener(this);
-    }
-
     private void initData() {
 
         // init google O'Auth client
@@ -99,6 +87,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // init Preference
         mPref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
+    }
+
+    private void initView() {
+
+        mFacebookLogin = (Button) findViewById(R.id.button_fb_login);
+        mFacebookLogin.setOnClickListener(this);
+
+        mGoogleLogin = (Button) findViewById(R.id.button_google_login);
+        mGoogleLogin.setOnClickListener(this);
+
+        mInstaLogin = (Button) findViewById(R.id.button_insta_login);
+        mInstaLogin.setOnClickListener(this);
     }
 
     @Override
@@ -122,12 +122,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void getFacebookToken() {
 
         mCallbackManager = CallbackManager.Factory.create();
-
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
+                // set facebook preference
                 mEditor.putString(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
                 mEditor.commit();
                 Log.d("CHECK_PREF", "Login Activity >>>>" + mPref.getString(getString(R.string.facebook_token), ""));
@@ -155,6 +155,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         startActivityForResult(intent, REQ_GOOGLE_SIGN_IN);
     }
 
+    // google auth callback method
+    private void handleSignInResult(GoogleSignInResult result) {
+
+        if (result.isSuccess()) {
+            // have to call 'getToken' in working thread
+            GoogleSignInAccount account = result.getSignInAccount();
+            new GetGoogleTokenAsync().execute(account.getAccount());
+
+        } else {
+            Log.d("ERROR_LOGIN", "Login Activity >>>>> fail to get google Account");
+            Toast.makeText(LoginActivity.this, getString(R.string.google_login_fail), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -171,44 +185,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private void handleSignInResult(GoogleSignInResult result) {
-
-        if (result.isSuccess()) {
-
-            GoogleSignInAccount account = result.getSignInAccount();
-            new GetGoogleTokenAsync().execute(account.getAccount());
-
-        } else {
-
-            Log.d("LOGIN_ERROR", "Login Activity >>> fail to get google Account");
-            Toast.makeText(LoginActivity.this, getString(R.string.google_login_fail), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // google connection failure listener
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.e("LOGIN_ERROR", "Login Activity >>>> " + connectionResult.getErrorMessage());
-    }
-
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
 
         @Override
         protected Void doInBackground(Account... params) {
 
+            // get credential info from google account
             GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES));
             credential.setSelectedAccount(params[0]);
 
+            // set google preference
             try {
-
                 mEditor.putString(getString(R.string.google_token), credential.getToken());
                 mEditor.commit();
                 Log.d("CHECK_TOKEN", "Login Activity >>>>> " + credential.getToken());
 
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.e("ERROR_LOGIN", "Login Activity >>>>> fail to get credential token");
             } catch (GoogleAuthException e) {
                 e.printStackTrace();
+                Log.e("ERROR_LOGIN", "Login Activity >>>>> fail to get credential token");
             }
 
             return null;
@@ -222,5 +219,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startActivity(intent);
             LoginActivity.this.finish();
         }
+    }
+
+    // google connection failure listener
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e("ERROR_LOGIN", "Login Activity >>>>> " + connectionResult.getErrorMessage());
     }
 }

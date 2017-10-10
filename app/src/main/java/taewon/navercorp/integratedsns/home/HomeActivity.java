@@ -2,7 +2,6 @@ package taewon.navercorp.integratedsns.home;
 
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,9 +10,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import taewon.navercorp.integratedsns.R;
@@ -29,7 +25,7 @@ import taewon.navercorp.integratedsns.youtube.YoutubeFragment;
  * @date 2017.09.27
  */
 
-public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class HomeActivity extends AppCompatActivity {
 
     TabLayout mTabLayout;
     ViewPager mViewPager;
@@ -51,19 +47,6 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
         initView();
         setAction();
-        initGoogleSignInclient();
-    }
-
-    private void initGoogleSignInclient(){
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(HomeActivity.this)
-                .enableAutoManage(HomeActivity.this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
     }
 
     private void initView() {
@@ -75,6 +58,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void setAction() {
 
+        // set action for viewPager
         mViewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -93,6 +77,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
+        // set action for tabLayout
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -127,13 +112,9 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
+        // set interaction between viewPager & tabLayout
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     private class ViewPagerAdapter extends FragmentStatePagerAdapter {

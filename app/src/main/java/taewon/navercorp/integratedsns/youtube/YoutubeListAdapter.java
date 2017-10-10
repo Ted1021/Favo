@@ -15,7 +15,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.YoutubeFeedData;
+import taewon.navercorp.integratedsns.model.YoutubeSubscriptionData;
 
 /**
  * @author 김태원
@@ -27,20 +27,20 @@ import taewon.navercorp.integratedsns.model.YoutubeFeedData;
 public class YoutubeListAdapter extends RecyclerView.Adapter<YoutubeListAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<YoutubeFeedData.Item> mDataset;
+    private ArrayList<YoutubeSubscriptionData.Item> mDataset;
     private LayoutInflater mLayoutInflater;
 
-    public YoutubeListAdapter (Context context, ArrayList<YoutubeFeedData.Item> dataset) {
+    public YoutubeListAdapter(Context context, ArrayList<YoutubeSubscriptionData.Item> dataset) {
 
         mContext = context;
         mDataset = dataset;
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView mThumbnail;
-        private TextView mListName, mDescription;
+        private TextView mListName;
         private LinearLayout mItemLayout;
 
         public ViewHolder(View itemView) {
@@ -48,7 +48,6 @@ public class YoutubeListAdapter extends RecyclerView.Adapter<YoutubeListAdapter.
 
             mThumbnail = (ImageView) itemView.findViewById(R.id.imageView_thumbnail);
             mListName = (TextView) itemView.findViewById(R.id.textView_listName);
-            mDescription = (TextView) itemView.findViewById(R.id.textView_description);
             mItemLayout = (LinearLayout) itemView.findViewById(R.id.linearLayout_item);
             mItemLayout.setOnClickListener(this);
         }
@@ -57,16 +56,14 @@ public class YoutubeListAdapter extends RecyclerView.Adapter<YoutubeListAdapter.
         public void onClick(View v) {
 
             int position = 0;
-            switch(v.getId()){
+            switch (v.getId()) {
 
                 case R.id.linearLayout_item:
 
                     position = getLayoutPosition();
                     Toast.makeText(mContext, mDataset.get(position).getSnippet().getTitle(), Toast.LENGTH_SHORT).show();
-
                     break;
             }
-
         }
     }
 
@@ -80,11 +77,10 @@ public class YoutubeListAdapter extends RecyclerView.Adapter<YoutubeListAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        YoutubeFeedData.Item.Snippet data = mDataset.get(position).getSnippet();
+        YoutubeSubscriptionData.Item.Snippet data = mDataset.get(position).getSnippet();
 
         Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).into(holder.mThumbnail);
         holder.mListName.setText(data.getTitle());
-//        holder.mDescription.setText(data.getDescription());
     }
 
     @Override

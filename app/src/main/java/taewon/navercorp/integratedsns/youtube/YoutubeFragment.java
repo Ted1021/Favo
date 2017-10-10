@@ -13,9 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,7 +21,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.YoutubeFeedData;
+import taewon.navercorp.integratedsns.model.YoutubeSubscriptionData;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -34,16 +32,16 @@ import static android.content.Context.MODE_PRIVATE;
  * @date 2017.10.07
  */
 
-public class YoutubeFragment extends Fragment implements EasyPermissions.PermissionCallbacks{
+public class YoutubeFragment extends Fragment {
 
     private RecyclerView mYoutubeList;
     private YoutubeListAdapter mAdapter;
-    private ArrayList<YoutubeFeedData.Item> mDataset = new ArrayList<>();
+    private ArrayList<YoutubeSubscriptionData.Item> mDataset = new ArrayList<>();
 
-    private static final String YOUTUBE_URL = "https://www.googleapis.com/";
+    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
+    private static final int MAX_COUNTS = 20;
 
     public YoutubeFragment() {
-
     }
 
     @Override
@@ -54,7 +52,7 @@ public class YoutubeFragment extends Fragment implements EasyPermissions.Permiss
 
         initView(view);
         setRecyclerView();
-        getYoutubeFeed();
+        getSubscriptionList();
 
         return view;
     }
@@ -66,55 +64,49 @@ public class YoutubeFragment extends Fragment implements EasyPermissions.Permiss
 
     private void setRecyclerView() {
 
+        // set adapter
         mAdapter = new YoutubeListAdapter(getContext(), mDataset);
         mYoutubeList.setAdapter(mAdapter);
 
+        // set layout manager
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mYoutubeList.setLayoutManager(layoutManager);
     }
 
-    private void getYoutubeFeed() {
+    private void getSubscriptionList() {
 
+        // get google credential access token
         SharedPreferences pref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        String accessToken = String.format("Bearer "+pref.getString(getString(R.string.google_token), ""));
-        Log.d("CHECK_TOKEN", "Youtube Fragment >>>>> " + accessToken);
+        String accessToken = String.format("Bearer " + pref.getString(getString(R.string.google_token), null));
 
+        // set retrofit
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(YOUTUBE_URL)
+                .baseUrl(YOUTUBE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
+        // get 'subscriptions' from youtube data api v3
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeFeedData> call = service.subscriptionList(accessToken, "snippet", 20, true);
-        call.enqueue(new Callback<YoutubeFeedData>() {
+        Call<YoutubeSubscriptionData> call = service.subscriptionList(accessToken, "snippet", MAX_COUNTS, true);
+        call.enqueue(new Callback<YoutubeSubscriptionData>() {
             @Override
-            public void onResponse(Call<YoutubeFeedData> call, Response<YoutubeFeedData> response) {
+            public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
                 if (response.isSuccessful()) {
 
                     mDataset.addAll(response.body().getItems());
                     mAdapter.notifyDataSetChanged();
 
                 } else {
-                    Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to get json" + response.toString());
-                    Toast.makeText(getContext(), "Fail to get json data", Toast.LENGTH_SHORT).show();
+                    Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to get json from youtube" + response.toString());
+                    Toast.makeText(getContext(), "Fail to get json data from youtube", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<YoutubeFeedData> call, Throwable t) {
+            public void onFailure(Call<YoutubeSubscriptionData> call, Throwable t) {
                 Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to access youtube api server");
                 Toast.makeText(getContext(), "Fail to access youtube server", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    @Override
-    public void onPermissionsGranted(int requestCode, List<String> perms) {
-
-    }
-
-    @Override
-    public void onPermissionsDenied(int requestCode, List<String> perms) {
-
     }
 }

@@ -36,19 +36,17 @@ public class FacebookFragment extends Fragment {
     private FacebookListAdapter mAdapter;
 
     public FacebookFragment() {
-        // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_facebook, container, false);
 
         initView(view);
         setRecyclerView();
-        getFacebookFeed();
+        getFeedList();
 
         return view;
     }
@@ -60,17 +58,18 @@ public class FacebookFragment extends Fragment {
 
     private void setRecyclerView() {
 
+        // set adapter
         mAdapter = new FacebookListAdapter(getContext(), mDataset);
         mFacebookList.setAdapter(mAdapter);
 
+        // set layout manager
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mFacebookList.setLayoutManager(layoutManager);
     }
 
-    private void getFacebookFeed() {
+    private void getFeedList() {
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
-
         GraphRequest request = GraphRequest.newGraphPathRequest(
                 accessToken,
                 "/me/feed",
@@ -79,8 +78,8 @@ public class FacebookFragment extends Fragment {
                     public void onCompleted(GraphResponse response) {
 
                         if (response.getError() == null) {
-                            JSONArray data;
-                            JSONObject article;
+                            JSONArray data; // article list
+                            JSONObject article; // single article
 
                             try {
                                 data = response.getJSONObject().getJSONArray("data");
@@ -90,10 +89,11 @@ public class FacebookFragment extends Fragment {
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                                Log.e("ERROR_FACEBOOK", "fail to get JSONObject");
+                                Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>>> fail to get JSONObject from facebook api");
                             }
+
                         } else {
-                            Log.e("ERROR_FACEBOOK", "fail to connect facebook >>> " + response.getError().getErrorMessage());
+                            Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>> fail to connect facebook server" + response.getError().getErrorMessage());
                         }
                         mAdapter.notifyDataSetChanged();
                     }
