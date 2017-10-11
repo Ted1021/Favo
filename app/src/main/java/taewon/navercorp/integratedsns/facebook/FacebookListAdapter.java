@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONObject;
 
@@ -81,7 +82,7 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
             holder.mUserName.setText(data.getString("name"));
             holder.mUploadTime.setText(data.getString("created_time"));
             holder.mDescription.setText(data.getString("description"));
-            Glide.with(mContext).load(data.getString("full_picture")).into(holder.mPicture);
+            Glide.with(mContext).load(data.getString("full_picture")).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
 
         } catch (Exception e) {
 

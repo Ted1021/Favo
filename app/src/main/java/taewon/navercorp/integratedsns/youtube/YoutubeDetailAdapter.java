@@ -2,6 +2,7 @@ package taewon.navercorp.integratedsns.youtube;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,11 +47,12 @@ public class YoutubeDetailAdapter extends RecyclerView.Adapter<YoutubeDetailAdap
         public ViewHolder(View itemView) {
             super(itemView);
 
-        mThumbnail = (ImageView) itemView.findViewById(R.id.imageView_thumbnail);
-        mTitle = (TextView) itemView.findViewById(R.id.textView_title);
-        mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
-        mItem = (LinearLayout) itemView.findViewById(R.id.linearLayout_item);
-    }
+            mThumbnail = (ImageView) itemView.findViewById(R.id.imageView_thumbnail);
+            mTitle = (TextView) itemView.findViewById(R.id.textView_title);
+            mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
+            mItem = (LinearLayout) itemView.findViewById(R.id.linearLayout_item);
+            mItem.setOnClickListener(this);
+        }
 
         @Override
         public void onClick(View v) {
@@ -63,6 +65,9 @@ public class YoutubeDetailAdapter extends RecyclerView.Adapter<YoutubeDetailAdap
 
                     String channelId = mDataset.get(position).getSnippet().getChannelId();
                     String channelTitle = mDataset.get(position).getSnippet().getChannelTitle();
+                    String videoId = mDataset.get(position).getId().getVideoId();
+
+                    Log.d("CHECK_YOUTUBE", "YoutubeDetailAdapter >>>>> "+ videoId);
                     Toast.makeText(mContext, channelId + " " + channelTitle, Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -84,6 +89,7 @@ public class YoutubeDetailAdapter extends RecyclerView.Adapter<YoutubeDetailAdap
         holder.mTitle.setText(data.getTitle());
         holder.mUserName.setText(data.getChannelTitle());
         Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).into(holder.mThumbnail);
+        Log.d("CHECK_IMAGE", data.getThumbnails().getHigh().getUrl());
     }
 
     @Override
