@@ -13,8 +13,9 @@
         <ImageView
             android:id="@+id/imageView_thumbnail"
             android:layout_width="150dp"
-            android:layout_height="80dp"
+            android:layout_height="100dp"
             android:layout_margin="8dp"
+            android:scaleType="fitXY"
             app:srcCompat="@android:drawable/ic_menu_gallery" />
 
         <LinearLayout

@@ -8,19 +8,26 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
 
 /**
- * Created by USER on 2017-10-11.
+ * @author 김태원
+ * @file YoutubeDetailAdapter.java
+ * @brief show videos from channel
+ * @date 2017.10.11
  */
 
 public class YoutubeDetailAdapter extends RecyclerView.Adapter<YoutubeDetailAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList mDataset;
+    private ArrayList<YoutubeSearchVideoData.Item> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
     public YoutubeDetailAdapter(Context context, ArrayList dataset) {
@@ -49,11 +56,14 @@ public class YoutubeDetailAdapter extends RecyclerView.Adapter<YoutubeDetailAdap
         public void onClick(View v) {
 
             int position;
-            switch(v.getId()){
+            switch (v.getId()) {
 
                 case R.id.linearLayout_item:
                     position = getLayoutPosition();
-                    // TODO - call video
+
+                    String channelId = mDataset.get(position).getSnippet().getChannelId();
+                    String channelTitle = mDataset.get(position).getSnippet().getChannelTitle();
+                    Toast.makeText(mContext, channelId + " " + channelTitle, Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -69,6 +79,11 @@ public class YoutubeDetailAdapter extends RecyclerView.Adapter<YoutubeDetailAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
+        YoutubeSearchVideoData.Item.Snippet data = mDataset.get(position).getSnippet();
+
+        holder.mTitle.setText(data.getTitle());
+        holder.mUserName.setText(data.getChannelTitle());
+        Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).into(holder.mThumbnail);
     }
 
     @Override

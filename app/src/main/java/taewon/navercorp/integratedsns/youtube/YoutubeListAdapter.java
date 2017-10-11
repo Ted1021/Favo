@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.youtube;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -63,7 +63,11 @@ public class YoutubeListAdapter extends RecyclerView.Adapter<YoutubeListAdapter.
                 case R.id.linearLayout_item:
 
                     position = getLayoutPosition();
-                    Toast.makeText(mContext, mDataset.get(position).getSnippet().getTitle(), Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(mContext, YoutubeDetailActivity.class);
+                    intent.putExtra("CHANNEL_ID", mDataset.get(position).getSnippet().getResourceId().getChannelId());
+                    mContext.startActivity(intent);
+
                     break;
             }
         }
