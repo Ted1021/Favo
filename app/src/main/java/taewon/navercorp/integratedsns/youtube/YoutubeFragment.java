@@ -105,6 +105,7 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
     // check youtube token state
     private void checkToken() {
 
+        // TODO - Token refresh 구현 필요
         String youtubeToken = mPref.getString(getString(R.string.google_token), "");
         if (!youtubeToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
