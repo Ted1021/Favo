@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -68,6 +69,9 @@ public class HomeActivity extends AppCompatActivity
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
+    private Handler mFacebookHandler;
+    private Handler mYoutubeHandler;
+
     private static final int FRAG_COUNT = 4;
 
     // fragment index
@@ -79,6 +83,12 @@ public class HomeActivity extends AppCompatActivity
     // Auth Request Code
     private static final int REQ_FACEBOOK_SIGN_IN = 100;
     private static final int REQ_GOOGLE_SIGN_IN = 101;
+
+    // state check
+    private static boolean isInitLoadFacebook = true;
+    private static boolean isInitLoadYoutube = true;
+
+    private static int REQ_REFRESH = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +131,7 @@ public class HomeActivity extends AppCompatActivity
         // set viewPager action
         mViewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
         mViewPager.setCurrentItem(0);
-//        mViewPager.setOffscreenPageLimit(3);
+//        mViewPager.setOffscreenPageLimit(4);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -217,13 +227,17 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRequestFacebookToken() {
+    public void onRequestFacebookToken(Handler handler) {
         getFacebookToken();
+        isInitLoadFacebook = false;
+        mFacebookHandler = handler;
     }
 
     @Override
-    public void onRequestYoutubeToken() {
+    public void onRequestYoutubeToken(Handler handler) {
         getGoogleToken();
+        isInitLoadYoutube = false;
+        mYoutubeHandler = handler;
     }
 
     private void getFacebookToken() {
@@ -238,6 +252,11 @@ public class HomeActivity extends AppCompatActivity
                 mEditor.putString(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
                 mEditor.commit();
                 Log.d("CHECK_PREF", "Home Activity >>>>" + mPref.getString(getString(R.string.facebook_token), ""));
+
+                if(!isInitLoadFacebook){
+                    mFacebookHandler.sendEmptyMessage(REQ_REFRESH);
+                    isInitLoadFacebook = true;
+                }
             }
 
             @Override
@@ -302,6 +321,10 @@ public class HomeActivity extends AppCompatActivity
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            if(!isInitLoadYoutube){
+                mYoutubeHandler.sendEmptyMessage(REQ_REFRESH);
+                isInitLoadYoutube = true;
+            }
         }
     }
 

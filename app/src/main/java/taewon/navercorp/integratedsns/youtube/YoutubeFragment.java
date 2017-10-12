@@ -4,6 +4,8 @@ package taewon.navercorp.integratedsns.youtube;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,10 +49,13 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
     private YoutubeListAdapter mAdapter;
     private ArrayList<YoutubeSubscriptionData.Item> mDataset = new ArrayList<>();
 
+    private OnRequestYoutubeTokenListener mCallback;
+    private YoutubeHandler mHandler;
+
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
     private static final int MAX_COUNTS = 20;
 
-    private OnRequestYoutubeTokenListener mCallback;
+    private static final int REQ_REFRESH = 100;
 
     @Override
     public void onAttach(Context context) {
@@ -85,6 +90,8 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
         // get preference
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
+
+        mHandler = new YoutubeHandler();
     }
 
     private void initView(View view) {
@@ -135,6 +142,7 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
                 if (response.isSuccessful()) {
 
+                    mDataset.clear();
                     mDataset.addAll(response.body().getItems());
                     mAdapter.notifyDataSetChanged();
 
@@ -158,8 +166,21 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
 
             case R.id.button_connect_youtube:
-                mCallback.onRequestYoutubeToken();
+                mCallback.onRequestYoutubeToken(mHandler);
                 break;
+        }
+    }
+
+    private class YoutubeHandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if(msg.what == REQ_REFRESH){
+                getSubscriptionList();
+                checkToken();
+            }
         }
     }
 }

@@ -34,16 +34,16 @@ public class SplashActivity extends AppCompatActivity {
         }, SPLASH_DISPLAY_LENGTH);
     }
 
-    private void checkTokens(){
+    private void checkTokens() {
 
         SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
 
-        String facebook_token = pref.getString(getString(R.string.facebook_token),"");
-        String google_token = pref.getString(getString(R.string.google_token),"");
+        String facebook_token = pref.getString(getString(R.string.facebook_token), "");
+        String google_token = pref.getString(getString(R.string.google_token), "");
 
         Intent intent;
 
-        if(facebook_token.equals("") && google_token.equals("")){
+        if (facebook_token.equals("") && google_token.equals("")) {
             intent = new Intent(SplashActivity.this, LoginActivity.class);
         } else {
             intent = new Intent(SplashActivity.this, HomeActivity.class);

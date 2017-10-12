@@ -4,6 +4,8 @@ package taewon.navercorp.integratedsns.facebook;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,7 +17,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 
@@ -41,8 +42,6 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
-    private CallbackManager mCallbackManager;
-
     private RecyclerView mFacebookList;
     private RelativeLayout mLayoutDisconnection;
     private Button mConnectFacebook;
@@ -51,6 +50,9 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
     private FacebookListAdapter mAdapter;
 
     private OnRequestFacebookTokenListener mCallback;
+    private FacebookHandler mHandler;
+
+    private static final int REQ_REFRESH = 100;
 
     @Override
     public void onAttach(Context context) {
@@ -85,6 +87,8 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
         // get preference
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
+
+        mHandler = new FacebookHandler();
     }
 
     private void initView(View view) {
@@ -123,6 +127,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
 
+                        mDataset.clear();
                         if (response.getError() == null) {
                             JSONArray data; // article list
                             JSONObject article; // single article
@@ -157,8 +162,21 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
 
             case R.id.button_connect_facebook:
-                mCallback.onRequestFacebookToken();
+                mCallback.onRequestFacebookToken(mHandler);
                 break;
+        }
+    }
+
+    private class FacebookHandler extends Handler {
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if(msg.what == REQ_REFRESH){
+                getFeedList();
+                checkToken();
+            }
         }
     }
 }
