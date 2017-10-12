@@ -96,7 +96,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     private void deleteFacebookToken() {
 
         if (AccessToken.getCurrentAccessToken() != null) {
-
             // call expire facebook token
             LoginManager.getInstance().logOut();
 

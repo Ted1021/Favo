@@ -41,7 +41,7 @@ import taewon.navercorp.integratedsns.home.HomeActivity;
  * @date 2017.09.27
  */
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private Button mFacebookLogin, mGoogleLogin, mInstaLogin;
 
@@ -122,7 +122,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void getFacebookToken() {
 
         mCallbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email", "user_posts"));
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
