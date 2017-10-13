@@ -67,6 +67,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         initData();
         initView();
+
+
     }
 
     private void initData() {
@@ -97,7 +99,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mGoogleLogin = (Button) findViewById(R.id.button_google_login);
         mGoogleLogin.setOnClickListener(this);
 
-        mInstaLogin = (Button) findViewById(R.id.button_insta_login);
+        mInstaLogin = (Button) findViewById(R.id.button_tumblr_login);
         mInstaLogin.setOnClickListener(this);
     }
 
@@ -114,7 +116,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 getGoogleToken();
                 break;
 
-            case R.id.button_insta_login:
+            case R.id.button_tumblr_login:
                 break;
         }
     }

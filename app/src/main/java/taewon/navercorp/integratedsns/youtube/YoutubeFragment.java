@@ -112,7 +112,6 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
     // check youtube token state
     private void checkToken() {
 
-        // TODO - Token refresh 구현 필요
         String youtubeToken = mPref.getString(getString(R.string.google_token), "");
         if (!youtubeToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
@@ -147,8 +146,12 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
                     mAdapter.notifyDataSetChanged();
 
                 } else {
-                    Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to get json from youtube" + response.toString());
-                    Toast.makeText(getContext(), "Fail to get json data from youtube", Toast.LENGTH_SHORT).show();
+                    Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
+
+                    // TODO - Google Token Refresh 로직이 구현되기 전까지의 임시방편...
+                    mEditor.putString(getString(R.string.google_token), "");
+                    mEditor.commit();
+                    checkToken();
                 }
             }
 

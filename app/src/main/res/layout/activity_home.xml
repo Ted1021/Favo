@@ -45,8 +45,8 @@
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/instgram_icon"
-            android:text="Instagram" />
+            android:icon="@drawable/tumblr_icon"
+            android:text="Tumblr" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/tabItem"

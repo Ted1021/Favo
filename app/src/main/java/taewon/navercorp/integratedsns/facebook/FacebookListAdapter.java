@@ -87,7 +87,7 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
         } catch (Exception e) {
 
             e.printStackTrace();
-            Log.e("ERROR_FACEBOOK", "Facebook List Adapter >>>>> fail to load json object");
+            Log.e("ERROR_FACEBOOK", "Facebook List Adapter >>>>> fail to load json object "+position);
         }
     }
 
@@ -97,3 +97,4 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
         return mDataset.size();
     }
 }
+

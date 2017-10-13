@@ -40,7 +40,7 @@ import java.util.Arrays;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.facebook.FacebookFragment;
 import taewon.navercorp.integratedsns.facebook.OnRequestFacebookTokenListener;
-import taewon.navercorp.integratedsns.instagram.InstagramFragment;
+import taewon.navercorp.integratedsns.tumblr.TumblrFragment;
 import taewon.navercorp.integratedsns.settings.SettingsFragment;
 import taewon.navercorp.integratedsns.youtube.OnRequestYoutubeTokenListener;
 import taewon.navercorp.integratedsns.youtube.YoutubeFragment;
@@ -77,7 +77,7 @@ public class HomeActivity extends AppCompatActivity
     // fragment index
     private static final int TAB_FACEBOOK = 0;
     private static final int TAB_YOUTUBE = 1;
-    private static final int TAB_INSTA = 2;
+    private static final int TAB_TUMBLR = 2;
     private static final int TAB_SETTINGS = 3;
 
     // Auth Request Code
@@ -163,8 +163,8 @@ public class HomeActivity extends AppCompatActivity
                         tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.youtube_color), PorterDuff.Mode.SRC_IN);
                         break;
 
-                    case TAB_INSTA:
-                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.insta_color), PorterDuff.Mode.SRC_IN);
+                    case TAB_TUMBLR:
+                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.tumblr_color), PorterDuff.Mode.SRC_IN);
                         break;
 
                     case TAB_SETTINGS:
@@ -209,8 +209,8 @@ public class HomeActivity extends AppCompatActivity
                     fragment = new YoutubeFragment();
                     break;
 
-                case TAB_INSTA:
-                    fragment = new InstagramFragment();
+                case TAB_TUMBLR:
+                    fragment = new TumblrFragment();
                     break;
 
                 case TAB_SETTINGS:
