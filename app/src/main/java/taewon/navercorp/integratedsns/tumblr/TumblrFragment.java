@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+import com.tumblr.jumblr.JumblrClient;
+
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
@@ -38,6 +40,8 @@ public class TumblrFragment extends Fragment implements View.OnClickListener, Sw
     private RelativeLayout mLayoutDisconnection;
     private Button mConnectTumblr;
 
+    private JumblrClient mClient;
+
     public TumblrFragment() {
     }
 
@@ -49,6 +53,7 @@ public class TumblrFragment extends Fragment implements View.OnClickListener, Sw
 
         initData();
         initView(view);
+        checkToken();
 
         return view;
     }
@@ -57,6 +62,8 @@ public class TumblrFragment extends Fragment implements View.OnClickListener, Sw
 
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
+
+        mClient = new JumblrClient(getString(R.string.tumblr_consumer_key), getString(R.string.tumblr_consumer_secret));
     }
 
     private void initView(View view){
@@ -74,6 +81,22 @@ public class TumblrFragment extends Fragment implements View.OnClickListener, Sw
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(layoutManager);
+    }
+
+    private void checkToken() {
+
+        String facebookToken = mPref.getString(getString(R.string.tumblr_token), "");
+        if (!facebookToken.equals("")) {
+            mLayoutDisconnection.setVisibility(View.GONE);
+            getTumblrDashboard();
+
+        } else {
+            mLayoutDisconnection.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void getTumblrDashboard() {
+
     }
 
     @Override

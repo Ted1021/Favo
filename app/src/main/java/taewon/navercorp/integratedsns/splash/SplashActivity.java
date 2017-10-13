@@ -38,12 +38,13 @@ public class SplashActivity extends AppCompatActivity {
 
         SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
 
-        String facebook_token = pref.getString(getString(R.string.facebook_token), "");
-        String google_token = pref.getString(getString(R.string.google_token), "");
+        String facebookToken = pref.getString(getString(R.string.facebook_token), "");
+        String googleToken = pref.getString(getString(R.string.google_token), "");
+        String tumblrToken = pref.getString(getString(R.string.tumblr_token), "");
 
         Intent intent;
 
-        if (facebook_token.equals("") && google_token.equals("")) {
+        if (facebookToken.equals("") && googleToken.equals("") && tumblrToken.equals("")) {
             intent = new Intent(SplashActivity.this, LoginActivity.class);
         } else {
             intent = new Intent(SplashActivity.this, HomeActivity.class);

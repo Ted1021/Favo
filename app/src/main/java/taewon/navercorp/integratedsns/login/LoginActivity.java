@@ -223,7 +223,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         protected void onPreExecute() {
             super.onPreExecute();
 
-
+            // TODO - making Progress dial here
         }
 
         @Override
@@ -232,17 +232,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             try {
                 mAuthUrl = mProvider.retrieveRequestToken(mConsumer, getString(R.string.tumblr_callback_url));
                 String token = Uri.parse(mAuthUrl).getQueryParameter("oauth_token");
-                Log.d("CHECK_TOKEN", "Login Activity >>>>> check tumblr token init " + token);
+                String verifier = Uri.parse(mAuthUrl).getQueryParameter("oauth_verifier");
+                Log.d("CHECK_TOKEN", "Login Activity >>>>> check tumblr token init " + verifier);
 
-                // get authorization first
-                if(TextUtils.isEmpty(token)){
-                    Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(mAuthUrl));
-                    startActivityForResult(intent, REQ_TUMBLR_SIGN_IN);
-                }
-                // not first time get
-                else {
-                    tumblrSignInResult();
-                }
+                Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(mAuthUrl));
+                startActivityForResult(intent, REQ_TUMBLR_SIGN_IN);
+
+//                // get authorization first
+//                if(TextUtils.isEmpty(token)){
+//                    Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(mAuthUrl));
+//                    startActivityForResult(intent, REQ_TUMBLR_SIGN_IN);
+//                }
+//                // not first time get
+//                else {
+//                    tumblrSignInResult();
+//                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -296,12 +300,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void tumblrSignInResult() {
 
         String token = Uri.parse(mAuthUrl).getQueryParameter("oauth_token");
+        String verifier = Uri.parse(mAuthUrl).getQueryParameter("oauth_verifier");
         Log.d("CHECK_TOKEN", "Login Activity >>>>> check tumblr token callback " + token);
+        Log.d("CHECK_TOKEN", "Login Activity >>>>> check tumblr token callback " + verifier);
 
         // Authorization is success
         if (!TextUtils.isEmpty(token)) {
 
             mEditor.putString(getString(R.string.tumblr_token), token);
+            mEditor.putString(getString(R.string.tumblr_token_secret), verifier);
+
             mEditor.commit();
 
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);

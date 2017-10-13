@@ -112,18 +112,20 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
     private void deleteGoogleToken() {
 
-        // call expire google token
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
-            @Override
-            public void onResult(@NonNull Status status) {
+        if (!mPref.getString(getString(R.string.google_token), "").equals("")) {
+            // call expire google token
+            Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+                @Override
+                public void onResult(@NonNull Status status) {
 
-                // delete google token
-                mEditor.putString(getString(R.string.google_token), "");
-                mEditor.commit();
+                    // delete google token
+                    mEditor.putString(getString(R.string.google_token), "");
+                    mEditor.commit();
 
-                Toast.makeText(getContext(), "disconnect google successfully!!", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    Toast.makeText(getContext(), "disconnect google successfully!!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void deleteTumblrToken() {
@@ -135,10 +137,11 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
     // check remained token
     private void checkTokens() {
 
-        String facebook_token = mPref.getString(getString(R.string.facebook_token), "");
-        String google_token = mPref.getString(getString(R.string.google_token), "");
+        String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
+        String googleToken = mPref.getString(getString(R.string.google_token), "");
+        String tumblrToken = mPref.getString(getString(R.string.tumblr_token), "");
 
-        if (facebook_token.equals("") && google_token.equals("")) {
+        if (facebookToken.equals("") && googleToken.equals("") && tumblrToken.equals("")) {
 
             // call Login Activity
             Intent intent = new Intent(getActivity(), LoginActivity.class);

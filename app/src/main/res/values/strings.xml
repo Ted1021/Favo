@@ -16,6 +16,7 @@
     <string name="tumblr_access_token_url">https://www.tumblr.com/oauth/access_token</string>
     <string name="tumblr_callback_url">tumblrdemo://tumblrdemo.com/ok</string>
     <string name="tumblr_token">tumblr_token</string>
+    <string name="tumblr_token_secret">tumblr_token_secret</string>
 
     <string name="facebook_login_fail">페이스북 로그인에 실패 하였습니다.</string>
     <string name="google_login_fail">구글 로그인에 실패 하였습니다.</string>
