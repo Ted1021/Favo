@@ -41,7 +41,6 @@ public class TumblrFragment extends Fragment implements View.OnClickListener, Sw
     public TumblrFragment() {
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

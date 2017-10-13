@@ -72,7 +72,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
         mGoogleLogout = (Button) view.findViewById(R.id.button_google_logout);
         mGoogleLogout.setOnClickListener(this);
 
-        mInstaLogout = (Button) view.findViewById(R.id.button_insta_logout);
+        mInstaLogout = (Button) view.findViewById(R.id.button_tumblr_logout);
         mInstaLogout.setOnClickListener(this);
     }
 
@@ -83,14 +83,17 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
             case R.id.button_fb_logout:
                 deleteFacebookToken();
-                checkTokens();
                 break;
 
             case R.id.button_google_logout:
                 deleteGoogleToken();
-                checkTokens();
+                break;
+
+            case R.id.button_tumblr_logout:
+                deleteTumblrToken();
                 break;
         }
+        checkTokens();
     }
 
     private void deleteFacebookToken() {
@@ -121,6 +124,12 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
                 Toast.makeText(getContext(), "disconnect google successfully!!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void deleteTumblrToken() {
+
+        mEditor.putString(getString(R.string.tumblr_token), "");
+        mEditor.commit();
     }
 
     // check remained token

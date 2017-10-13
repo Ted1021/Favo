@@ -5,20 +5,20 @@
     tools:context="taewon.navercorp.integratedsns.settings.SettingsFragment">
 
     <Button
-        android:id="@+id/button_insta_logout"
+        android:id="@+id/button_tumblr_logout"
         android:layout_width="200dp"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="100dp"
         android:layout_marginTop="4dp"
-        android:text="Logout Instagram" />
+        android:text="Logout Tumblr" />
 
     <Button
         android:id="@+id/button_google_logout"
         android:layout_width="200dp"
         android:layout_height="40dp"
-        android:layout_above="@+id/button_insta_logout"
+        android:layout_above="@+id/button_tumblr_logout"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="4dp"
         android:text="Logout Google" />
@@ -30,6 +30,5 @@
         android:layout_above="@+id/button_google_logout"
         android:layout_centerHorizontal="true"
         android:text="Logout Facebook" />
-
 
 </RelativeLayout>

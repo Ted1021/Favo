@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,6 +33,8 @@ import com.google.api.services.youtube.YouTubeScopes;
 import java.io.IOException;
 import java.util.Arrays;
 
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
+import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 
@@ -44,7 +47,7 @@ import taewon.navercorp.integratedsns.home.HomeActivity;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
-    private Button mFacebookLogin, mGoogleLogin, mInstaLogin;
+    private Button mFacebookLogin, mGoogleLogin, mTumblrLogin;
 
     // Auth for facebook
     private CallbackManager mCallbackManager;
@@ -52,6 +55,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // Auth for google (Youtube)
     private GoogleApiClient mGoogleApiClient;
     private static final String[] SCOPES = {YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBEPARTNER};
+
+    // Auth for tumblr
+    private CommonsHttpOAuthConsumer mConsumer;
+    private CommonsHttpOAuthProvider mProvider;
+    private String mAuthUrl;
 
     // Auth Request Code
     private static final int REQ_FACEBOOK_SIGN_IN = 100;
@@ -86,6 +94,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
+        // init tumblr client
+        mConsumer = new CommonsHttpOAuthConsumer(
+                getString(R.string.tumblr_consumer_key),
+                getString(R.string.tumblr_consumer_secret));
+
+        mProvider = new CommonsHttpOAuthProvider(
+                getString(R.string.tumblr_request_token_url),
+                getString(R.string.tumblr_access_token_url),
+                getString(R.string.tumblr_authorize_url));
+
         // init Preference
         mPref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
@@ -99,8 +117,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         mGoogleLogin = (Button) findViewById(R.id.button_google_login);
         mGoogleLogin.setOnClickListener(this);
 
-        mInstaLogin = (Button) findViewById(R.id.button_tumblr_login);
-        mInstaLogin.setOnClickListener(this);
+        mTumblrLogin = (Button) findViewById(R.id.button_tumblr_login);
+        mTumblrLogin.setOnClickListener(this);
     }
 
     @Override
@@ -160,29 +178,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     // request call oAuth logic
     private void getTumblrToken() {
-
-        Uri uri = this.getIntent().getData();
-        if (uri != null) {
-
-            String token = uri.getQueryParameter("oauth_token");
-            String verifier = uri.getQueryParameter("oauth_verifier");
-        } else {
-
-        }
-    }
-
-    // google auth callback method
-    private void handleSignInResult(GoogleSignInResult result) {
-
-        if (result.isSuccess()) {
-            // have to call 'getToken' in working thread
-            GoogleSignInAccount account = result.getSignInAccount();
-            new GetGoogleTokenAsync().execute(account.getAccount());
-
-        } else {
-            Log.d("ERROR_LOGIN", "Login Activity >>>>> fail to get google Account");
-            Toast.makeText(LoginActivity.this, getString(R.string.google_login_fail), Toast.LENGTH_SHORT).show();
-        }
+        new GetTumblrTokenAsync().execute();
     }
 
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
@@ -221,6 +217,48 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    private class GetTumblrTokenAsync extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            try {
+                mAuthUrl = mProvider.retrieveRequestToken(mConsumer, getString(R.string.tumblr_callback_url));
+                String token = Uri.parse(mAuthUrl).getQueryParameter("oauth_token");
+                Log.d("CHECK_TOKEN", "Login Activity >>>>> check tumblr token init " + token);
+
+                // get authorization first
+                if(TextUtils.isEmpty(token)){
+                    Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(mAuthUrl));
+                    startActivityForResult(intent, REQ_TUMBLR_SIGN_IN);
+                }
+                // not first time get
+                else {
+                    tumblrSignInResult();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("ERROR_TUMBLR", "Login Activity >>>>> fail to get access token");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -228,12 +266,52 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // google login
         if (requestCode == REQ_GOOGLE_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
+            googleSignInResult(result);
         }
-
+        // tumblr login
+        else if (requestCode == REQ_TUMBLR_SIGN_IN) {
+            tumblrSignInResult();
+        }
         // facebook login
         else {
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    // google auth callback method
+    private void googleSignInResult(GoogleSignInResult result) {
+
+        if (result.isSuccess()) {
+            // have to call 'getToken' in working thread
+            GoogleSignInAccount account = result.getSignInAccount();
+            new GetGoogleTokenAsync().execute(account.getAccount());
+
+        } else {
+            Log.d("ERROR_LOGIN", "Login Activity >>>>> fail to get google Account");
+            Toast.makeText(LoginActivity.this, getString(R.string.google_login_fail), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // tumblr auth callback method
+    private void tumblrSignInResult() {
+
+        String token = Uri.parse(mAuthUrl).getQueryParameter("oauth_token");
+        Log.d("CHECK_TOKEN", "Login Activity >>>>> check tumblr token callback " + token);
+
+        // Authorization is success
+        if (!TextUtils.isEmpty(token)) {
+
+            mEditor.putString(getString(R.string.tumblr_token), token);
+            mEditor.commit();
+
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(intent);
+            LoginActivity.this.finish();
+        }
+        // Authorization is fail
+        else {
+            Log.d("ERROR_LOGIN", "Login Activity >>>>> fail to get tumblr Account");
+            Toast.makeText(LoginActivity.this, getString(R.string.tumblr_login_fail), Toast.LENGTH_SHORT).show();
         }
     }
 
