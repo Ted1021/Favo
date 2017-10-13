@@ -9,6 +9,13 @@
     <string name="google_token">google_token</string>
     <string name="google_user_email">google_user_email</string>
 
+    <string name="tumblr_consumer_key">kw20SHp5wVloEPAPQKS7jD1ueQVtlDxH4W6u8EJOp5er02wS27</string>
+    <string name="tumblr_consumer_secret">hxZgQfuMeWssSWOqRtV6qDQiMgXIEbQzfw9AnxGBvMxFA3Nubn</string>
+    <string name="tumblr_request_token_url">https://www.tumblr.com/oauth/request_token</string>
+    <string name="tumblr_authorize_url">https://www.tumblr.com/oauth/authorize</string>
+    <string name="tumblr_access_token_url">https://www.tumblr.com/oauth/access_token</string>
+    <string name="tumblr_callback_url">tumblrdemo://tumblrdemo.com/ok</string>
+
     <string name="facebook_login_fail">페이스북 로그인에 실패 하였습니다.</string>
     <string name="google_login_fail">구글 로그인에 실패 하였습니다.</string>
 

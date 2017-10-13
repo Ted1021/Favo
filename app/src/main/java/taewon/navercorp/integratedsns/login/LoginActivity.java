@@ -3,6 +3,7 @@ package taewon.navercorp.integratedsns.login;
 import android.accounts.Account;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -55,6 +56,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // Auth Request Code
     private static final int REQ_FACEBOOK_SIGN_IN = 100;
     private static final int REQ_GOOGLE_SIGN_IN = 101;
+    private static final int REQ_TUMBLR_SIGN_IN = 102;
 
     // managing tokens
     private SharedPreferences mPref;
@@ -67,8 +69,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         initData();
         initView();
-
-
     }
 
     private void initData() {
@@ -117,6 +117,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.button_tumblr_login:
+                getTumblrToken();
                 break;
         }
     }
@@ -155,6 +156,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         Intent intent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(intent, REQ_GOOGLE_SIGN_IN);
+    }
+
+    // request call oAuth logic
+    private void getTumblrToken() {
+
+        Uri uri = this.getIntent().getData();
+        if (uri != null) {
+
+            String token = uri.getQueryParameter("oauth_token");
+            String verifier = uri.getQueryParameter("oauth_verifier");
+        } else {
+
+        }
     }
 
     // google auth callback method

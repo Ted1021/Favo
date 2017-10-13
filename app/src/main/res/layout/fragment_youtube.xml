@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context="taewon.navercorp.integratedsns.youtube.YoutubeFragment">
 
@@ -15,10 +15,10 @@
             android:id="@+id/imageView"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            app:srcCompat="@drawable/ic_disconnection"
             android:layout_above="@+id/textView"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="11dp" />
+            android:layout_marginBottom="11dp"
+            app:srcCompat="@drawable/ic_disconnection" />
 
         <TextView
             android:id="@+id/textView"
@@ -42,8 +42,16 @@
             android:textStyle="bold|italic" />
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView_youtube"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView_youtube"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 </LinearLayout>

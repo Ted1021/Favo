@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.model.FacebookFeedData;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -37,20 +39,21 @@ import static android.content.Context.MODE_PRIVATE;
  * @date 2017.09.28
  */
 
-public class FacebookFragment extends Fragment implements View.OnClickListener {
+public class FacebookFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
     private RecyclerView mFacebookList;
-    private RelativeLayout mLayoutDisconnection;
-    private Button mConnectFacebook;
-
-    private ArrayList<JSONObject> mDataset = new ArrayList<>();
+    private ArrayList<FacebookFeedData> mDataset = new ArrayList<>();
     private FacebookListAdapter mAdapter;
 
     private OnRequestFacebookTokenListener mCallback;
     private FacebookHandler mHandler;
+
+    private SwipeRefreshLayout mRefreshLayout;
+    private RelativeLayout mLayoutDisconnection;
+    private Button mConnectFacebook;
 
     private static final int REQ_REFRESH = 100;
 
@@ -93,6 +96,9 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
 
     private void initView(View view) {
 
+        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
+        mRefreshLayout.setOnRefreshListener(this);
+
         // view for disconnection
         mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
         mConnectFacebook = (Button) view.findViewById(R.id.button_connect_facebook);
@@ -129,14 +135,27 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
 
                         mDataset.clear();
                         if (response.getError() == null) {
-                            JSONArray data; // article list
+
+                            JSONArray result; // article list
                             JSONObject article; // single article
 
                             try {
-                                data = response.getJSONObject().getJSONObject("posts").getJSONArray("data");
-                                for (int i = 0; i < data.length(); i++) {
-                                    article = data.getJSONObject(i);
-                                    mDataset.add(article);
+                                result = response.getJSONObject().getJSONObject("posts").getJSONArray("data");
+
+                                for (int i = 0; i < result.length(); i++) {
+
+                                    article = result.getJSONObject(i);
+                                    FacebookFeedData data = new FacebookFeedData();
+
+                                    // TODO - gson converter 를 써야 ......
+                                    if (!article.has("name")) {continue;}
+                                    data.setName(article.getString("name"));
+                                    if (article.has("description")) {data.setDescription(article.getString("description"));}
+                                    if (article.has("created_time")) {data.setUpload_time(article.getString("created_time"));}
+                                    if (article.has("full_picture")) {data.setPicture(article.getString("full_picture"));}
+                                    if (article.has("source")) {data.setVideo(article.getString("source"));}
+
+                                    mDataset.add(data);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -144,9 +163,11 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
                             }
 
                         } else {
+                            checkToken();
                             Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>> fail to connect facebook server" + response.getError().getErrorMessage());
                         }
                         mAdapter.notifyDataSetChanged();
+                        mRefreshLayout.setRefreshing(false);
                     }
                 });
 
@@ -167,13 +188,18 @@ public class FacebookFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onRefresh() {
+        getFeedList();
+    }
+
     private class FacebookHandler extends Handler {
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            if(msg.what == REQ_REFRESH){
+            if (msg.what == REQ_REFRESH) {
                 getFeedList();
                 checkToken();
             }

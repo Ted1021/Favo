@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -37,20 +38,21 @@ import static android.content.Context.MODE_PRIVATE;
  * @date 2017.10.07
  */
 
-public class YoutubeFragment extends Fragment implements View.OnClickListener {
+public class YoutubeFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
     private RecyclerView mYoutubeList;
-    private RelativeLayout mLayoutDisconnection;
-    private Button mConnectYoutube;
-
     private YoutubeListAdapter mAdapter;
     private ArrayList<YoutubeSubscriptionData.Item> mDataset = new ArrayList<>();
 
     private OnRequestYoutubeTokenListener mCallback;
     private YoutubeHandler mHandler;
+
+    private SwipeRefreshLayout mRefreshLayout;
+    private RelativeLayout mLayoutDisconnection;
+    private Button mConnectYoutube;
 
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
     private static final int MAX_COUNTS = 20;
@@ -95,6 +97,15 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void initView(View view) {
+
+        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
+        mRefreshLayout.setOnRefreshListener(this);
+        mRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light
+        );
 
         // view for disconnection
         mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
@@ -145,6 +156,7 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
                     mDataset.addAll(response.body().getItems());
                     mAdapter.notifyDataSetChanged();
 
+
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
 
@@ -153,6 +165,7 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
                     mEditor.commit();
                     checkToken();
                 }
+                mRefreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -172,6 +185,11 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener {
                 mCallback.onRequestYoutubeToken(mHandler);
                 break;
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        getSubscriptionList();
     }
 
     private class YoutubeHandler extends Handler {

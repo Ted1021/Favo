@@ -13,6 +13,7 @@ public class FacebookFeedData {
     private String upload_time;
     private String description;
     private String picture;
+    private String video;
 
     public String getName() {
         return name;
@@ -44,5 +45,13 @@ public class FacebookFeedData {
 
     public void setPicture(String picture) {
         this.picture = picture;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
     }
 }

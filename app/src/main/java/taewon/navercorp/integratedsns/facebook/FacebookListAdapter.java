@@ -13,11 +13,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.model.FacebookFeedData;
 
 /**
  * @author 김태원
@@ -29,10 +28,10 @@ import taewon.navercorp.integratedsns.R;
 public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapter.ViewHolder> implements View.OnClickListener {
 
     private Context mContext;
-    private ArrayList<JSONObject> mDataset = new ArrayList<>();
+    private ArrayList<FacebookFeedData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
-    public FacebookListAdapter(Context context, ArrayList<JSONObject> dataset) {
+    public FacebookListAdapter(Context context, ArrayList<FacebookFeedData> dataset) {
 
         mContext = context;
         mDataset = dataset;
@@ -76,13 +75,13 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        JSONObject data = mDataset.get(position);
+        FacebookFeedData data = mDataset.get(position);
 
         try {
-            holder.mUserName.setText(data.getString("name"));
-            holder.mUploadTime.setText(data.getString("created_time"));
-            holder.mDescription.setText(data.getString("description"));
-            Glide.with(mContext).load(data.getString("full_picture")).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+            holder.mUserName.setText(data.getName());
+            holder.mUploadTime.setText(data.getUpload_time());
+            holder.mDescription.setText(data.getDescription());
+            Glide.with(mContext).load(data.getPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
 
         } catch (Exception e) {
 
