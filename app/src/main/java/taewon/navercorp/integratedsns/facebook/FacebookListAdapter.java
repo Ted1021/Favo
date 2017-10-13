@@ -1,7 +1,10 @@
 package taewon.navercorp.integratedsns.facebook;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +28,7 @@ import taewon.navercorp.integratedsns.model.FacebookFeedData;
  * @date 2017.09.29
  */
 
-public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapter.ViewHolder> implements View.OnClickListener {
+public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapter.ViewHolder> {
 
     private Context mContext;
     private ArrayList<FacebookFeedData> mDataset = new ArrayList<>();
@@ -38,7 +41,7 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mUserName, mUploadTime, mDescription;
         private ImageView mProfile, mPicture;
@@ -53,16 +56,35 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
 
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
+            mPicture.setOnClickListener(this);
 
             mLike = (Button) itemView.findViewById(R.id.button_like);
             mComment = (Button) itemView.findViewById(R.id.button_comment);
             mShare = (Button) itemView.findViewById(R.id.button_share);
         }
+
+        @Override
+        public void onClick(View v) {
+
+            int position = getLayoutPosition();
+            switch (v.getId()) {
+
+                case R.id.imageView_picture:
+                    loadVideo((mDataset.get(position).getVideo()));
+                    break;
+            }
+        }
     }
 
-    @Override
-    public void onClick(View v) {
+    private void loadVideo(String videoUrl) {
 
+        if(TextUtils.isEmpty(videoUrl)){
+            return;
+        }
+        Uri uri = Uri.parse(videoUrl);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(uri, "video/*");
+        mContext.startActivity(intent);
     }
 
     @Override
@@ -86,7 +108,7 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
         } catch (Exception e) {
 
             e.printStackTrace();
-            Log.e("ERROR_FACEBOOK", "Facebook List Adapter >>>>> fail to load json object "+position);
+            Log.e("ERROR_FACEBOOK", "Facebook List Adapter >>>>> fail to load json object " + position);
         }
     }
 

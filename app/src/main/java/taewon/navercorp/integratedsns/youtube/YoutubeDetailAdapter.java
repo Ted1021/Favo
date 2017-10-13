@@ -57,11 +57,10 @@ public class YoutubeDetailAdapter extends RecyclerView.Adapter<YoutubeDetailAdap
         @Override
         public void onClick(View v) {
 
-            int position;
+            int position = getLayoutPosition();;
             switch (v.getId()) {
 
                 case R.id.linearLayout_item:
-                    position = getLayoutPosition();
 
                     String channelId = mDataset.get(position).getSnippet().getChannelId();
                     String channelTitle = mDataset.get(position).getSnippet().getChannelTitle();
