@@ -38,7 +38,16 @@
 
         <activity
             android:name=".login.LoginActivity"
-            android:configChanges="orientation|screenSize|keyboard" />
+            android:configChanges="orientation|screenSize|keyboard" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="pdk4928301781867311512" />
+            </intent-filter>
+
+        </activity>
         <activity
             android:name=".home.HomeActivity"
             android:configChanges="orientation|screenSize|keyboard" />

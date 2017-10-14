@@ -3,12 +3,10 @@ package taewon.navercorp.integratedsns.login;
 import android.accounts.Account;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,12 +27,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.youtube.YouTubeScopes;
+import com.pinterest.android.pdk.PDKCallback;
+import com.pinterest.android.pdk.PDKClient;
+import com.pinterest.android.pdk.PDKException;
+import com.pinterest.android.pdk.PDKResponse;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
-import oauth.signpost.commonshttp.CommonsHttpOAuthProvider;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 
@@ -45,7 +45,8 @@ import taewon.navercorp.integratedsns.home.HomeActivity;
  * @date 2017.09.27
  */
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class LoginActivity extends AppCompatActivity
+        implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     private Button mFacebookLogin, mGoogleLogin, mTumblrLogin;
 
@@ -54,17 +55,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     // Auth for google (Youtube)
     private GoogleApiClient mGoogleApiClient;
-    private static final String[] SCOPES = {YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBEPARTNER};
+    private static final String[] GOOGLE_SCOPES = {
+            YouTubeScopes.YOUTUBE_READONLY,
+            YouTubeScopes.YOUTUBE_READONLY,
+            YouTubeScopes.YOUTUBEPARTNER};
 
-    // Auth for tumblr
-    private CommonsHttpOAuthConsumer mConsumer;
-    private CommonsHttpOAuthProvider mProvider;
-    private String mAuthUrl;
+    // Auth for pinterest
+    private PDKClient mPinterestClient;
+    private static final String[] PINTEREST_SCOPE = {
+            PDKClient.PDKCLIENT_PERMISSION_READ_PUBLIC,
+            PDKClient.PDKCLIENT_PERMISSION_WRITE_PUBLIC,
+            PDKClient.PDKCLIENT_PERMISSION_READ_RELATIONSHIPS,
+            PDKClient.PDKCLIENT_PERMISSION_WRITE_RELATIONSHIPS
+    };
 
     // Auth Request Code
     private static final int REQ_FACEBOOK_SIGN_IN = 100;
     private static final int REQ_GOOGLE_SIGN_IN = 101;
-    private static final int REQ_TUMBLR_SIGN_IN = 102;
+    private static final int REQ_PINTEREST_SIGN_IN = 8772;
 
     // managing tokens
     private SharedPreferences mPref;
@@ -81,8 +89,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void initData() {
 
+        // init Preference
+        mPref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mEditor = mPref.edit();
+
         // init google client
-        // 여기서 Scope 를 지정하는것이 매우 중요!
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.google_client_id))
                 .requestScopes(new Scope(YouTubeScopes.YOUTUBE), new Scope(YouTubeScopes.YOUTUBE_READONLY), new Scope(YouTubeScopes.YOUTUBEPARTNER))
@@ -94,19 +105,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        // init tumblr client
-        mConsumer = new CommonsHttpOAuthConsumer(
-                getString(R.string.tumblr_consumer_key),
-                getString(R.string.tumblr_consumer_secret));
-
-        mProvider = new CommonsHttpOAuthProvider(
-                getString(R.string.tumblr_request_token_url),
-                getString(R.string.tumblr_access_token_url),
-                getString(R.string.tumblr_authorize_url));
-
-        // init Preference
-        mPref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        mEditor = mPref.edit();
+        // init pinterest client
+        mPinterestClient = PDKClient.configureInstance(this, getString(R.string.pinterest_app_id));
+        mPinterestClient.onConnect(LoginActivity.this);
     }
 
     private void initView() {
@@ -135,11 +136,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.button_tumblr_login:
-                getTumblrToken();
+                getPinterestToken();
                 break;
         }
     }
 
+    // request facebook token
     private void getFacebookToken() {
 
         mCallbackManager = CallbackManager.Factory.create();
@@ -170,15 +172,34 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
+    // request google token
     private void getGoogleToken() {
 
         Intent intent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(intent, REQ_GOOGLE_SIGN_IN);
     }
 
-    // request call oAuth logic
-    private void getTumblrToken() {
-        new GetTumblrTokenAsync().execute();
+    // request pinterest token
+    private void getPinterestToken() {
+
+        mPinterestClient.login(this, Arrays.asList(PINTEREST_SCOPE), new PDKCallback() {
+            @Override
+            public void onSuccess(PDKResponse response) {
+                mEditor.putString(getString(R.string.pinterest_token), response.getUser().getUid());
+                mEditor.commit();
+                Log.d("CHECK_TOKEN","Login activity >>>>> "+response.getUser().getUid());
+
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                startActivity(intent);
+                LoginActivity.this.finish();
+            }
+
+            @Override
+            public void onFailure(PDKException exception) {
+                Log.e("ERROR_LOGIN", exception.getDetailMessage());
+            }
+        });
+
     }
 
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
@@ -187,7 +208,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         protected Void doInBackground(Account... params) {
 
             // get credential info from google account
-            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES));
+            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(GOOGLE_SCOPES));
             credential.setSelectedAccount(params[0]);
 
             // set google preference
@@ -217,71 +238,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private class GetTumblrTokenAsync extends AsyncTask<Void, Void, Void>{
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            // TODO - making Progress dial here
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-
-            try {
-                mAuthUrl = mProvider.retrieveRequestToken(mConsumer, getString(R.string.tumblr_callback_url));
-                String token = Uri.parse(mAuthUrl).getQueryParameter("oauth_token");
-                String verifier = Uri.parse(mAuthUrl).getQueryParameter("oauth_verifier");
-                Log.d("CHECK_TOKEN", "Login Activity >>>>> check tumblr token init " + verifier);
-
-                Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(mAuthUrl));
-                startActivityForResult(intent, REQ_TUMBLR_SIGN_IN);
-
-//                // get authorization first
-//                if(TextUtils.isEmpty(token)){
-//                    Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(mAuthUrl));
-//                    startActivityForResult(intent, REQ_TUMBLR_SIGN_IN);
-//                }
-//                // not first time get
-//                else {
-//                    tumblrSignInResult();
-//                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e("ERROR_TUMBLR", "Login Activity >>>>> fail to get access token");
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // google login
-        if (requestCode == REQ_GOOGLE_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            googleSignInResult(result);
-        }
-        // tumblr login
-        else if (requestCode == REQ_TUMBLR_SIGN_IN) {
-            tumblrSignInResult();
-        }
-        // facebook login
-        else {
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
     // google auth callback method
     private void googleSignInResult(GoogleSignInResult result) {
 
@@ -296,35 +252,28 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    // tumblr auth callback method
-    private void tumblrSignInResult() {
-
-        String token = Uri.parse(mAuthUrl).getQueryParameter("oauth_token");
-        String verifier = Uri.parse(mAuthUrl).getQueryParameter("oauth_verifier");
-        Log.d("CHECK_TOKEN", "Login Activity >>>>> check tumblr token callback " + token);
-        Log.d("CHECK_TOKEN", "Login Activity >>>>> check tumblr token callback " + verifier);
-
-        // Authorization is success
-        if (!TextUtils.isEmpty(token)) {
-
-            mEditor.putString(getString(R.string.tumblr_token), token);
-            mEditor.putString(getString(R.string.tumblr_token_secret), verifier);
-
-            mEditor.commit();
-
-            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-            startActivity(intent);
-            LoginActivity.this.finish();
-        }
-        // Authorization is fail
-        else {
-            Log.d("ERROR_LOGIN", "Login Activity >>>>> fail to get tumblr Account");
-            Toast.makeText(LoginActivity.this, getString(R.string.tumblr_login_fail), Toast.LENGTH_SHORT).show();
-        }
-    }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e("ERROR_LOGIN", "Login Activity >>>>> " + connectionResult.getErrorMessage());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // google login activity result
+        if (requestCode == REQ_GOOGLE_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            googleSignInResult(result);
+        }
+
+        // pinterest login activity result
+        else if (requestCode == REQ_PINTEREST_SIGN_IN) {
+            mPinterestClient.onOauthResponse(requestCode, resultCode, data);
+        }
+        // facebook login activity result
+        else {
+            mCallbackManager.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

@@ -40,7 +40,7 @@ import java.util.Arrays;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.facebook.FacebookFragment;
 import taewon.navercorp.integratedsns.facebook.OnRequestFacebookTokenListener;
-import taewon.navercorp.integratedsns.tumblr.TumblrFragment;
+import taewon.navercorp.integratedsns.pinterest.PinterestFragment;
 import taewon.navercorp.integratedsns.settings.SettingsFragment;
 import taewon.navercorp.integratedsns.youtube.OnRequestYoutubeTokenListener;
 import taewon.navercorp.integratedsns.youtube.YoutubeFragment;
@@ -210,7 +210,7 @@ public class HomeActivity extends AppCompatActivity
                     break;
 
                 case TAB_TUMBLR:
-                    fragment = new TumblrFragment();
+                    fragment = new PinterestFragment();
                     break;
 
                 case TAB_SETTINGS:

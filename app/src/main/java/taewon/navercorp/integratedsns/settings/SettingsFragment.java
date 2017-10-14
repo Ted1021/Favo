@@ -130,7 +130,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
     private void deleteTumblrToken() {
 
-        mEditor.putString(getString(R.string.tumblr_token), "");
+        mEditor.putString(getString(R.string.pinterest_token), "");
         mEditor.commit();
     }
 
@@ -139,7 +139,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener, 
 
         String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
         String googleToken = mPref.getString(getString(R.string.google_token), "");
-        String tumblrToken = mPref.getString(getString(R.string.tumblr_token), "");
+        String tumblrToken = mPref.getString(getString(R.string.pinterest_token), "");
 
         if (facebookToken.equals("") && googleToken.equals("") && tumblrToken.equals("")) {
 
