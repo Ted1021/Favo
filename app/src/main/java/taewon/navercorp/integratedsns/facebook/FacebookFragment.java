@@ -3,6 +3,7 @@ package taewon.navercorp.integratedsns.facebook;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,19 +21,25 @@ import android.widget.RelativeLayout;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.pinterest.android.pdk.PDKBoard;
+import com.pinterest.android.pdk.PDKCallback;
+import com.pinterest.android.pdk.PDKClient;
+import com.pinterest.android.pdk.PDKException;
+import com.pinterest.android.pdk.PDKPin;
+import com.pinterest.android.pdk.PDKResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.FacebookFeedData;
+import taewon.navercorp.integratedsns.model.FavoFeedData;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 
 /**
  * @author 김태원
@@ -47,7 +54,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
     private SharedPreferences.Editor mEditor;
 
     private RecyclerView mFacebookList;
-    private ArrayList<FacebookFeedData> mDataset = new ArrayList<>();
+    private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
     private FacebookListAdapter mAdapter;
 
     private OnRequestFacebookTokenListener mCallback;
@@ -57,7 +64,20 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
     private RelativeLayout mLayoutDisconnection;
     private Button mConnectFacebook;
 
+    private PDKClient mPinterestClient;
+
+    private static final String BOARD_FIELDS = "id,name";
+    private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
+
     private static final int REQ_REFRESH = 100;
+
+    private static final int CONTENTS_IMAGE = 1;
+    private static final int CONTENTS_VIDEO = 2;
+    private static final int CONTENTS_MULTI = 3;
+
+    private static final int PLATFORM_FACEBOOK = 1;
+    private static final int PLATFORM_YOUTUBE = 2;
+    private static final int PLATFORM_PINTEREST = 3;
 
     @Override
     public void onAttach(Context context) {
@@ -93,6 +113,11 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
 
+
+        // Pinterest client init
+        PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
+        mPinterestClient = PDKClient.getInstance();
+
         mHandler = new FacebookHandler();
     }
 
@@ -116,16 +141,20 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
 
     private void checkToken() {
 
+        Log.e("CHCEK_TOKEN", "facebook token >>>>>> "+mPref.getString(getString(R.string.facebook_token), ""));
         String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
         if (!facebookToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
             getUserPages();
+            getFollowingBoards();
 
         } else {
             mLayoutDisconnection.setVisibility(View.VISIBLE);
         }
     }
 
+    // TODO - 여기에서부터 리팩토링 필수!!!!
+    // Facebook API Call
     private void getUserPages() {
 
         mDataset.clear();
@@ -158,8 +187,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
                 });
 
         Bundle parameters = new Bundle();
-        // TODO - limit logic 변경 할 것
-        parameters.putString("limit", "20");
+        parameters.putString("limit", "10");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -183,26 +211,33 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
                                 for (int i = 0; i < results.length(); i++) {
 
                                     article = results.getJSONObject(i);
-                                    FacebookFeedData data = new FacebookFeedData();
+                                    FavoFeedData data = new FavoFeedData();
+                                    FacebookFeedData feed = new FacebookFeedData();
 
                                     if (article.getJSONObject("from").has("name")) {
-                                        data.setName(article.getJSONObject("from").getString("name"));
+                                        feed.setName(article.getJSONObject("from").getString("name"));
                                     }
                                     if (article.getJSONObject("from").getJSONObject("picture").getJSONObject("data").has("url")) {
-                                        data.setProfileImage(article.getJSONObject("from").getJSONObject("picture").getJSONObject("data").getString("url"));
+                                        feed.setProfileImage(article.getJSONObject("from").getJSONObject("picture").getJSONObject("data").getString("url"));
                                     }
                                     if (article.has("created_time")) {
-                                        data.setUploadTime(article.getString("created_time"));
+                                        feed.setUploadTime(article.getString("created_time"));
                                     }
                                     if (article.has("message")) {
-                                        data.setDescription(article.getString("message"));
+                                        feed.setDescription(article.getString("message"));
                                     }
                                     if (article.has("full_picture")) {
-                                        data.setPicture(article.getString("full_picture"));
+                                        feed.setPicture(article.getString("full_picture"));
                                     }
                                     if (article.has("source")) {
-                                        data.setVideo(article.getString("source"));
+                                        data.setContentsType(CONTENTS_VIDEO);
+                                        feed.setVideo(article.getString("source"));
+                                    } else {
+                                        data.setContentsType(CONTENTS_IMAGE);
                                     }
+
+                                    data.setFacebookData(feed);
+                                    data.setFlatformType(PLATFORM_FACEBOOK);
 
                                     mDataset.add(data);
                                 }
@@ -210,13 +245,12 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
                                 e.printStackTrace();
                             }
 
-                            Collections.sort(mDataset, new Comparator<FacebookFeedData>() {
-                                @Override
-                                public int compare(FacebookFeedData o1, FacebookFeedData o2) {
-
-                                    return o2.getUploadTime().compareToIgnoreCase(o1.getUploadTime());
-                                }
-                            });
+//                            Collections.sort(mDataset, new Comparator<FavoFeedData>() {
+//                                @Override
+//                                public int compare(FavoFeedData o1, FavoFeedData o2) {
+//                                    return o2.getFacebookData().getUploadTime().compareToIgnoreCase(o1.getFacebookData().getUploadTime());
+//                                }
+//                            });
                             mAdapter.notifyDataSetChanged();
                             mRefreshLayout.setRefreshing(false);
                         }
@@ -230,68 +264,68 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
         request.executeAsync();
     }
 
-    private void getUserFeedList() {
+    // Pinterest API Call
+    private void getFollowingBoards() {
 
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        GraphRequest request = GraphRequest.newMeRequest(
-                accessToken,
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
+        mPinterestClient.getMyFollowedBoards(BOARD_FIELDS, new PDKCallback() {
+            @Override
+            public void onSuccess(PDKResponse response) {
+                super.onSuccess(response);
 
-                        mDataset.clear();
-                        if (response.getError() == null) {
+                mDataset.clear();
+                for (PDKBoard board : response.getBoardList()) {
+                    Log.d("CHECK_BOARD", " >>>>> "+board.getName());
+                    new GetFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
+                }
+            }
 
-                            JSONArray result; // article list
-                            JSONObject article; // single article
+            @Override
+            public void onFailure(PDKException exception) {
+                super.onFailure(exception);
+            }
+        });
+    }
 
-                            try {
-                                result = response.getJSONObject().getJSONObject("posts").getJSONArray("data");
+    private class GetFollowingPins extends AsyncTask<String, Void, Void> {
 
-                                for (int i = 0; i < result.length(); i++) {
+        @Override
+        protected Void doInBackground(String... params) {
 
-                                    article = result.getJSONObject(i);
-                                    FacebookFeedData data = new FacebookFeedData();
+            mPinterestClient.getBoardPins(params[0], PIN_FIELDS, new PDKCallback() {
+                @Override
+                public void onSuccess(PDKResponse response) {
+                    super.onSuccess(response);
 
-                                    // TODO - gson converter 를 써야 ......
-                                    if (!article.has("name")) {
-                                        continue;
-                                    }
-                                    data.setName(article.getString("name"));
-                                    if (article.has("description")) {
-                                        data.setDescription(article.getString("description"));
-                                    }
-                                    if (article.has("created_time")) {
-                                        data.setUploadTime(article.getString("created_time"));
-                                    }
-                                    if (article.has("full_picture")) {
-                                        data.setPicture(article.getString("full_picture"));
-                                    }
-                                    if (article.has("source")) {
-                                        data.setVideo(article.getString("source"));
-                                    }
+                    for(PDKPin pin : response.getPinList()){
 
-                                    mDataset.add(data);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>>> fail to get JSONObject from facebook api");
-                            }
+                        FavoFeedData data = new FavoFeedData();
 
-                        } else {
-                            checkToken();
-                            Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>> fail to connect facebook server" + response.getError().getErrorMessage());
-                        }
+                        data.setFlatformType(PLATFORM_PINTEREST);
+                        data.setContentsType(CONTENTS_IMAGE);
+                        data.setPinterestData(pin);
 
-                        // mAdapter.notifyDataSetChanged();
-                        mRefreshLayout.setRefreshing(false);
+                        mDataset.add(data);
                     }
-                });
 
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "posts{name,created_time,description,source,full_picture}");
-        request.setParameters(parameters);
-        request.executeAsync();
+//                    Collections.sort(mDataset, new Comparator<FavoFeedData>() {
+//                        @Override
+//                        public int compare(FavoFeedData o1, FavoFeedData o2) {
+//                            return (int)(o2.getPinterestData().getCreatedAt().getTime() - o1.getPinterestData().getCreatedAt().getTime());
+//                        }
+//                    });
+                    mAdapter.notifyDataSetChanged();
+                    mRefreshLayout.setRefreshing(false);
+                }
+
+                @Override
+                public void onFailure(PDKException exception) {
+                    super.onFailure(exception);
+                    exception.printStackTrace();
+                }
+            });
+
+            return null;
+        }
     }
 
     @Override
@@ -307,7 +341,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onRefresh() {
-        getUserPages();
+        checkToken();
     }
 
     private class FacebookHandler extends Handler {
@@ -322,4 +356,69 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
             }
         }
     }
+
+    // for facebook
+//    private void getUserFeedList() {
+//
+//        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+//        GraphRequest request = GraphRequest.newMeRequest(
+//                accessToken,
+//                new GraphRequest.GraphJSONObjectCallback() {
+//                    @Override
+//                    public void onCompleted(JSONObject object, GraphResponse response) {
+//
+//                        mDataset.clear();
+//                        if (response.getError() == null) {
+//
+//                            JSONArray result; // article list
+//                            JSONObject article; // single article
+//
+//                            try {
+//                                result = response.getJSONObject().getJSONObject("posts").getJSONArray("data");
+//
+//                                for (int i = 0; i < result.length(); i++) {
+//
+//                                    article = result.getJSONObject(i);
+//                                    FacebookFeedData data = new FacebookFeedData();
+//
+//                                    // TODO - gson converter 를 써야 ......
+//                                    if (!article.has("name")) {
+//                                        continue;
+//                                    }
+//                                    data.setName(article.getString("name"));
+//                                    if (article.has("description")) {
+//                                        data.setDescription(article.getString("description"));
+//                                    }
+//                                    if (article.has("created_time")) {
+//                                        data.setUploadTime(article.getString("created_time"));
+//                                    }
+//                                    if (article.has("full_picture")) {
+//                                        data.setPicture(article.getString("full_picture"));
+//                                    }
+//                                    if (article.has("source")) {
+//                                        data.setVideo(article.getString("source"));
+//                                    }
+//
+////                                    mDataset.add(data);
+//                                }
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                                Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>>> fail to get JSONObject from facebook api");
+//                            }
+//
+//                        } else {
+//                            checkToken();
+//                            Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>> fail to connect facebook server" + response.getError().getErrorMessage());
+//                        }
+//
+//                        // mAdapter.notifyDataSetChanged();
+//                        mRefreshLayout.setRefreshing(false);
+//                    }
+//                });
+//
+//        Bundle parameters = new Bundle();
+//        parameters.putString("fields", "posts{name,created_time,description,source,full_picture}");
+//        request.setParameters(parameters);
+//        request.executeAsync();
+//    }
 }
