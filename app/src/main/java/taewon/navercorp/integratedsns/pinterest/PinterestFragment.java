@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import taewon.navercorp.integratedsns.R;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 
 /**
  * @author 김태원
@@ -37,7 +38,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class PinterestFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String BOARD_FIELDS = "id,name";
-    private static final String PIN_FIELDS = "created_at,creator,id,image, media, note,original_link";
+    private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
 
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
@@ -113,30 +114,12 @@ public class PinterestFragment extends Fragment implements View.OnClickListener,
             public void onSuccess(PDKResponse response) {
                 super.onSuccess(response);
 
+                mDataset.clear();
                 for (PDKBoard board : response.getBoardList()) {
 
                     Log.d("CHECK_DATA", "Pinterest Fragment >>>>> " + board.getUid() + " " + board.getName());
-//                    new GetFollowingPins().execute(board.getUid());
+                    new GetFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
 
-                    mPinterestClient.getBoardPins(board.getUid(), PIN_FIELDS, new PDKCallback() {
-                        @Override
-                        public void onSuccess(PDKResponse response) {
-                            super.onSuccess(response);
-
-                            Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " +response.getData());
-                            for (PDKPin pin : response.getPinList()) {
-                                Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getUser().getFirstName());
-                                Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getImageUrl());
-                                Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getNote());
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(PDKException exception) {
-                            super.onFailure(exception);
-                            exception.printStackTrace();
-                        }
-                    });
                 }
             }
 
@@ -157,11 +140,17 @@ public class PinterestFragment extends Fragment implements View.OnClickListener,
                 public void onSuccess(PDKResponse response) {
                     super.onSuccess(response);
 
-                    for (PDKPin pin : response.getPinList()) {
-                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getUser().getFirstName());
-                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getImageUrl());
-                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getNote());
-                    }
+                    mDataset.addAll(response.getPinList());
+                    mAdapter.notifyDataSetChanged();
+                    mRefreshLayout.setRefreshing(false);
+
+//                    Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + response.getData().toString());
+//                    for (PDKPin pin : response.getPinList()) {
+//                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getNote());
+//                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getImageUrl());
+//                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getCreatedAt());
+//                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getUid());
+//                    }
                 }
 
                 @Override
@@ -189,6 +178,6 @@ public class PinterestFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onRefresh() {
-
+        getFollowingBoards();
     }
 }

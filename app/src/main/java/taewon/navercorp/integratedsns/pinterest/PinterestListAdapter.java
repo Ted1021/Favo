@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.pinterest.android.pdk.PDKPin;
 
 import java.util.ArrayList;
@@ -61,6 +63,11 @@ public class PinterestListAdapter extends RecyclerView.Adapter<PinterestListAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
+        PDKPin pin = mDataset.get(position);
+
+        holder.mUploadTime.setText(pin.getCreatedAt().toString());
+        holder.mDescription.setText(pin.getNote());
+        Glide.with(mContext).load(pin.getImageUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
     }
 
     @Override
