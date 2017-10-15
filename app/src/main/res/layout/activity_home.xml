@@ -11,7 +11,8 @@
         class="android.support.v4.view.ViewPager"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/view"/>
+        android:layout_above="@+id/view"
+        android:background="@color/colorCremeWhite" />
 
     <View
         android:layout_width="match_parent"
@@ -33,20 +34,20 @@
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/facebook_icon"
-            android:text="Facebook" />
+            android:icon="@drawable/icon_feed"
+            android:text="Feed" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/youtube_icon"
-            android:text="Youtube" />
+            android:icon="@drawable/icon_search"
+            android:text="Search" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/tumblr_icon"
-            android:text="Tumblr" />
+            android:icon="@drawable/icon_profile"
+            android:text="profile" />
 
         <android.support.design.widget.TabItem
             android:id="@+id/tabItem"

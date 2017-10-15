@@ -5,10 +5,11 @@
     <string name="fb_login_protocol_scheme">fb265540180604990</string>
 
     <string name="tokens">taewon.navercorp.integratedsns.tokens</string>
-    <string name="facebook_token">facebook_service_token</string>
+    <string name="facebook_token">facebook_favo_token</string>
 
     <string name="google_token">google_token</string>
     <string name="google_user_email">google_user_email</string>
+    <string name="google_client_id">939742218505-m2s27klio03vvk078tl03h9jl6jhchuf.apps.googleusercontent.com</string>
 
     <string name="pinterest_app_id">4928301781867311512</string>
     <string name="pinterest_token">pinterest_token</string>
@@ -17,6 +18,12 @@
     <string name="google_login_fail">구글 로그인에 실패 하였습니다.</string>
     <string name="tumblr_login_fail">텀블러 로그인에 실패 하였습니다.</string>
 
-    <string name="google_client_id">939742218505-m2s27klio03vvk078tl03h9jl6jhchuf.apps.googleusercontent.com</string>
+    <string name="platform_facebook">facebook</string>
+    <string name="platform_youtube">youtube</string>
+    <string name="platform_pinterest">pinterest</string>
+
+    <string name="contents_image">image</string>
+    <string name="contents_vidoe">video</string>
+    <string name="contents_multi_image">multiImage</string>
 
 </resources>

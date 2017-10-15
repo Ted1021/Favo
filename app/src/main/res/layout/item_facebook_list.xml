@@ -23,11 +23,27 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:id="@+id/imageView_profile"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    app:srcCompat="@drawable/com_facebook_profile_picture_blank_portrait" />
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/imageView_profile"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@drawable/com_facebook_profile_picture_blank_portrait" />
+
+                    <ImageView
+                        android:id="@+id/imageView_flatformType"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="bottom|right"
+                        android:background="@color/colorCremeWhite"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@drawable/image_loading" />
+
+                </FrameLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -74,7 +90,7 @@
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
                 android:scaleType="fitXY"
-                app:srcCompat="@android:drawable/ic_menu_gallery" />
+                app:srcCompat="@drawable/image_loading" />
 
             <View
                 android:layout_width="match_parent"
@@ -87,7 +103,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <Button
