@@ -10,7 +10,8 @@ package taewon.navercorp.integratedsns.model;
 public class FacebookFeedData {
 
     private String name;
-    private String upload_time;
+    private String profileImage;
+    private String uploadTime;
     private String description;
     private String picture;
     private String video;
@@ -23,12 +24,12 @@ public class FacebookFeedData {
         this.name = name;
     }
 
-    public String getUpload_time() {
-        return upload_time;
+    public String getUploadTime() {
+        return uploadTime;
     }
 
-    public void setUpload_time(String upload_time) {
-        this.upload_time = upload_time;
+    public void setUploadTime(String uploadTime) {
+        this.uploadTime = uploadTime;
     }
 
     public String getDescription() {
@@ -53,5 +54,13 @@ public class FacebookFeedData {
 
     public void setVideo(String video) {
         this.video = video;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

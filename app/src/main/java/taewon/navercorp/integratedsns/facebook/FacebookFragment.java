@@ -26,6 +26,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.FacebookFeedData;
@@ -117,14 +119,118 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
         String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
         if (!facebookToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
-            getFeedList();
+            getUserPages();
 
         } else {
             mLayoutDisconnection.setVisibility(View.VISIBLE);
         }
     }
 
-    private void getFeedList() {
+    private void getUserPages() {
+
+        mDataset.clear();
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        GraphRequest request = GraphRequest.newGraphPathRequest(
+                accessToken,
+                "/me/likes",
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+
+                        if (response.getError() == null) {
+                            try {
+
+                                JSONArray results = response.getJSONObject().getJSONArray("data");
+                                JSONObject pageInfo;
+
+                                for (int i = 0; i < results.length(); i++) {
+                                    pageInfo = results.getJSONObject(i);
+                                    getPageFeed(pageInfo.getString("id"));
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+
+                        }
+                    }
+                });
+
+        Bundle parameters = new Bundle();
+        // TODO - limit logic 변경 할 것
+        parameters.putString("limit", "20");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
+    private void getPageFeed(String pageId) {
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        String path = String.format("/%s/feed", pageId);
+        GraphRequest request = GraphRequest.newGraphPathRequest(
+                accessToken,
+                path,
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+
+                        if (response.getError() == null) {
+                            try {
+                                JSONArray results = response.getJSONObject().getJSONArray("data");
+                                JSONObject article;
+
+                                for (int i = 0; i < results.length(); i++) {
+
+                                    article = results.getJSONObject(i);
+                                    FacebookFeedData data = new FacebookFeedData();
+
+                                    if (article.getJSONObject("from").has("name")) {
+                                        data.setName(article.getJSONObject("from").getString("name"));
+                                    }
+                                    if (article.getJSONObject("from").getJSONObject("picture").getJSONObject("data").has("url")) {
+                                        data.setProfileImage(article.getJSONObject("from").getJSONObject("picture").getJSONObject("data").getString("url"));
+                                    }
+                                    if (article.has("created_time")) {
+                                        data.setUploadTime(article.getString("created_time"));
+                                    }
+                                    if (article.has("message")) {
+                                        data.setDescription(article.getString("message"));
+                                    }
+                                    if (article.has("full_picture")) {
+                                        data.setPicture(article.getString("full_picture"));
+                                    }
+                                    if (article.has("source")) {
+                                        data.setVideo(article.getString("source"));
+                                    }
+
+                                    mDataset.add(data);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            Collections.sort(mDataset, new Comparator<FacebookFeedData>() {
+                                @Override
+                                public int compare(FacebookFeedData o1, FacebookFeedData o2) {
+
+                                    return o2.getUploadTime().compareToIgnoreCase(o1.getUploadTime());
+                                }
+                            });
+                            mAdapter.notifyDataSetChanged();
+                            mRefreshLayout.setRefreshing(false);
+                        }
+                    }
+                });
+
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "created_time,message,full_picture,from{name, picture{url}},attachments{subattachments},source");
+        parameters.putString("limit", "5");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
+    private void getUserFeedList() {
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newMeRequest(
@@ -148,12 +254,22 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
                                     FacebookFeedData data = new FacebookFeedData();
 
                                     // TODO - gson converter 를 써야 ......
-                                    if (!article.has("name")) {continue;}
+                                    if (!article.has("name")) {
+                                        continue;
+                                    }
                                     data.setName(article.getString("name"));
-                                    if (article.has("description")) {data.setDescription(article.getString("description"));}
-                                    if (article.has("created_time")) {data.setUpload_time(article.getString("created_time"));}
-                                    if (article.has("full_picture")) {data.setPicture(article.getString("full_picture"));}
-                                    if (article.has("source")) {data.setVideo(article.getString("source"));}
+                                    if (article.has("description")) {
+                                        data.setDescription(article.getString("description"));
+                                    }
+                                    if (article.has("created_time")) {
+                                        data.setUploadTime(article.getString("created_time"));
+                                    }
+                                    if (article.has("full_picture")) {
+                                        data.setPicture(article.getString("full_picture"));
+                                    }
+                                    if (article.has("source")) {
+                                        data.setVideo(article.getString("source"));
+                                    }
 
                                     mDataset.add(data);
                                 }
@@ -166,7 +282,8 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
                             checkToken();
                             Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>> fail to connect facebook server" + response.getError().getErrorMessage());
                         }
-                        mAdapter.notifyDataSetChanged();
+
+                        // mAdapter.notifyDataSetChanged();
                         mRefreshLayout.setRefreshing(false);
                     }
                 });
@@ -190,7 +307,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onRefresh() {
-        getFeedList();
+        getUserPages();
     }
 
     private class FacebookHandler extends Handler {
@@ -200,7 +317,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
             super.handleMessage(msg);
 
             if (msg.what == REQ_REFRESH) {
-                getFeedList();
+                getUserPages();
                 checkToken();
             }
         }

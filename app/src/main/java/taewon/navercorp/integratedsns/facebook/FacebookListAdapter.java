@@ -101,9 +101,10 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
 
         try {
             holder.mUserName.setText(data.getName());
-            holder.mUploadTime.setText(data.getUpload_time());
+            holder.mUploadTime.setText(data.getUploadTime());
             holder.mDescription.setText(data.getDescription());
             Glide.with(mContext).load(data.getPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+            Glide.with(mContext).load(data.getProfileImage()).into(holder.mProfile);
 
         } catch (Exception e) {
 
