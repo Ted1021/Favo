@@ -48,6 +48,7 @@ public class PinterestListAdapter extends RecyclerView.Adapter<PinterestListAdap
             mUploadTime = (TextView) itemView.findViewById(R.id.textView_uploadTime);
             mDescription = (TextView) itemView.findViewById(R.id.textView_description);
 
+
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
         }
@@ -65,6 +66,7 @@ public class PinterestListAdapter extends RecyclerView.Adapter<PinterestListAdap
 
         PDKPin pin = mDataset.get(position);
 
+        holder.mUserName.setText(pin.getUid());
         holder.mUploadTime.setText(pin.getCreatedAt().toString());
         holder.mDescription.setText(pin.getNote());
         Glide.with(mContext).load(pin.getImageUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);

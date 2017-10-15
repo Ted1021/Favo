@@ -23,6 +23,8 @@ import com.pinterest.android.pdk.PDKPin;
 import com.pinterest.android.pdk.PDKResponse;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import taewon.navercorp.integratedsns.R;
 
@@ -116,10 +118,8 @@ public class PinterestFragment extends Fragment implements View.OnClickListener,
 
                 mDataset.clear();
                 for (PDKBoard board : response.getBoardList()) {
-
-                    Log.d("CHECK_DATA", "Pinterest Fragment >>>>> " + board.getUid() + " " + board.getName());
+                    Log.d("CHECK_BOARD", " >>>>> "+board.getName());
                     new GetFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
-
                 }
             }
 
@@ -141,16 +141,15 @@ public class PinterestFragment extends Fragment implements View.OnClickListener,
                     super.onSuccess(response);
 
                     mDataset.addAll(response.getPinList());
+                    Collections.sort(mDataset, new Comparator<PDKPin>() {
+                        @Override
+                        public int compare(PDKPin o1, PDKPin o2) {
+
+                            return o2.getCreatedAt().toString().compareToIgnoreCase(o1.getCreatedAt().toString());
+                        }
+                    });
                     mAdapter.notifyDataSetChanged();
                     mRefreshLayout.setRefreshing(false);
-
-//                    Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + response.getData().toString());
-//                    for (PDKPin pin : response.getPinList()) {
-//                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getNote());
-//                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getImageUrl());
-//                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getCreatedAt());
-//                        Log.d("CHECK_PIN", "Pinterest Fragment >>>>> " + pin.getUid());
-//                    }
                 }
 
                 @Override
@@ -178,6 +177,6 @@ public class PinterestFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onRefresh() {
-        getFollowingBoards();
+        checkToken();
     }
 }
