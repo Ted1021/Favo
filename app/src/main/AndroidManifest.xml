@@ -21,7 +21,6 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -35,26 +34,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".login.LoginActivity"
-            android:configChanges="orientation|screenSize|keyboard" >
-
+            android:configChanges="orientation|screenSize|keyboard">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="pdk4928301781867311512" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".home.HomeActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-
-        <activity android:name=".youtube.YoutubeDetailActivity"
-            android:configChanges="orientation|screenSize|keyboard"/>
-
+        <activity
+            android:name=".youtube.YoutubeDetailActivity"
+            android:configChanges="orientation|screenSize|keyboard" />
+        <activity android:name=".profile.SettingActivity"></activity>
     </application>
 
 </manifest>

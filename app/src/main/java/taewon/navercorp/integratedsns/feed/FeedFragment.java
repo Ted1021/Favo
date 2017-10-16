@@ -161,7 +161,6 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
         if (!facebookToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
             getUserPages();
-            getFollowingBoards();
         }
 
         if (!googleToken.equals("")) {
@@ -171,7 +170,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
 
         if (!pinterestToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
-
+            getFollowingBoards();
         }
     }
 

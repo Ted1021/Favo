@@ -41,7 +41,6 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.feed.OnRequestFacebookTokenListener;
 import taewon.navercorp.integratedsns.profile.ProfileFragment;
-import taewon.navercorp.integratedsns.settings.SettingsFragment;
 import taewon.navercorp.integratedsns.youtube.OnRequestYoutubeTokenListener;
 import taewon.navercorp.integratedsns.youtube.YoutubeFragment;
 
@@ -75,10 +74,9 @@ public class HomeActivity extends AppCompatActivity
     private static final int FRAG_COUNT = 4;
 
     // fragment index
-    private static final int TAB_FACEBOOK = 0;
-    private static final int TAB_YOUTUBE = 1;
-    private static final int TAB_TUMBLR = 2;
-    private static final int TAB_SETTINGS = 3;
+    private static final int TAB_FEED = 0;
+    private static final int TAB_SEARCH = 1;
+    private static final int TAB_PROFILE = 2;
 
     // Auth Request Code
     private static final int REQ_FACEBOOK_SIGN_IN = 100;
@@ -155,20 +153,16 @@ public class HomeActivity extends AppCompatActivity
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
 
-                    case TAB_FACEBOOK:
+                    case TAB_FEED:
                         tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.facebook_color), PorterDuff.Mode.SRC_IN);
                         break;
 
-                    case TAB_YOUTUBE:
+                    case TAB_SEARCH:
                         tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.youtube_color), PorterDuff.Mode.SRC_IN);
                         break;
 
-                    case TAB_TUMBLR:
+                    case TAB_PROFILE:
                         tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.tumblr_color), PorterDuff.Mode.SRC_IN);
-                        break;
-
-                    case TAB_SETTINGS:
-                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.settings_color), PorterDuff.Mode.SRC_IN);
                         break;
                 }
             }
@@ -201,20 +195,16 @@ public class HomeActivity extends AppCompatActivity
             Fragment fragment = new FeedFragment();
             switch (position) {
 
-                case TAB_FACEBOOK:
+                case TAB_FEED:
                     fragment = new FeedFragment();
                     break;
 
-                case TAB_YOUTUBE:
+                case TAB_SEARCH:
                     fragment = new YoutubeFragment();
                     break;
 
-                case TAB_TUMBLR:
+                case TAB_PROFILE:
                     fragment = new ProfileFragment();
-                    break;
-
-                case TAB_SETTINGS:
-                    fragment = new SettingsFragment();
                     break;
             }
             return fragment;

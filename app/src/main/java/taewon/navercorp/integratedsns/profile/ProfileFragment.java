@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.profile;
 
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -58,7 +59,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
 
     private PDKClient mPinterestClient;
 
-    private ImageView mPrifile;
+    private ImageView mProfile;
     private TextView mUserName;
     private ImageButton mSetting;
     private ViewPager mViewPager;
@@ -89,6 +90,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
 
     private void initView(View view) {
 
+        mProfile = (ImageView) view.findViewById(R.id.imageView_profile);
+        mUserName = (TextView) view.findViewById(R.id.textView_userName);
+        mViewPager = (ViewPager) view.findViewById(R.id.viewPager);
+        mSetting = (ImageButton) view.findViewById(R.id.button_setting);
+        mSetting.setOnClickListener(this);
     }
 
     private void getFollowingBoards() {
@@ -100,7 +106,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
 
                 mDataset.clear();
                 for (PDKBoard board : response.getBoardList()) {
-                    Log.d("CHECK_BOARD", " >>>>> "+board.getName());
+                    Log.d("CHECK_BOARD", " >>>>> " + board.getName());
                     new GetFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
                 }
             }
@@ -151,6 +157,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
 
         switch (v.getId()) {
 
+            case R.id.button_setting:
+
+                Intent intent = new Intent(getActivity(), SettingActivity.class);
+                startActivity(intent);
+
+                break;
         }
     }
 
