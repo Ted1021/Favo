@@ -187,7 +187,7 @@ public class LoginActivity extends AppCompatActivity
             public void onSuccess(PDKResponse response) {
                 mEditor.putString(getString(R.string.pinterest_token), response.getUser().getUid());
                 mEditor.commit();
-                Log.d("CHECK_TOKEN","Login activity >>>>> "+response.getUser().getUid());
+                Log.d("CHECK_TOKEN","Login activity >>>>> pinterest "+response.getUser().getUid());
 
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(intent);

@@ -55,7 +55,7 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener, S
     private Button mConnectYoutube;
 
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
-    private static final int MAX_COUNTS = 20;
+    private static final int MAX_COUNTS = 10;
 
     private static final int REQ_REFRESH = 100;
 

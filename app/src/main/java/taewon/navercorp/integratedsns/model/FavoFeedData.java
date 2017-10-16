@@ -10,20 +10,20 @@ import java.util.Date;
 
 public class FavoFeedData {
 
-    private int flatformType;
+    private int platformType;
     private int contentsType;
     private Date pubDate;
 
     private FacebookFeedData facebookData;
-    private YoutubeSearchVideoData youtubeData;
+    private YoutubeSearchVideoData.Item youtubeData;
     private PDKPin pinterestData;
 
-    public int getFlatformType() {
-        return flatformType;
+    public int getPlatformType() {
+        return platformType;
     }
 
-    public void setFlatformType(int flatformType) {
-        this.flatformType = flatformType;
+    public void setPlatformType(int platformType) {
+        this.platformType = platformType;
     }
 
     public int getContentsType() {
@@ -50,11 +50,11 @@ public class FavoFeedData {
         this.facebookData = facebookData;
     }
 
-    public YoutubeSearchVideoData getYoutubeData() {
+    public YoutubeSearchVideoData.Item getYoutubeData() {
         return youtubeData;
     }
 
-    public void setYoutubeData(YoutubeSearchVideoData youtubeData) {
+    public void setYoutubeData(YoutubeSearchVideoData.Item youtubeData) {
         this.youtubeData = youtubeData;
     }
 

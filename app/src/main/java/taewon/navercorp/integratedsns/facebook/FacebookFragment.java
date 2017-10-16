@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -34,9 +35,17 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.FacebookFeedData;
 import taewon.navercorp.integratedsns.model.FavoFeedData;
+import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.YoutubeSubscriptionData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
@@ -70,6 +79,9 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
 
     private static final int REQ_REFRESH = 100;
+
+    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
+    private static final int MAX_COUNTS = 10;
 
     private static final int CONTENTS_IMAGE = 1;
     private static final int CONTENTS_VIDEO = 2;
@@ -141,15 +153,25 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
 
     private void checkToken() {
 
-        Log.e("CHCEK_TOKEN", "facebook token >>>>>> "+mPref.getString(getString(R.string.facebook_token), ""));
         String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
+        String googleToken = mPref.getString(getString(R.string.google_token), "");
+        String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
+
+        mLayoutDisconnection.setVisibility(View.VISIBLE);
         if (!facebookToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
             getUserPages();
             getFollowingBoards();
+        }
 
-        } else {
-            mLayoutDisconnection.setVisibility(View.VISIBLE);
+        if (!googleToken.equals("")) {
+            mLayoutDisconnection.setVisibility(View.GONE);
+            getSubscriptionList();
+        }
+
+        if (!pinterestToken.equals("")) {
+            mLayoutDisconnection.setVisibility(View.GONE);
+
         }
     }
 
@@ -237,7 +259,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
                                     }
 
                                     data.setFacebookData(feed);
-                                    data.setFlatformType(PLATFORM_FACEBOOK);
+                                    data.setPlatformType(PLATFORM_FACEBOOK);
 
                                     mDataset.add(data);
                                 }
@@ -245,12 +267,6 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
                                 e.printStackTrace();
                             }
 
-//                            Collections.sort(mDataset, new Comparator<FavoFeedData>() {
-//                                @Override
-//                                public int compare(FavoFeedData o1, FavoFeedData o2) {
-//                                    return o2.getFacebookData().getUploadTime().compareToIgnoreCase(o1.getFacebookData().getUploadTime());
-//                                }
-//                            });
                             mAdapter.notifyDataSetChanged();
                             mRefreshLayout.setRefreshing(false);
                         }
@@ -274,7 +290,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
 
                 mDataset.clear();
                 for (PDKBoard board : response.getBoardList()) {
-                    Log.d("CHECK_BOARD", " >>>>> "+board.getName());
+                    Log.d("CHECK_BOARD", " >>>>> " + board.getName());
                     new GetFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
                 }
             }
@@ -296,23 +312,17 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
                 public void onSuccess(PDKResponse response) {
                     super.onSuccess(response);
 
-                    for(PDKPin pin : response.getPinList()){
+                    for (PDKPin pin : response.getPinList()) {
 
                         FavoFeedData data = new FavoFeedData();
 
-                        data.setFlatformType(PLATFORM_PINTEREST);
+                        data.setPlatformType(PLATFORM_PINTEREST);
                         data.setContentsType(CONTENTS_IMAGE);
                         data.setPinterestData(pin);
 
                         mDataset.add(data);
                     }
 
-//                    Collections.sort(mDataset, new Comparator<FavoFeedData>() {
-//                        @Override
-//                        public int compare(FavoFeedData o1, FavoFeedData o2) {
-//                            return (int)(o2.getPinterestData().getCreatedAt().getTime() - o1.getPinterestData().getCreatedAt().getTime());
-//                        }
-//                    });
                     mAdapter.notifyDataSetChanged();
                     mRefreshLayout.setRefreshing(false);
                 }
@@ -321,6 +331,95 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
                 public void onFailure(PDKException exception) {
                     super.onFailure(exception);
                     exception.printStackTrace();
+                }
+            });
+
+            return null;
+        }
+    }
+
+    private void getSubscriptionList() {
+
+        // get google credential access token
+        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), null));
+
+        // set retrofit
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        // get 'subscriptions' from youtube data api v3
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeSubscriptionData> call = service.subscriptionList(accessToken, "snippet", MAX_COUNTS, true);
+        call.enqueue(new Callback<YoutubeSubscriptionData>() {
+            @Override
+            public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
+                if (response.isSuccessful()) {
+
+                    for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
+                        new GetYoutubeVideos().executeOnExecutor(THREAD_POOL_EXECUTOR, item.getSnippet().getResourceId().getChannelId());
+//                        new GetYoutubeVideos().execute(item.getSnippet().getResourceId().getChannelId());
+                    }
+                } else {
+                    Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
+
+                    // TODO - Google Token Refresh 로직이 구현되기 전까지의 임시방편...
+                    mEditor.putString(getString(R.string.google_token), "");
+                    mEditor.commit();
+                    checkToken();
+                }
+                mRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onFailure(Call<YoutubeSubscriptionData> call, Throwable t) {
+                Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to access youtube api server");
+                Toast.makeText(getContext(), "Fail to access youtube server", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private class GetYoutubeVideos extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+
+            String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(YOUTUBE_BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            YoutubeService service = retrofit.create(YoutubeService.class);
+            Call<YoutubeSearchVideoData> call = service.searchVideoList(accessToken, "snippet", MAX_COUNTS, params[0]);
+            call.enqueue(new Callback<YoutubeSearchVideoData>() {
+                @Override
+                public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
+                    if (response.isSuccessful()) {
+
+                        for (YoutubeSearchVideoData.Item item : response.body().getItems()) {
+
+                            FavoFeedData data = new FavoFeedData();
+
+                            data.setPlatformType(PLATFORM_YOUTUBE);
+                            data.setContentsType(CONTENTS_VIDEO);
+                            data.setYoutubeData(item);
+
+                            mDataset.add(data);
+                        }
+                        mAdapter.notifyDataSetChanged();
+
+                    } else {
+                        Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
+                    t.printStackTrace();
+                    Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
                 }
             });
 
@@ -351,74 +450,8 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
             super.handleMessage(msg);
 
             if (msg.what == REQ_REFRESH) {
-                getUserPages();
                 checkToken();
             }
         }
     }
-
-    // for facebook
-//    private void getUserFeedList() {
-//
-//        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-//        GraphRequest request = GraphRequest.newMeRequest(
-//                accessToken,
-//                new GraphRequest.GraphJSONObjectCallback() {
-//                    @Override
-//                    public void onCompleted(JSONObject object, GraphResponse response) {
-//
-//                        mDataset.clear();
-//                        if (response.getError() == null) {
-//
-//                            JSONArray result; // article list
-//                            JSONObject article; // single article
-//
-//                            try {
-//                                result = response.getJSONObject().getJSONObject("posts").getJSONArray("data");
-//
-//                                for (int i = 0; i < result.length(); i++) {
-//
-//                                    article = result.getJSONObject(i);
-//                                    FacebookFeedData data = new FacebookFeedData();
-//
-//                                    // TODO - gson converter 를 써야 ......
-//                                    if (!article.has("name")) {
-//                                        continue;
-//                                    }
-//                                    data.setName(article.getString("name"));
-//                                    if (article.has("description")) {
-//                                        data.setDescription(article.getString("description"));
-//                                    }
-//                                    if (article.has("created_time")) {
-//                                        data.setUploadTime(article.getString("created_time"));
-//                                    }
-//                                    if (article.has("full_picture")) {
-//                                        data.setPicture(article.getString("full_picture"));
-//                                    }
-//                                    if (article.has("source")) {
-//                                        data.setVideo(article.getString("source"));
-//                                    }
-//
-////                                    mDataset.add(data);
-//                                }
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                                Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>>> fail to get JSONObject from facebook api");
-//                            }
-//
-//                        } else {
-//                            checkToken();
-//                            Log.e("ERROR_FACEBOOK", "Facebook Fragment >>>> fail to connect facebook server" + response.getError().getErrorMessage());
-//                        }
-//
-//                        // mAdapter.notifyDataSetChanged();
-//                        mRefreshLayout.setRefreshing(false);
-//                    }
-//                });
-//
-//        Bundle parameters = new Bundle();
-//        parameters.putString("fields", "posts{name,created_time,description,source,full_picture}");
-//        request.setParameters(parameters);
-//        request.executeAsync();
-//    }
 }
