@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.pinterest;
+package taewon.navercorp.integratedsns.profile;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

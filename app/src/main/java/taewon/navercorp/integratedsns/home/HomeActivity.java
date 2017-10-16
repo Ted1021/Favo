@@ -38,9 +38,9 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.facebook.FacebookFragment;
-import taewon.navercorp.integratedsns.facebook.OnRequestFacebookTokenListener;
-import taewon.navercorp.integratedsns.pinterest.PinterestFragment;
+import taewon.navercorp.integratedsns.feed.FeedFragment;
+import taewon.navercorp.integratedsns.feed.OnRequestFacebookTokenListener;
+import taewon.navercorp.integratedsns.profile.ProfileFragment;
 import taewon.navercorp.integratedsns.settings.SettingsFragment;
 import taewon.navercorp.integratedsns.youtube.OnRequestYoutubeTokenListener;
 import taewon.navercorp.integratedsns.youtube.YoutubeFragment;
@@ -198,11 +198,11 @@ public class HomeActivity extends AppCompatActivity
         @Override
         public Fragment getItem(int position) {
 
-            Fragment fragment = new FacebookFragment();
+            Fragment fragment = new FeedFragment();
             switch (position) {
 
                 case TAB_FACEBOOK:
-                    fragment = new FacebookFragment();
+                    fragment = new FeedFragment();
                     break;
 
                 case TAB_YOUTUBE:
@@ -210,7 +210,7 @@ public class HomeActivity extends AppCompatActivity
                     break;
 
                 case TAB_TUMBLR:
-                    fragment = new PinterestFragment();
+                    fragment = new ProfileFragment();
                     break;
 
                 case TAB_SETTINGS:

@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.facebook;
+package taewon.navercorp.integratedsns.feed;
 
 import android.os.Handler;
 

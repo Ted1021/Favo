@@ -1,19 +1,22 @@
-package taewon.navercorp.integratedsns.pinterest;
+package taewon.navercorp.integratedsns.profile;
 
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.pinterest.android.pdk.PDKBoard;
 import com.pinterest.android.pdk.PDKCallback;
@@ -37,7 +40,7 @@ import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
  * @brief show tumblr contents, search & add tumblr channels
  * @date 2017.10.13
  */
-public class PinterestFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class ProfileFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
@@ -55,18 +58,22 @@ public class PinterestFragment extends Fragment implements View.OnClickListener,
 
     private PDKClient mPinterestClient;
 
-    public PinterestFragment() {
+    private ImageView mPrifile;
+    private TextView mUserName;
+    private ImageButton mSetting;
+    private ViewPager mViewPager;
+
+    public ProfileFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_pinterest, container, false);
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         initData();
         initView(view);
-        checkToken();
 
         return view;
     }
@@ -82,31 +89,6 @@ public class PinterestFragment extends Fragment implements View.OnClickListener,
 
     private void initView(View view) {
 
-        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
-        mRefreshLayout.setOnRefreshListener(this);
-
-        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
-        mConnectTumblr = (Button) view.findViewById(R.id.button_connect_tumblr);
-        mConnectTumblr.setOnClickListener(this);
-
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView_tumblr);
-        mAdapter = new PinterestListAdapter(getContext(), mDataset);
-        mRecyclerView.setAdapter(mAdapter);
-
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(layoutManager);
-    }
-
-    private void checkToken() {
-
-        String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
-        if (!pinterestToken.equals("")) {
-            mLayoutDisconnection.setVisibility(View.GONE);
-            getFollowingBoards();
-
-        } else {
-            mLayoutDisconnection.setVisibility(View.VISIBLE);
-        }
     }
 
     private void getFollowingBoards() {
@@ -169,14 +151,11 @@ public class PinterestFragment extends Fragment implements View.OnClickListener,
 
         switch (v.getId()) {
 
-            case R.id.button_connect_tumblr:
-
-                break;
         }
     }
 
     @Override
     public void onRefresh() {
-        checkToken();
+
     }
 }

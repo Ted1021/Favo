@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.facebook;
+package taewon.navercorp.integratedsns.feed;
 
 
 import android.content.Context;
@@ -57,14 +57,14 @@ import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
  * @date 2017.09.28
  */
 
-public class FacebookFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class FeedFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
     private RecyclerView mFacebookList;
     private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
-    private FacebookListAdapter mAdapter;
+    private FeedListAdapter mAdapter;
 
     private OnRequestFacebookTokenListener mCallback;
     private FacebookHandler mHandler;
@@ -103,14 +103,14 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
-    public FacebookFragment() {
+    public FeedFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_facebook, container, false);
+        View view = inflater.inflate(R.layout.fragment_feed, container, false);
 
         initData();
         initView(view);
@@ -145,7 +145,7 @@ public class FacebookFragment extends Fragment implements View.OnClickListener, 
 
         // set recyclerView
         mFacebookList = (RecyclerView) view.findViewById(R.id.recyclerView_facebook);
-        mAdapter = new FacebookListAdapter(getContext(), mDataset);
+        mAdapter = new FeedListAdapter(getContext(), mDataset);
         mFacebookList.setAdapter(mAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mFacebookList.setLayoutManager(layoutManager);

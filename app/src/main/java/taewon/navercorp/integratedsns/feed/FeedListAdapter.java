@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.facebook;
+package taewon.navercorp.integratedsns.feed;
 
 import android.content.Context;
 import android.content.Intent;
@@ -34,7 +34,7 @@ import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
  * @date 2017.09.29
  */
 
-public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapter.ViewHolder> {
+public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHolder> {
 
     private Context mContext;
     private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
@@ -48,7 +48,7 @@ public class FacebookListAdapter extends RecyclerView.Adapter<FacebookListAdapte
     private static final int PLATFORM_YOUTUBE = 2;
     private static final int PLATFORM_PINTEREST = 3;
 
-    public FacebookListAdapter(Context context, ArrayList<FavoFeedData> dataset) {
+    public FeedListAdapter(Context context, ArrayList<FavoFeedData> dataset) {
 
         mContext = context;
         mDataset = dataset;
