@@ -126,7 +126,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mFacebookSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d("CHECK_TOKEN", "Setting Activity >>>>> switch action "+mFacebookToken);
                 if (isChecked) {
                     if (mFacebookToken.equals("")) {
                         getFacebookToken();
@@ -142,7 +141,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mYoutubeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d("CHECK_TOKEN", "Setting Activity >>>>> switch action "+mGoogleToken);
                 if (isChecked) {
                     if (mGoogleToken.equals("")) {
                         getGoogleToken();
@@ -158,7 +156,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mPinterestSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Log.d("CHECK_TOKEN", "Setting Activity >>>>> switch action "+mPinterestToken);
                 if (isChecked) {
                     if (mPinterestToken.equals("")) {
                         getPinterestToken();
@@ -185,13 +182,13 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             mFacebookSwitch.setChecked(false);
         }
 
-        if (mGoogleToken.equals("")) {
+        if (!mGoogleToken.equals("")) {
             mYoutubeSwitch.setChecked(true);
         } else {
             mYoutubeSwitch.setChecked(false);
         }
 
-        if (mPinterestToken.equals("")) {
+        if (!mPinterestToken.equals("")) {
             mPinterestSwitch.setChecked(true);
         } else {
             mPinterestSwitch.setChecked(false);
@@ -218,11 +215,13 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             @Override
             public void onCancel() {
                 Toast.makeText(SettingActivity.this, getString(R.string.facebook_login_fail), Toast.LENGTH_SHORT).show();
+                mFacebookSwitch.setChecked(false);
             }
 
             @Override
             public void onError(FacebookException error) {
                 Toast.makeText(SettingActivity.this, getString(R.string.facebook_login_fail), Toast.LENGTH_SHORT).show();
+                mFacebookSwitch.setChecked(false);
             }
         });
     }
@@ -236,7 +235,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             // delete facebook preference
             mEditor.putString(getString(R.string.facebook_token), "");
             mEditor.commit();
-            mFacebookSwitch.setChecked(false);
             Toast.makeText(SettingActivity.this, "disconnect facebook successfully!!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -259,7 +257,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
                     // delete google token
                     mEditor.putString(getString(R.string.google_token), "");
                     mEditor.commit();
-                    mYoutubeSwitch.setChecked(false);
                     Toast.makeText(SettingActivity.this, "disconnect google successfully!!", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -274,14 +271,13 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             public void onSuccess(PDKResponse response) {
                 mEditor.putString(getString(R.string.pinterest_token), response.getUser().getUid());
                 mEditor.commit();
-                mPinterestSwitch.setChecked(true);
                 Log.d("CHECK_TOKEN","Setting Activity >>>>> pinterest "+response.getUser().getUid());
             }
 
             @Override
             public void onFailure(PDKException exception) {
-                mPinterestSwitch.setChecked(false);
                 Log.e("ERROR_LOGIN", exception.getDetailMessage());
+                mPinterestSwitch.setChecked(false);
             }
         });
     }
@@ -291,7 +287,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mPinterestClient.logout();
         mEditor.putString(getString(R.string.pinterest_token), "");
         mEditor.commit();
-        mPinterestSwitch.setChecked(false);
         Toast.makeText(SettingActivity.this, "disconnect pinterest successfully!!", Toast.LENGTH_SHORT).show();
     }
 
@@ -324,7 +319,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            mYoutubeSwitch.setChecked(true);
         }
     }
 
@@ -338,8 +332,8 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
         } else {
             Log.d("ERROR_LOGIN", "Setting Activity >>>>> fail to get google Account");
-            mYoutubeSwitch.setChecked(false);
             Toast.makeText(SettingActivity.this, getString(R.string.google_login_fail), Toast.LENGTH_SHORT).show();
+            mYoutubeSwitch.setChecked(false);
         }
     }
 

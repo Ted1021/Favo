@@ -71,7 +71,7 @@ public class HomeActivity extends AppCompatActivity
     private Handler mFacebookHandler;
     private Handler mYoutubeHandler;
 
-    private static final int FRAG_COUNT = 4;
+    private static final int FRAG_COUNT = 3;
 
     // fragment index
     private static final int TAB_FEED = 0;
