@@ -27,5 +27,6 @@
     <string name="contents_multi_image">multiImage</string>
 
     <string name="update_token_status">update_token_status</string>
+    <string name="async_finish_status">async_finish_status</string>
 
 </resources>

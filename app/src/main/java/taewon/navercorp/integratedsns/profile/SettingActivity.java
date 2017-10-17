@@ -175,7 +175,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     // send status of tokens to "FeedFragment"
     private void sendTokenStatus() {
         Intent intent = new Intent(getString(R.string.update_token_status));
-        intent.putExtra("CHECK_MESSAGE", "send success!");
         LocalBroadcastManager.getInstance(SettingActivity.this).sendBroadcast(intent);
     }
 

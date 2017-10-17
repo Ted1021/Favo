@@ -34,7 +34,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Vector;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -71,11 +76,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private PDKClient mPinterestClient;
 
     // BroadcastReceiver for updating status of tokens to "FeedFragment"
-    private BroadcastReceiver mBroadcastReceiver;
+    private BroadcastReceiver mTokenUpdateReceiver;
+    private BroadcastReceiver mAsyncFinishReceiver;
 
     // UI Components
     private RecyclerView mFacebookList;
-    private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
+    private Vector<FavoFeedData> mDataset = new Vector<>();
     private FeedListAdapter mAdapter;
 
     private SwipeRefreshLayout mRefreshLayout;
@@ -84,10 +90,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
 
-    private static final int REQ_REFRESH = 100;
-
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
-    private static final int MAX_COUNTS = 10;
+    private static final int MAX_COUNTS = 5;
 
     private static final int CONTENTS_IMAGE = 1;
     private static final int CONTENTS_VIDEO = 2;
@@ -96,6 +100,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private static final int PLATFORM_FACEBOOK = 1;
     private static final int PLATFORM_YOUTUBE = 2;
     private static final int PLATFORM_PINTEREST = 3;
+
+    private int mAsyncCount = 0;
 
     @Override
     public void onAttach(Context context) {
@@ -130,7 +136,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         super.onDestroyView();
 
         // destroy broadcast receiver along with fragment life cycle
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mBroadcastReceiver);
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mTokenUpdateReceiver);
     }
 
     private void initData() {
@@ -144,16 +150,22 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mPinterestClient = PDKClient.getInstance();
 
         // init update token status receiver
-        mBroadcastReceiver = new BroadcastReceiver() {
+        mTokenUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-
                 checkToken();
-                String message = intent.getStringExtra("CHECK_MESSAGE");
-                Log.d("CHECK_MESSAGE", message);
             }
         };
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mBroadcastReceiver, new IntentFilter(getString(R.string.update_token_status)));
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
+
+        // init check async requests status receiver
+        mAsyncFinishReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                refreshDataset();
+            }
+        };
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mAsyncFinishReceiver, new IntentFilter(getString(R.string.async_finish_status)));
     }
 
     private void initView(View view) {
@@ -174,10 +186,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void checkToken() {
 
+        mAsyncCount = 0;
         String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
         String googleToken = mPref.getString(getString(R.string.google_token), "");
         String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
 
+        mDataset.clear();
         mLayoutDisconnection.setVisibility(View.VISIBLE);
         if (!facebookToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
@@ -195,6 +209,29 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }
     }
 
+    private void refreshDataset() {
+
+        Collections.sort(mDataset, new Comparator<FavoFeedData>() {
+            @Override
+            public int compare(FavoFeedData o1, FavoFeedData o2) {
+                return o2.getPubDate().compareTo(o1.getPubDate());
+            }
+        });
+
+        for (FavoFeedData test : mDataset) {
+            Log.d("dslkfjad;lkdslkfj", "asdasdasd " + test.getPubDate().toString());
+        }
+
+        mAdapter.notifyDataSetChanged();
+        mRefreshLayout.setRefreshing(false);
+    }
+
+    // send status of asyncTasks
+    private void sendAsyncStatus() {
+        Intent intent = new Intent(getString(R.string.async_finish_status));
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+    }
+
     // TODO - 여기에서부터 리팩토링 필수!!!!
     // Facebook API Call
     private void getFacebookUserPages() {
@@ -208,11 +245,13 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     public void onCompleted(GraphResponse response) {
 
                         if (response.getError() == null) {
-                            mDataset.clear();
                             try {
 
                                 JSONArray results = response.getJSONObject().getJSONArray("data");
                                 JSONObject pageInfo;
+
+                                mAsyncCount = mAsyncCount + results.length();
+                                Log.d("CHECK_COUNT", "Feed Fragment >>>>> facebook " + mAsyncCount);
 
                                 for (int i = 0; i < results.length(); i++) {
                                     pageInfo = results.getJSONObject(i);
@@ -223,13 +262,13 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 e.printStackTrace();
                             }
                         } else {
-
+                            Log.e("ERROR_FACEBOOK", "Feed Fragment >>>>> getFacebookUserPages() " + response.getError().getErrorMessage());
                         }
                     }
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("limit", "10");
+        parameters.putString("limit", "5");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -263,6 +302,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                         feed.setProfileImage(article.getJSONObject("from").getJSONObject("picture").getJSONObject("data").getString("url"));
                                     }
                                     if (article.has("created_time")) {
+
+                                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                                        Date date = format.parse(article.getString("created_time"));
+                                        data.setPubDate(date);
+                                        Log.d("CHECK_DATE", "Feed Fragment >>>>> getFacebookPageFeed() " + date);
                                         feed.setUploadTime(article.getString("created_time"));
                                     }
                                     if (article.has("message")) {
@@ -285,10 +329,17 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
                             }
+                        }
 
-                            mAdapter.notifyDataSetChanged();
-                            mRefreshLayout.setRefreshing(false);
+                        synchronized ((Integer) mAsyncCount) {
+                            mAsyncCount = mAsyncCount - 1;
+                        }
+                        Log.d("CHECK_COUNT", "Feed Fragment F >>>>> " + mAsyncCount);
+                        if (mAsyncCount == 0) {
+                            sendAsyncStatus();
                         }
                     }
                 });
@@ -308,7 +359,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onSuccess(PDKResponse response) {
                 super.onSuccess(response);
 
-                mDataset.clear();
+                mAsyncCount = mAsyncCount + response.getBoardList().size();
+                Log.d("CHECK_COUNT", "Feed Fragment pinterest >>>>> " + mAsyncCount);
                 for (PDKBoard board : response.getBoardList()) {
                     Log.d("CHECK_BOARD", " >>>>> " + board.getName());
                     new GetPinterestFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
@@ -339,12 +391,19 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setPlatformType(PLATFORM_PINTEREST);
                         data.setContentsType(CONTENTS_IMAGE);
                         data.setPinterestData(pin);
+                        data.setPubDate(pin.getCreatedAt());
+                        Log.d("CHECK_DATE", "Feed Fragment >>>>> GetPinterestFollowingPins() " + pin.getCreatedAt());
 
                         mDataset.add(data);
                     }
 
-                    mAdapter.notifyDataSetChanged();
-                    mRefreshLayout.setRefreshing(false);
+                    synchronized ((Integer) mAsyncCount) {
+                        mAsyncCount = mAsyncCount - 1;
+                    }
+                    Log.d("CHECK_COUNT", "Feed Fragment P >>>>> " + mAsyncCount);
+                    if (mAsyncCount == 0) {
+                        sendAsyncStatus();
+                    }
                 }
 
                 @Override
@@ -355,6 +414,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             });
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
         }
     }
 
@@ -378,7 +443,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
                 if (response.isSuccessful()) {
 
-                    mDataset.clear();
+                    mAsyncCount = mAsyncCount + response.body().getItems().size();
+                    Log.d("CHECK_COUNT", "Feed Fragment >>>>> youtube " + mAsyncCount);
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
                         new GetYoutubeChannelVideos().executeOnExecutor(THREAD_POOL_EXECUTOR, item.getSnippet().getResourceId().getChannelId());
                     }
@@ -428,12 +494,28 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                             data.setContentsType(CONTENTS_VIDEO);
                             data.setYoutubeData(item);
 
+                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                            try {
+                                Date date = format.parse(item.getSnippet().getPublishedAt());
+                                data.setPubDate(date);
+                                Log.d("CHECK_DATE", "Feed Fragment >>>>> GetYoutubeChannelVideos() " + date.toString());
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
                             mDataset.add(data);
                         }
-                        mAdapter.notifyDataSetChanged();
-
                     } else {
                         Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
+                    }
+
+                    synchronized ((Integer) mAsyncCount) {
+                        mAsyncCount = mAsyncCount - 1;
+                    }
+
+                    Log.d("CHECK_COUNT", "Feed Fragment >>>>> Y " + mAsyncCount);
+                    if (mAsyncCount == 0) {
+                        sendAsyncStatus();
                     }
                 }
 
@@ -445,6 +527,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             });
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
         }
     }
 

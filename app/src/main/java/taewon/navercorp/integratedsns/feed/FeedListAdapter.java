@@ -20,7 +20,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.pinterest.android.pdk.PDKPin;
 
-import java.util.ArrayList;
+import java.util.Vector;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.FacebookFeedData;
@@ -37,7 +37,7 @@ import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
 public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
+    private Vector<FavoFeedData> mDataset = new Vector<>();
     private LayoutInflater mLayoutInflater;
 
     private static final int CONTENTS_IMAGE = 1;
@@ -48,7 +48,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     private static final int PLATFORM_YOUTUBE = 2;
     private static final int PLATFORM_PINTEREST = 3;
 
-    public FeedListAdapter(Context context, ArrayList<FavoFeedData> dataset) {
+    public FeedListAdapter(Context context, Vector<FavoFeedData> dataset) {
 
         mContext = context;
         mDataset = dataset;
