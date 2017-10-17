@@ -8,8 +8,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -19,7 +17,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -61,7 +58,7 @@ import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
  * @date 2017.09.28
  */
 
-public class FeedFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     // for managing tokens
     private SharedPreferences mPref;
@@ -69,7 +66,6 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
 
     // for facebook client
     private OnRequestFacebookTokenListener mCallback;
-    private FacebookHandler mHandler;
 
     // for pinterest client
     private PDKClient mPinterestClient;
@@ -84,7 +80,6 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
 
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
-    private Button mConnectFacebook;
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
@@ -96,7 +91,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
 
     private static final int CONTENTS_IMAGE = 1;
     private static final int CONTENTS_VIDEO = 2;
-    private static final int CONTENTS_MULTI = 3;
+    private static final int CONTENTS_MULTI_IMAGE = 3;
 
     private static final int PLATFORM_FACEBOOK = 1;
     private static final int PLATFORM_YOUTUBE = 2;
@@ -144,7 +139,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
 
-        // Pinterest client init
+        // init pinterest client
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
         mPinterestClient = PDKClient.getInstance();
 
@@ -159,9 +154,6 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
             }
         };
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mBroadcastReceiver, new IntentFilter(getString(R.string.update_token_status)));
-
-        // TODO - old update token receiver (delete soon)
-        mHandler = new FacebookHandler();
     }
 
     private void initView(View view) {
@@ -171,8 +163,6 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
 
         // view for disconnection
         mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
-        mConnectFacebook = (Button) view.findViewById(R.id.button_connect_facebook);
-        mConnectFacebook.setOnClickListener(this);
 
         // set recyclerView
         mFacebookList = (RecyclerView) view.findViewById(R.id.recyclerView_facebook);
@@ -191,25 +181,24 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
         mLayoutDisconnection.setVisibility(View.VISIBLE);
         if (!facebookToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
-            getUserPages();
+            getFacebookUserPages();
         }
 
         if (!googleToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
-            getSubscriptionList();
+            getYoutubeSubscriptionList();
         }
 
         if (!pinterestToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
-            getFollowingBoards();
+            getPinterestFollowingBoards();
         }
     }
 
     // TODO - 여기에서부터 리팩토링 필수!!!!
     // Facebook API Call
-    private void getUserPages() {
+    private void getFacebookUserPages() {
 
-        mDataset.clear();
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newGraphPathRequest(
                 accessToken,
@@ -219,6 +208,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
                     public void onCompleted(GraphResponse response) {
 
                         if (response.getError() == null) {
+                            mDataset.clear();
                             try {
 
                                 JSONArray results = response.getJSONObject().getJSONArray("data");
@@ -226,7 +216,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
 
                                 for (int i = 0; i < results.length(); i++) {
                                     pageInfo = results.getJSONObject(i);
-                                    getPageFeed(pageInfo.getString("id"));
+                                    getFacebookPageFeed(pageInfo.getString("id"));
                                 }
 
                             } catch (JSONException e) {
@@ -244,7 +234,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
         request.executeAsync();
     }
 
-    private void getPageFeed(String pageId) {
+    private void getFacebookPageFeed(String pageId) {
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         String path = String.format("/%s/feed", pageId);
@@ -311,7 +301,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     // Pinterest API Call
-    private void getFollowingBoards() {
+    private void getPinterestFollowingBoards() {
 
         mPinterestClient.getMyFollowedBoards(BOARD_FIELDS, new PDKCallback() {
             @Override
@@ -321,7 +311,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
                 mDataset.clear();
                 for (PDKBoard board : response.getBoardList()) {
                     Log.d("CHECK_BOARD", " >>>>> " + board.getName());
-                    new GetFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
+                    new GetPinterestFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
                 }
             }
 
@@ -332,7 +322,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
         });
     }
 
-    private class GetFollowingPins extends AsyncTask<String, Void, Void> {
+    private class GetPinterestFollowingPins extends AsyncTask<String, Void, Void> {
 
         @Override
         protected Void doInBackground(String... params) {
@@ -369,7 +359,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     // Youtube API Call
-    private void getSubscriptionList() {
+    private void getYoutubeSubscriptionList() {
 
         // get google credential access token
         String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), null));
@@ -388,9 +378,9 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
                 if (response.isSuccessful()) {
 
+                    mDataset.clear();
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
-                        new GetYoutubeVideos().executeOnExecutor(THREAD_POOL_EXECUTOR, item.getSnippet().getResourceId().getChannelId());
-//                        new GetYoutubeVideos().execute(item.getSnippet().getResourceId().getChannelId());
+                        new GetYoutubeChannelVideos().executeOnExecutor(THREAD_POOL_EXECUTOR, item.getSnippet().getResourceId().getChannelId());
                     }
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
@@ -411,7 +401,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
         });
     }
 
-    private class GetYoutubeVideos extends AsyncTask<String, Void, Void> {
+    private class GetYoutubeChannelVideos extends AsyncTask<String, Void, Void> {
 
         @Override
         protected Void doInBackground(String... params) {
@@ -459,30 +449,7 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
     }
 
     @Override
-    public void onClick(View v) {
-
-        switch (v.getId()) {
-
-            case R.id.button_connect_facebook:
-                mCallback.onRequestFacebookToken(mHandler);
-                break;
-        }
-    }
-
-    @Override
     public void onRefresh() {
         checkToken();
-    }
-
-    private class FacebookHandler extends Handler {
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
-            if (msg.what == REQ_REFRESH) {
-                checkToken();
-            }
-        }
     }
 }
