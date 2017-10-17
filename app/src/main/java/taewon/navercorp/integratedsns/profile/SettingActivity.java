@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.CompoundButton;
@@ -61,17 +62,18 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             PDKClient.PDKCLIENT_PERMISSION_WRITE_RELATIONSHIPS
     };
 
-    // Auth Request Code
-    private static final int REQ_FACEBOOK_SIGN_IN = 100;
-    private static final int REQ_GOOGLE_SIGN_IN = 101;
-    private static final int REQ_PINTEREST_SIGN_IN = 8772;
-
     // managing tokens
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
-    Switch mFacebookSwitch, mYoutubeSwitch, mPinterestSwitch;
-    String mFacebookToken, mGoogleToken, mPinterestToken;
+    // UI Components
+    private Switch mFacebookSwitch, mYoutubeSwitch, mPinterestSwitch;
+    private String mFacebookToken, mGoogleToken, mPinterestToken;
+
+    // Auth Request Code
+    private static final int REQ_FACEBOOK_SIGN_IN = 100;
+    private static final int REQ_GOOGLE_SIGN_IN = 101;
+    private static final int REQ_PINTEREST_SIGN_IN = 8772;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,15 +87,16 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
     private void initData() {
 
+        // init preference of tokens
         mPref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
 
         mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init "+mFacebookToken);
+        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mFacebookToken);
         mGoogleToken = mPref.getString(getString(R.string.google_token), "");
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init "+mGoogleToken);
+        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mGoogleToken);
         mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init "+mPinterestToken);
+        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mPinterestToken);
 
         // init google client
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -169,12 +172,15 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         });
     }
 
+    // send status of tokens to "FeedFragment"
+    private void sendTokenStatus() {
+        Intent intent = new Intent(getString(R.string.update_token_status));
+        intent.putExtra("CHECK_MESSAGE", "send success!");
+        LocalBroadcastManager.getInstance(SettingActivity.this).sendBroadcast(intent);
+    }
+
     // check remained token
     private void checkTokens() {
-
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> switch action "+mFacebookToken);
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> switch action "+mGoogleToken);
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> switch action "+mPinterestToken);
 
         if (!mFacebookToken.equals("")) {
             mFacebookSwitch.setChecked(true);
@@ -210,6 +216,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
                 Toast.makeText(SettingActivity.this, "Connect to facebook", Toast.LENGTH_SHORT).show();
                 Log.d("CHECK_PREF", "Setting Activity >>>>" + mPref.getString(getString(R.string.facebook_token), ""));
+                sendTokenStatus();
             }
 
             @Override
@@ -236,6 +243,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             mEditor.putString(getString(R.string.facebook_token), "");
             mEditor.commit();
             Toast.makeText(SettingActivity.this, "disconnect facebook successfully!!", Toast.LENGTH_SHORT).show();
+            sendTokenStatus();
         }
     }
 
@@ -271,7 +279,8 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             public void onSuccess(PDKResponse response) {
                 mEditor.putString(getString(R.string.pinterest_token), response.getUser().getUid());
                 mEditor.commit();
-                Log.d("CHECK_TOKEN","Setting Activity >>>>> pinterest "+response.getUser().getUid());
+                Log.d("CHECK_TOKEN", "Setting Activity >>>>> pinterest " + response.getUser().getUid());
+                sendTokenStatus();
             }
 
             @Override
@@ -288,6 +297,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mEditor.putString(getString(R.string.pinterest_token), "");
         mEditor.commit();
         Toast.makeText(SettingActivity.this, "disconnect pinterest successfully!!", Toast.LENGTH_SHORT).show();
+        sendTokenStatus();
     }
 
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
@@ -304,6 +314,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
                 mEditor.putString(getString(R.string.google_token), credential.getToken());
                 mEditor.commit();
                 Log.d("CHECK_TOKEN", "Setting Activity >>>>> " + credential.getToken());
+                sendTokenStatus();
 
             } catch (IOException e) {
                 e.printStackTrace();

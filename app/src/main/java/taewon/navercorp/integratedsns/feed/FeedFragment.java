@@ -1,13 +1,17 @@
 package taewon.navercorp.integratedsns.feed;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -59,21 +63,28 @@ import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 
 public class FeedFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
+    // for managing tokens
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
+    // for facebook client
+    private OnRequestFacebookTokenListener mCallback;
+    private FacebookHandler mHandler;
+
+    // for pinterest client
+    private PDKClient mPinterestClient;
+
+    // BroadcastReceiver for updating status of tokens to "FeedFragment"
+    private BroadcastReceiver mBroadcastReceiver;
+
+    // UI Components
     private RecyclerView mFacebookList;
     private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
     private FeedListAdapter mAdapter;
 
-    private OnRequestFacebookTokenListener mCallback;
-    private FacebookHandler mHandler;
-
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
     private Button mConnectFacebook;
-
-    private PDKClient mPinterestClient;
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
@@ -119,17 +130,37 @@ public class FeedFragment extends Fragment implements View.OnClickListener, Swip
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // destroy broadcast receiver along with fragment life cycle
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mBroadcastReceiver);
+    }
+
     private void initData() {
 
-        // get preference
+        // init preference
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
-
 
         // Pinterest client init
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
         mPinterestClient = PDKClient.getInstance();
 
+        // init update token status receiver
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                checkToken();
+                String message = intent.getStringExtra("CHECK_MESSAGE");
+                Log.d("CHECK_MESSAGE", message);
+            }
+        };
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mBroadcastReceiver, new IntentFilter(getString(R.string.update_token_status)));
+
+        // TODO - old update token receiver (delete soon)
         mHandler = new FacebookHandler();
     }
 
