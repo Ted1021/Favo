@@ -14,7 +14,7 @@ public class FavoFeedData {
     private int contentsType;
     private Date pubDate;
 
-    private FacebookFeedData facebookData;
+    private FacebookFeedData.ArticleData facebookData;
     private YoutubeSearchVideoData.Item youtubeData;
     private PDKPin pinterestData;
 
@@ -42,11 +42,11 @@ public class FavoFeedData {
         this.pubDate = pubDate;
     }
 
-    public FacebookFeedData getFacebookData() {
+    public FacebookFeedData.ArticleData getFacebookData() {
         return facebookData;
     }
 
-    public void setFacebookData(FacebookFeedData facebookData) {
+    public void setFacebookData(FacebookFeedData.ArticleData facebookData) {
         this.facebookData = facebookData;
     }
 

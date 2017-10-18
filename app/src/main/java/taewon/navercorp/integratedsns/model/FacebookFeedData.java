@@ -1,5 +1,10 @@
 package taewon.navercorp.integratedsns.model;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
 /**
  * @author 김태원
  * @file FacebookFeedData.java
@@ -9,58 +14,308 @@ package taewon.navercorp.integratedsns.model;
 
 public class FacebookFeedData {
 
-    private String name;
-    private String profileImage;
-    private String uploadTime;
-    private String description;
-    private String picture;
-    private String video;
+    @SerializedName("data")
+    private List<ArticleData> data = null;
+    @SerializedName("paging")
+    private Paging paging;
 
-    public String getName() {
-        return name;
+    public List<ArticleData> getData() {
+        return data;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setData(List<ArticleData> data) {
+        this.data = data;
     }
 
-    public String getUploadTime() {
-        return uploadTime;
+    public Paging getPaging() {
+        return paging;
     }
 
-    public void setUploadTime(String uploadTime) {
-        this.uploadTime = uploadTime;
+    public void setPaging(Paging paging) {
+        this.paging = paging;
     }
 
-    public String getDescription() {
-        return description;
+    public class ArticleData {
+
+        @SerializedName("created_time")
+        private String createdTime;
+        @SerializedName("message")
+        private String message;
+        @SerializedName("full_picture")
+        private String fullPicture;
+        @SerializedName("from")
+        private From from;
+        @SerializedName("source")
+        private String source;
+        @SerializedName("attachments")
+        private Attachments attachments;
+        @SerializedName("id")
+        private String id;
+
+        public String getCreatedTime() {
+            return createdTime;
+        }
+
+        public void setCreatedTime(String createdTime) {
+            this.createdTime = createdTime;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getFullPicture() {
+            return fullPicture;
+        }
+
+        public void setFullPicture(String fullPicture) {
+            this.fullPicture = fullPicture;
+        }
+
+        public From getFrom() {
+            return from;
+        }
+
+        public void setFrom(From from) {
+            this.from = from;
+        }
+
+        public String getSource() {
+            return source;
+        }
+
+        public void setSource(String source) {
+            this.source = source;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public class From {
+
+            @SerializedName("name")
+            private String name;
+            @SerializedName("picture")
+            private Picture picture;
+            @SerializedName("id")
+            private String id;
+
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public Picture getPicture() {
+                return picture;
+            }
+
+            public void setPicture(Picture picture) {
+                this.picture = picture;
+            }
+
+            public String getId() {
+                return id;
+            }
+
+            public void setId(String id) {
+                this.id = id;
+            }
+        }
+
+        public class Picture {
+
+            @SerializedName("data")
+            private ProfileData profileData;
+
+            public ProfileData getProfileData() {
+                return profileData;
+            }
+
+            public void setProfileData(ProfileData profileData) {
+                this.profileData = profileData;
+            }
+
+            public class ProfileData {
+
+                @SerializedName("url")
+                @Expose
+                private String url;
+
+                public String getUrl() {
+                    return url;
+                }
+
+                public void setUrl(String url) {
+                    this.url = url;
+                }
+
+            }
+        }
+
+        public class Attachments {
+
+            @SerializedName("data")
+            private List<PhotoSet> data = null;
+
+            public List<PhotoSet> getData() {
+                return data;
+            }
+
+            public void setData(List<PhotoSet> data) {
+                this.data = data;
+            }
+
+            public class PhotoSet {
+
+                @SerializedName("subattachments")
+                private Subattachments subattachments;
+
+                public Subattachments getSubattachments() {
+                    return subattachments;
+                }
+
+                public void setSubattachments(Subattachments subattachments) {
+                    this.subattachments = subattachments;
+                }
+
+                public class Subattachments {
+
+                    @SerializedName("data")
+                    private List<Photo> data = null;
+
+                    public List<Photo> getData() {
+                        return data;
+                    }
+
+                    public void setData(List<Photo> data) {
+                        this.data = data;
+                    }
+
+                    public class Photo {
+
+                        @SerializedName("media")
+                        private Media media;
+
+                        public Media getMedia() {
+                            return media;
+                        }
+
+                        public void setMedia(Media media) {
+                            this.media = media;
+                        }
+
+                        public class Media {
+
+                            @SerializedName("image")
+                            private Image image;
+
+                            public Image getImage() {
+                                return image;
+                            }
+
+                            public void setImage(Image image) {
+                                this.image = image;
+                            }
+
+                            public class Image {
+
+                                @SerializedName("height")
+                                private Integer height;
+                                @SerializedName("src")
+                                private String src;
+                                @SerializedName("width")
+                                private Integer width;
+
+                                public Integer getHeight() {
+                                    return height;
+                                }
+
+                                public void setHeight(Integer height) {
+                                    this.height = height;
+                                }
+
+                                public String getSrc() {
+                                    return src;
+                                }
+
+                                public void setSrc(String src) {
+                                    this.src = src;
+                                }
+
+                                public Integer getWidth() {
+                                    return width;
+                                }
+
+                                public void setWidth(Integer width) {
+                                    this.width = width;
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public class Paging {
 
-    public String getPicture() {
-        return picture;
-    }
+        @SerializedName("cursors")
+        private Cursors cursors;
+        @SerializedName("next")
+        private String next;
 
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
+        public Cursors getCursors() {
+            return cursors;
+        }
 
-    public String getVideo() {
-        return video;
-    }
+        public void setCursors(Cursors cursors) {
+            this.cursors = cursors;
+        }
 
-    public void setVideo(String video) {
-        this.video = video;
-    }
+        public String getNext() {
+            return next;
+        }
 
-    public String getProfileImage() {
-        return profileImage;
-    }
+        public void setNext(String next) {
+            this.next = next;
+        }
 
-    public void setProfileImage(String profileImage) {
-        this.profileImage = profileImage;
+        public class Cursors {
+
+            @SerializedName("before")
+            private String before;
+            @SerializedName("after")
+            private String after;
+
+            public String getBefore() {
+                return before;
+            }
+
+            public void setBefore(String before) {
+                this.before = before;
+            }
+
+            public String getAfter() {
+                return after;
+            }
+
+            public void setAfter(String after) {
+                this.after = after;
+            }
+
+        }
     }
 }

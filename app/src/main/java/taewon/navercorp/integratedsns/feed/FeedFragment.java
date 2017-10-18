@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.google.gson.Gson;
 import com.pinterest.android.pdk.PDKBoard;
 import com.pinterest.android.pdk.PDKCallback;
 import com.pinterest.android.pdk.PDKClient;
@@ -91,7 +92,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
 
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
-    private static final int MAX_COUNTS = 5;
+    private static final int MAX_COUNTS = 10;
 
     private static final int CONTENTS_IMAGE = 1;
     private static final int CONTENTS_VIDEO = 2;
@@ -218,10 +219,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             }
         });
 
-        for (FavoFeedData test : mDataset) {
-            Log.d("dslkfjad;lkdslkfj", "asdasdasd " + test.getPubDate().toString());
-        }
-
         mAdapter.notifyDataSetChanged();
         mRefreshLayout.setRefreshing(false);
     }
@@ -236,6 +233,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     // Facebook API Call
     private void getFacebookUserPages() {
 
+        mRefreshLayout.setRefreshing(true);
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newGraphPathRequest(
                 accessToken,
@@ -251,11 +249,10 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 JSONObject pageInfo;
 
                                 mAsyncCount = mAsyncCount + results.length();
-                                Log.d("CHECK_COUNT", "Feed Fragment >>>>> facebook " + mAsyncCount);
-
                                 for (int i = 0; i < results.length(); i++) {
                                     pageInfo = results.getJSONObject(i);
                                     getFacebookPageFeed(pageInfo.getString("id"));
+                                    Log.d("CHECK_PAGE_ID", ">>>>>>> "+ pageInfo.getString("id"));
                                 }
 
                             } catch (JSONException e) {
@@ -268,7 +265,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("limit", "5");
+        parameters.putString("limit", "10");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -286,49 +283,28 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                         if (response.getError() == null) {
                             try {
-                                JSONArray results = response.getJSONObject().getJSONArray("data");
-                                JSONObject article;
 
-                                for (int i = 0; i < results.length(); i++) {
+                                FacebookFeedData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedData.class);
+                                FacebookFeedData.ArticleData article;
+                                for (int i = 0; i < result.getData().size(); i++) {
 
-                                    article = results.getJSONObject(i);
+                                    article = result.getData().get(i);
                                     FavoFeedData data = new FavoFeedData();
-                                    FacebookFeedData feed = new FacebookFeedData();
 
-                                    if (article.getJSONObject("from").has("name")) {
-                                        feed.setName(article.getJSONObject("from").getString("name"));
-                                    }
-                                    if (article.getJSONObject("from").getJSONObject("picture").getJSONObject("data").has("url")) {
-                                        feed.setProfileImage(article.getJSONObject("from").getJSONObject("picture").getJSONObject("data").getString("url"));
-                                    }
-                                    if (article.has("created_time")) {
-
-                                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                                        Date date = format.parse(article.getString("created_time"));
-                                        data.setPubDate(date);
-                                        Log.d("CHECK_DATE", "Feed Fragment >>>>> getFacebookPageFeed() " + date);
-                                        feed.setUploadTime(article.getString("created_time"));
-                                    }
-                                    if (article.has("message")) {
-                                        feed.setDescription(article.getString("message"));
-                                    }
-                                    if (article.has("full_picture")) {
-                                        feed.setPicture(article.getString("full_picture"));
-                                    }
-                                    if (article.has("source")) {
+                                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                                    Date date = format.parse(article.getCreatedTime());
+                                    if (!(article.getSource() == null)) {
                                         data.setContentsType(CONTENTS_VIDEO);
-                                        feed.setVideo(article.getString("source"));
                                     } else {
                                         data.setContentsType(CONTENTS_IMAGE);
                                     }
 
-                                    data.setFacebookData(feed);
+                                    data.setPubDate(date);
+                                    data.setFacebookData(result.getData().get(i));
                                     data.setPlatformType(PLATFORM_FACEBOOK);
 
                                     mDataset.add(data);
                                 }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
@@ -337,7 +313,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         synchronized ((Integer) mAsyncCount) {
                             mAsyncCount = mAsyncCount - 1;
                         }
-                        Log.d("CHECK_COUNT", "Feed Fragment F >>>>> " + mAsyncCount);
+
                         if (mAsyncCount == 0) {
                             sendAsyncStatus();
                         }
@@ -354,15 +330,14 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     // Pinterest API Call
     private void getPinterestFollowingBoards() {
 
+        mRefreshLayout.setRefreshing(true);
         mPinterestClient.getMyFollowedBoards(BOARD_FIELDS, new PDKCallback() {
             @Override
             public void onSuccess(PDKResponse response) {
                 super.onSuccess(response);
 
                 mAsyncCount = mAsyncCount + response.getBoardList().size();
-                Log.d("CHECK_COUNT", "Feed Fragment pinterest >>>>> " + mAsyncCount);
                 for (PDKBoard board : response.getBoardList()) {
-                    Log.d("CHECK_BOARD", " >>>>> " + board.getName());
                     new GetPinterestFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
                 }
             }
@@ -392,7 +367,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setContentsType(CONTENTS_IMAGE);
                         data.setPinterestData(pin);
                         data.setPubDate(pin.getCreatedAt());
-                        Log.d("CHECK_DATE", "Feed Fragment >>>>> GetPinterestFollowingPins() " + pin.getCreatedAt());
 
                         mDataset.add(data);
                     }
@@ -400,7 +374,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
                     }
-                    Log.d("CHECK_COUNT", "Feed Fragment P >>>>> " + mAsyncCount);
                     if (mAsyncCount == 0) {
                         sendAsyncStatus();
                     }
@@ -410,6 +383,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 public void onFailure(PDKException exception) {
                     super.onFailure(exception);
                     exception.printStackTrace();
+                    synchronized ((Integer) mAsyncCount) {
+                        mAsyncCount = mAsyncCount - 1;
+                    }
+                    if (mAsyncCount == 0) {
+                        sendAsyncStatus();
+                    }
                 }
             });
 
@@ -425,6 +404,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     // Youtube API Call
     private void getYoutubeSubscriptionList() {
+
+        mRefreshLayout.setRefreshing(true);
 
         // get google credential access token
         String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), null));
@@ -444,7 +425,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 if (response.isSuccessful()) {
 
                     mAsyncCount = mAsyncCount + response.body().getItems().size();
-                    Log.d("CHECK_COUNT", "Feed Fragment >>>>> youtube " + mAsyncCount);
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
                         new GetYoutubeChannelVideos().executeOnExecutor(THREAD_POOL_EXECUTOR, item.getSnippet().getResourceId().getChannelId());
                     }
@@ -456,7 +436,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     mEditor.commit();
                     checkToken();
                 }
-                mRefreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -498,7 +477,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                             try {
                                 Date date = format.parse(item.getSnippet().getPublishedAt());
                                 data.setPubDate(date);
-                                Log.d("CHECK_DATE", "Feed Fragment >>>>> GetYoutubeChannelVideos() " + date.toString());
 
                             } catch (ParseException e) {
                                 e.printStackTrace();
@@ -512,8 +490,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
                     }
-
-                    Log.d("CHECK_COUNT", "Feed Fragment >>>>> Y " + mAsyncCount);
                     if (mAsyncCount == 0) {
                         sendAsyncStatus();
                     }
@@ -523,16 +499,17 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
                     t.printStackTrace();
                     Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
+
+                    synchronized ((Integer) mAsyncCount) {
+                        mAsyncCount = mAsyncCount - 1;
+                    }
+                    if (mAsyncCount == 0) {
+                        sendAsyncStatus();
+                    }
                 }
             });
 
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
         }
     }
 
