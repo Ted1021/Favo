@@ -51,6 +51,8 @@ public class FacebookFeedData {
         private Attachments attachments;
         @SerializedName("id")
         private String id;
+        @SerializedName("comment")
+        private Comments comments;
 
         public String getCreatedTime() {
             return createdTime;
@@ -98,6 +100,22 @@ public class FacebookFeedData {
 
         public void setId(String id) {
             this.id = id;
+        }
+
+        public Attachments getAttachments() {
+            return attachments;
+        }
+
+        public void setAttachments(Attachments attachments) {
+            this.attachments = attachments;
+        }
+
+        public Comments getComments() {
+            return comments;
+        }
+
+        public void setComments(Comments comments) {
+            this.comments = comments;
         }
 
         public class From {
@@ -265,6 +283,134 @@ public class FacebookFeedData {
 
                         }
                     }
+                }
+            }
+        }
+
+        public class Comments {
+
+            @SerializedName("data")
+            @Expose
+            private List<CommentData> data = null;
+            @SerializedName("paging")
+            @Expose
+            private Paging paging;
+
+            public List<CommentData> getData() {
+                return data;
+            }
+
+            public void setData(List<CommentData> data) {
+                this.data = data;
+            }
+
+            public Paging getPaging() {
+                return paging;
+            }
+
+            public void setPaging(Paging paging) {
+                this.paging = paging;
+            }
+
+            public class CommentData {
+
+                @SerializedName("from")
+                @Expose
+                private CommentUser from;
+                @SerializedName("message")
+                @Expose
+                private String message;
+                @SerializedName("id")
+                @Expose
+                private String id;
+
+                public CommentUser getFrom() {
+                    return from;
+                }
+
+                public void setFrom(CommentUser from) {
+                    this.from = from;
+                }
+
+                public String getMessage() {
+                    return message;
+                }
+
+                public void setMessage(String message) {
+                    this.message = message;
+                }
+
+                public String getId() {
+                    return id;
+                }
+
+                public void setId(String id) {
+                    this.id = id;
+                }
+
+            }
+
+            public class CommentUser {
+
+                @SerializedName("name")
+                private String name;
+                @SerializedName("picture")
+                private UserProfile picture;
+                @SerializedName("id")
+                private String id;
+
+                public String getName() {
+                    return name;
+                }
+
+                public void setName(String name) {
+                    this.name = name;
+                }
+
+                public UserProfile getPicture() {
+                    return picture;
+                }
+
+                public void setPicture(UserProfile picture) {
+                    this.picture = picture;
+                }
+
+                public String getId() {
+                    return id;
+                }
+
+                public void setId(String id) {
+                    this.id = id;
+                }
+
+            }
+
+            public class UserProfile {
+
+                @SerializedName("data")
+                private UserProfileUrl data;
+
+                public UserProfileUrl getData() {
+                    return data;
+                }
+
+                public void setData(UserProfileUrl data) {
+                    this.data = data;
+                }
+
+                public class UserProfileUrl {
+
+                    @SerializedName("url")
+                    private String url;
+
+                    public String getUrl() {
+                        return url;
+                    }
+
+                    public void setUrl(String url) {
+                        this.url = url;
+                    }
+
                 }
             }
         }

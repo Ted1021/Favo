@@ -201,7 +201,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
 
             Glide.with(mContext).load(data.getFullPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-            Glide.with(mContext).load(data.getFrom().getPicture().getProfileData().getUrl()).into(holder.mProfile);
+            Glide.with(mContext).load(data.getFrom().getPicture().getProfileData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
             Glide.with(mContext).load(R.drawable.icon_facebook_small).into(holder.mPlatformType);
 
         } catch (Exception e) {
@@ -221,7 +221,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mDescription.setText(data.getDescription());
 
         Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth()).placeholder(R.drawable.image_loading)).into(holder.mPicture);
-        Glide.with(mContext).load(R.drawable.icon_profile).into(holder.mProfile);
+        Glide.with(mContext).load(R.drawable.icon_profile).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
         Glide.with(mContext).load(R.drawable.icon_youtube_small).into(holder.mPlatformType);
         Log.d("CHECK_VIDEO_URL", "http://www.youtube.com/watch?v=" + id.getVideoId());
     }
@@ -234,7 +234,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mUploadTime.setText(data.getCreatedAt().toString());
         holder.mDescription.setText(data.getNote());
         Glide.with(mContext).load(data.getImageUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth()).placeholder(R.drawable.image_loading)).into(holder.mPicture);
-        Glide.with(mContext).load(R.drawable.icon_profile).into(holder.mProfile);
+        Glide.with(mContext).load(R.drawable.icon_profile).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
         Glide.with(mContext).load(R.drawable.icon_pinterest_small).into(holder.mPlatformType);
     }
 

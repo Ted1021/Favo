@@ -52,7 +52,8 @@
         <activity
             android:name=".youtube.YoutubeDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-        <activity android:name=".profile.SettingActivity"></activity>
+        <activity android:name=".profile.SettingActivity" />
+        <activity android:name=".feed.FeedDetail.FeedDetailActivity"></activity>
     </application>
 
 </manifest>
