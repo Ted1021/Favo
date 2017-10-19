@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -156,15 +157,17 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 break;
 
             case PLATFORM_YOUTUBE:
+
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position).getYoutubeData().getSnippet());
+                intent.putExtras(bundle);
                 intent.putExtra("VIDEO_ID", mDataset.get(position).getYoutubeData().getId().getVideoId());
-                intent.putExtra("VIDEO_CONTENT", mDataset.get(position).getYoutubeData().getSnippet());
                 break;
 
             case PLATFORM_PINTEREST:
 
                 break;
         }
-
         mContext.startActivity(intent);
     }
 

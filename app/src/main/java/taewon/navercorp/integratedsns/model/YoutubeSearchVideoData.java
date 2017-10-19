@@ -3,6 +3,7 @@ package taewon.navercorp.integratedsns.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -167,7 +168,8 @@ public class YoutubeSearchVideoData {
 
         }
 
-        public class Snippet {
+        @SuppressWarnings("serial")
+        public class Snippet implements Serializable{
 
             @SerializedName("publishedAt")
             @Expose

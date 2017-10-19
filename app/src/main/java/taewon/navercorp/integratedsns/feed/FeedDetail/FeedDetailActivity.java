@@ -19,6 +19,8 @@ import com.google.gson.Gson;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.FacebookFeedDetailData;
+import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.YoutubeVideoCommentData;
 
 public class FeedDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -26,6 +28,8 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
     private RecyclerView.Adapter mAdapter;
 
     private FacebookFeedDetailData mFeedDetail = new FacebookFeedDetailData();
+    private YoutubeVideoCommentData mYoutubeVideoCommentData = new YoutubeVideoCommentData();
+    private YoutubeSearchVideoData mYoutubeSearchVideoData = new YoutubeSearchVideoData();
 
     private int mContentType, mPlatformType;
     private String mArticleId, mVideoId, mPinId;
@@ -47,7 +51,6 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
 
         initData();
         initView();
-        getFacebookFeedDetail();
     }
 
     private void initData() {
@@ -65,6 +68,7 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
 
             case PLATFORM_YOUTUBE:
                 mVideoId = intent.getStringExtra("VIDEO_ID");
+                mYoutubeSearchVideoData = (YoutubeSearchVideoData) intent.getSerializableExtra("VIDEO_CONTENT");
                 getYoutubeVideoComments();
                 break;
 
@@ -116,6 +120,14 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
         request.executeAsync();
     }
 
+    private void getYoutubeVideoComments() {
+
+    }
+
+    private void getPinterestPinComments() {
+
+    }
+
     private void setFacebookComment() {
 
         Bundle params = new Bundle();
@@ -138,14 +150,6 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
                     }
                 }
         ).executeAsync();
-    }
-
-    private void getYoutubeVideoComments() {
-
-    }
-
-    private void getPinterestPinComments() {
-
     }
 
     @Override
