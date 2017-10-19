@@ -348,69 +348,68 @@ public class FacebookFeedData {
                     this.id = id;
                 }
 
-            }
+                public class CommentUser {
 
-            public class CommentUser {
+                    @SerializedName("name")
+                    private String name;
+                    @SerializedName("picture")
+                    private UserProfile picture;
+                    @SerializedName("id")
+                    private String id;
 
-                @SerializedName("name")
-                private String name;
-                @SerializedName("picture")
-                private UserProfile picture;
-                @SerializedName("id")
-                private String id;
-
-                public String getName() {
-                    return name;
-                }
-
-                public void setName(String name) {
-                    this.name = name;
-                }
-
-                public UserProfile getPicture() {
-                    return picture;
-                }
-
-                public void setPicture(UserProfile picture) {
-                    this.picture = picture;
-                }
-
-                public String getId() {
-                    return id;
-                }
-
-                public void setId(String id) {
-                    this.id = id;
-                }
-
-            }
-
-            public class UserProfile {
-
-                @SerializedName("data")
-                private UserProfileUrl data;
-
-                public UserProfileUrl getData() {
-                    return data;
-                }
-
-                public void setData(UserProfileUrl data) {
-                    this.data = data;
-                }
-
-                public class UserProfileUrl {
-
-                    @SerializedName("url")
-                    private String url;
-
-                    public String getUrl() {
-                        return url;
+                    public String getName() {
+                        return name;
                     }
 
-                    public void setUrl(String url) {
-                        this.url = url;
+                    public void setName(String name) {
+                        this.name = name;
                     }
 
+                    public UserProfile getPicture() {
+                        return picture;
+                    }
+
+                    public void setPicture(UserProfile picture) {
+                        this.picture = picture;
+                    }
+
+                    public String getId() {
+                        return id;
+                    }
+
+                    public void setId(String id) {
+                        this.id = id;
+                    }
+
+                }
+
+                public class UserProfile {
+
+                    @SerializedName("data")
+                    private UserProfileUrl data;
+
+                    public UserProfileUrl getData() {
+                        return data;
+                    }
+
+                    public void setData(UserProfileUrl data) {
+                        this.data = data;
+                    }
+
+                    public class UserProfileUrl {
+
+                        @SerializedName("url")
+                        private String url;
+
+                        public String getUrl() {
+                            return url;
+                        }
+
+                        public void setUrl(String url) {
+                            this.url = url;
+                        }
+
+                    }
                 }
             }
         }
