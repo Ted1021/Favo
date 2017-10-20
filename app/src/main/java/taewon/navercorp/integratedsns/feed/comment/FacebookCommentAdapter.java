@@ -15,7 +15,7 @@ import com.bumptech.glide.request.RequestOptions;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.FacebookFeedDetailData;
+import taewon.navercorp.integratedsns.model.comment.FacebookCommentData;
 
 /**
  * Created by USER on 2017-10-18.
@@ -24,11 +24,11 @@ import taewon.navercorp.integratedsns.model.FacebookFeedDetailData;
 public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookCommentAdapter.ViewHolder> {
 
     private Context mContext;
-    private FacebookFeedDetailData mFeedDetail;
-    private ArrayList mDataset = new ArrayList<>();
+    private FacebookCommentData mFeedDetail;
+    private ArrayList<FacebookCommentData.Comments.CommentData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
-    private int mContentType, mPlatformType;
+    private int mContentType;
 
     // ViewHolder Type
     public static final int TYPE_HEADER = 0;
@@ -44,17 +44,14 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
     private static final int PLATFORM_YOUTUBE = 2;
     private static final int PLATFORM_PINTEREST = 3;
 
-    public FacebookCommentAdapter(Context context, FacebookFeedDetailData feedDetail, int contentType, int platformType) {
+    public FacebookCommentAdapter(Context context, FacebookCommentData feedDetail, ArrayList<FacebookCommentData.Comments.CommentData> dataset, int contentType) {
 
         mContext = context;
         mFeedDetail = feedDetail;
+        mDataset = dataset;
         mContentType = contentType;
-        mPlatformType = platformType;
 
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (mFeedDetail.getComments() != null) {
-            mDataset.addAll(mFeedDetail.getComments().getData());
-        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -155,7 +152,7 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
     private void bindBodyViewItem(ViewHolder holder, int position) {
 
         if (!mDataset.isEmpty()) {
-            FacebookFeedDetailData.Comments.CommentData data = (FacebookFeedDetailData.Comments.CommentData) mDataset.get(position);
+            FacebookCommentData.Comments.CommentData data = mFeedDetail.getComments().getData().get(position);
 
             holder.mCommentUserName.setText(data.getFrom().getName());
             holder.mCommentText.setText(data.getMessage());

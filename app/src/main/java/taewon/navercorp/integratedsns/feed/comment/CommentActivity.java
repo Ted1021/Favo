@@ -16,6 +16,8 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,9 +25,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.FacebookFeedDetailData;
-import taewon.navercorp.integratedsns.model.YoutubeCommentData;
-import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.comment.FacebookCommentData;
+import taewon.navercorp.integratedsns.model.comment.YoutubeComment;
+import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
+import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 
 public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -36,9 +39,10 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
     private RecyclerView mCommentList;
     private RecyclerView.Adapter mAdapter;
 
-    private FacebookFeedDetailData mFeedDetail = new FacebookFeedDetailData();
+    private FacebookCommentData mFeedDetail = new FacebookCommentData();
+    private ArrayList<FacebookCommentData.Comments.CommentData> mFacebookDataset = new ArrayList<>();
 
-    private YoutubeCommentData mYoutubeCommentData = new YoutubeCommentData();
+    private ArrayList<YoutubeCommentData.Item> mYoutubeDataset = new ArrayList<>();
     private YoutubeSearchVideoData.Item mYoutubeSearchVideoData;
 
     private int mContentType, mPlatformType;
@@ -56,6 +60,8 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
     private static final int MAX_COUNTS = 10;
+    private String mNextPage;
+    private String mPrevPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +92,9 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
             case PLATFORM_YOUTUBE:
 
                 mVideoId = intent.getStringExtra("VIDEO_ID");
+                Log.d("CHECK_VIDEO", mVideoId);
                 mYoutubeSearchVideoData = (YoutubeSearchVideoData.Item) intent.getSerializableExtra("VIDEO_CONTENT");
-                getYoutubeVideoComments();
+                getYoutubeComments();
                 break;
 
             case PLATFORM_PINTEREST:
@@ -101,16 +108,24 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
     private void initView() {
 
         mCommentList = (RecyclerView) findViewById(R.id.recyclerView_commentList);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
-        mCommentList.setLayoutManager(layoutManager);
-
         mUserComment = (EditText) findViewById(R.id.editText_userComment);
 
         mCamera = (ImageButton) findViewById(R.id.button_camera);
         mCamera.setOnClickListener(this);
-
         mSend = (ImageButton) findViewById(R.id.button_send);
         mSend.setOnClickListener(this);
+
+        if (mPlatformType == PLATFORM_FACEBOOK) {
+
+        } else if (mPlatformType == PLATFORM_YOUTUBE) {
+            mAdapter = new YoutubeCommentAdapter(CommentActivity.this, mYoutubeSearchVideoData, mYoutubeDataset);
+            mCommentList.setAdapter(mAdapter);
+        } else {
+
+        }
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
+        mCommentList.setLayoutManager(layoutManager);
     }
 
     private void getFacebookFeedDetail() {
@@ -125,8 +140,9 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                     public void onCompleted(GraphResponse response) {
 
                         if (response.getError() == null) {
-                            mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedDetailData.class);
-                            mAdapter = new FacebookCommentAdapter(CommentActivity.this, mFeedDetail, mContentType, mPlatformType);
+                            mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
+                            mFacebookDataset.addAll(mFeedDetail.getComments().getData());
+                            mAdapter = new FacebookCommentAdapter(CommentActivity.this, mFeedDetail, mFacebookDataset, mContentType);
                             mCommentList.setAdapter(mAdapter);
                         }
                     }
@@ -138,7 +154,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         request.executeAsync();
     }
 
-    private void getYoutubeVideoComments() {
+    private void getYoutubeComments() {
 
         String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
 
@@ -155,12 +171,12 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
                 if (response.isSuccessful()) {
 
-                    mYoutubeCommentData = response.body();
-                    mAdapter = new YoutubeCommentAdapter(CommentActivity.this, mYoutubeSearchVideoData, mYoutubeCommentData);
-                    mCommentList.setAdapter(mAdapter);
+                    mNextPage = response.body().getNextPageToken();
+                    mYoutubeDataset.addAll(response.body().getItems());
+                    mAdapter.notifyDataSetChanged();
 
                 } else {
-                    Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to get json for video "+ response.raw().toString());
+                    Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to get json for video " + response.raw().toString());
                 }
             }
 
@@ -168,6 +184,72 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
             public void onFailure(Call<YoutubeCommentData> call, Throwable t) {
                 t.printStackTrace();
                 Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to access youtube api server");
+            }
+        });
+    }
+
+    private void getYoutubeCommentNext() {
+
+        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeCommentData> call = service.getCommentListNext(accessToken, mNextPage, "snippet", mVideoId);
+        call.enqueue(new Callback<YoutubeCommentData>() {
+            @Override
+            public void onResponse(Call<YoutubeCommentData> call, Response<YoutubeCommentData> response) {
+
+                if (response.isSuccessful()) {
+
+                    mNextPage = response.body().getNextPageToken();
+                    mYoutubeDataset.addAll(response.body().getItems());
+                    mAdapter.notifyDataSetChanged();
+
+                } else {
+                    Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to get json for video " + response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<YoutubeCommentData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to access youtube api server");
+            }
+        });
+    }
+
+    private void setYoutubeComment(String userComment) {
+
+        YoutubeComment commentData = new YoutubeComment();
+        commentData.getSnippet().setVideoId(mVideoId);
+        commentData.getSnippet().getTopLevelComment().getSnippet().setTextOriginal(userComment);
+
+        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        Log.d("CHECK_TOKEN", accessToken);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<Void> call = service.setComment(accessToken, "snippet", commentData);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    getYoutubeComments();
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+
             }
         });
     }
@@ -180,6 +262,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
 
+        String comment = mUserComment.getText().toString();
         switch (v.getId()) {
 
             case R.id.button_camera:
@@ -187,6 +270,10 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.button_send:
+
+                if (mPlatformType == PLATFORM_YOUTUBE) {
+                    setYoutubeComment(comment);
+                }
                 break;
         }
     }

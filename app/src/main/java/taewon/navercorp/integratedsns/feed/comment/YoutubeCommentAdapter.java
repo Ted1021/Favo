@@ -12,9 +12,11 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.ArrayList;
+
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.YoutubeCommentData;
-import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
+import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 
 /**
  * Created by USER on 2017-10-20.
@@ -24,18 +26,18 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
 
     private Context mContext;
     private YoutubeSearchVideoData.Item mVideoData;
-    private YoutubeCommentData mCommentData;
+    private ArrayList<YoutubeCommentData.Item> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
     // ViewHolder Type
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_ITEM = 1;
 
-    public YoutubeCommentAdapter(Context context, YoutubeSearchVideoData.Item videoData, YoutubeCommentData commentData) {
+    public YoutubeCommentAdapter(Context context, YoutubeSearchVideoData.Item videoData, ArrayList<YoutubeCommentData.Item> dataset) {
 
         mContext = context;
         mVideoData = videoData;
-        mCommentData = commentData;
+        mDataset = dataset;
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -103,7 +105,7 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
 
-            View headerView = mLayoutInflater.inflate(R.layout.item_image_article, parent, false);
+            View headerView = mLayoutInflater.inflate(R.layout.item_video_article, parent, false);
             return new ViewHolder(headerView, viewType);
         } else {
 
@@ -135,7 +137,7 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
 
     private void bindBodyViewItem(ViewHolder holder, int position) {
 
-        YoutubeCommentData.Item.TopLevelComment.Author data = mCommentData.getItems().get(position).getSnippet().getTopLevelComment().getSnippet();
+        YoutubeCommentData.Item.TopLevelComment.Author data = mDataset.get(position).getSnippet().getTopLevelComment().getSnippet();
 
         holder.mCommentUserName.setText(data.getAuthorDisplayName());
         holder.mCommentText.setText(data.getTextOriginal());
@@ -146,6 +148,6 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
 
     @Override
     public int getItemCount() {
-        return mCommentData.getItems().size() + 1;
+        return mDataset.size() + 1;
     }
 }

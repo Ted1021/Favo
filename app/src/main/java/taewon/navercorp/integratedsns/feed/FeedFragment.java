@@ -49,10 +49,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.FacebookFeedData;
-import taewon.navercorp.integratedsns.model.FavoFeedData;
-import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
-import taewon.navercorp.integratedsns.model.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.model.feed.FacebookFeedData;
+import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
+import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
@@ -426,7 +426,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                     mAsyncCount = mAsyncCount + response.body().getItems().size();
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
-                        new GetYoutubeChannelVideos().executeOnExecutor(THREAD_POOL_EXECUTOR, item.getSnippet().getResourceId().getChannelId());
+
+                        String[] params = {item.getSnippet().getResourceId().getChannelId(), item.getSnippet().getThumbnails().getHigh().getUrl()};
+                        new GetYoutubeChannelVideos().executeOnExecutor(THREAD_POOL_EXECUTOR, params);
                     }
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
@@ -449,9 +451,10 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private class GetYoutubeChannelVideos extends AsyncTask<String, Void, Void> {
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected Void doInBackground(final String... params) {
 
             String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+            final String profileUrl = params[1];
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(YOUTUBE_BASE_URL)
@@ -471,6 +474,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                             data.setPlatformType(PLATFORM_YOUTUBE);
                             data.setContentsType(CONTENTS_VIDEO);
+                            item.getSnippet().setProfileImage(profileUrl);
                             data.setYoutubeData(item);
 
                             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");

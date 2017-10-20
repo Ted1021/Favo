@@ -1,12 +1,15 @@
 package taewon.navercorp.integratedsns.interfaces;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
-import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
-import taewon.navercorp.integratedsns.model.YoutubeSubscriptionData;
-import taewon.navercorp.integratedsns.model.YoutubeCommentData;
+import taewon.navercorp.integratedsns.model.comment.YoutubeComment;
+import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
+import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
 
 /**
  * @author 김태원
@@ -34,4 +37,15 @@ public interface YoutubeService {
                                             @Query("part") String part,
                                             @Query("videoId") String videoId);
 
+    @GET("youtube/v3/commentThreads")
+    Call<YoutubeCommentData> getCommentListNext(@Header("Authorization") String auth,
+                                                @Query("part") String part,
+                                                @Query("pageToken") String pageToken,
+                                                @Query("videoId") String videoId);
+
+    @POST("youtube/v3/commentThreads")
+    Call<Void> setComment(@Header("Authorization") String auth,
+                          @Query("part") String part,
+                          @Body YoutubeComment comment
+    );
 }

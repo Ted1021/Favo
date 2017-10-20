@@ -25,9 +25,9 @@ import java.util.Vector;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
-import taewon.navercorp.integratedsns.model.FacebookFeedData;
-import taewon.navercorp.integratedsns.model.FavoFeedData;
-import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.feed.FacebookFeedData;
+import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
+import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 
 /**
  * @author 김태원
@@ -261,7 +261,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mDescription.setText(data.getDescription());
 
         Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-        Glide.with(mContext).load(R.drawable.icon_profile).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
+        Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
         Glide.with(mContext).load(R.drawable.icon_youtube_small).into(holder.mPlatformType);
         Log.d("CHECK_VIDEO_URL", "http://www.youtube.com/watch?v=" + id.getVideoId());
     }
