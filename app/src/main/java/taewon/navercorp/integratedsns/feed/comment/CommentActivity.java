@@ -141,7 +141,9 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
                         if (response.getError() == null) {
                             mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
-                            mFacebookDataset.addAll(mFeedDetail.getComments().getData());
+                            if (mFeedDetail.getComments().getData() != null) {
+                                mFacebookDataset.addAll(mFeedDetail.getComments().getData());
+                            }
                             mAdapter = new FacebookCommentAdapter(CommentActivity.this, mFeedDetail, mFacebookDataset, mContentType);
                             mCommentList.setAdapter(mAdapter);
                         }

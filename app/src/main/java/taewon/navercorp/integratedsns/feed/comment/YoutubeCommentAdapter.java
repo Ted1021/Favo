@@ -131,7 +131,7 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
         holder.mDescription.setText(mVideoData.getSnippet().getDescription());
 
         Glide.with(mContext).load(mVideoData.getSnippet().getThumbnails().getHigh().getUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-        Glide.with(mContext).load(R.drawable.icon_profile).apply(new RequestOptions().circleCropTransform()).into(holder.mArticleProfile);
+        Glide.with(mContext).load(mVideoData.getSnippet().getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mArticleProfile);
         Glide.with(mContext).load(R.drawable.icon_youtube_small).into(holder.mPlatformType);
     }
 
