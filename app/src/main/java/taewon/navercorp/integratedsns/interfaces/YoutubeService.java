@@ -35,12 +35,14 @@ public interface YoutubeService {
     @GET("youtube/v3/commentThreads")
     Call<YoutubeCommentData> getCommentList(@Header("Authorization") String auth,
                                             @Query("part") String part,
+                                            @Query("maxResults") int maxResults,
                                             @Query("videoId") String videoId);
 
     @GET("youtube/v3/commentThreads")
     Call<YoutubeCommentData> getCommentListNext(@Header("Authorization") String auth,
                                                 @Query("part") String part,
                                                 @Query("pageToken") String pageToken,
+                                                @Query("maxResults") int maxResults,
                                                 @Query("videoId") String videoId);
 
     @POST("youtube/v3/commentThreads")

@@ -2,7 +2,9 @@ package taewon.navercorp.integratedsns.feed.comment;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +31,7 @@ import taewon.navercorp.integratedsns.model.comment.FacebookCommentData;
 import taewon.navercorp.integratedsns.model.comment.YoutubeComment;
 import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 
 public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -50,6 +53,8 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
     private EditText mUserComment;
     private ImageButton mCamera, mSend;
 
+    private EndlessRecyclerViewScrollListener mScrollListener;
+
     private static final int CONTENTS_IMAGE = 1;
     private static final int CONTENTS_VIDEO = 2;
     private static final int CONTENTS_MULTI = 3;
@@ -63,6 +68,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
     private String mNextPage;
     private String mPrevPage;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +100,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 mVideoId = intent.getStringExtra("VIDEO_ID");
                 Log.d("CHECK_VIDEO", mVideoId);
                 mYoutubeSearchVideoData = (YoutubeSearchVideoData.Item) intent.getSerializableExtra("VIDEO_CONTENT");
-                getYoutubeComments();
+//                getYoutubeComments();
                 break;
 
             case PLATFORM_PINTEREST:
@@ -105,6 +111,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void initView() {
 
         mCommentList = (RecyclerView) findViewById(R.id.recyclerView_commentList);
@@ -126,6 +133,27 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
         mCommentList.setLayoutManager(layoutManager);
+        mScrollListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+
+                switch (mPlatformType) {
+
+                    case PLATFORM_FACEBOOK:
+
+                        break;
+
+                    case PLATFORM_YOUTUBE:
+                        getYoutubeComment();
+                        break;
+
+                    case PLATFORM_PINTEREST:
+
+                        break;
+                }
+            }
+        };
+        mCommentList.addOnScrollListener(mScrollListener);
     }
 
     private void getFacebookFeedDetail() {
@@ -156,7 +184,8 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         request.executeAsync();
     }
 
-    private void getYoutubeComments() {
+
+    private void getYoutubeComment() {
 
         String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
 
@@ -166,46 +195,16 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeCommentData> call = service.getCommentList(accessToken, "snippet", mVideoId);
+        Call<YoutubeCommentData> call = service.getCommentListNext(accessToken, "snippet", mNextPage, MAX_COUNTS, mVideoId);
         call.enqueue(new Callback<YoutubeCommentData>() {
             @Override
             public void onResponse(Call<YoutubeCommentData> call, Response<YoutubeCommentData> response) {
 
                 if (response.isSuccessful()) {
 
-                    mNextPage = response.body().getNextPageToken();
-                    mYoutubeDataset.addAll(response.body().getItems());
-                    mAdapter.notifyDataSetChanged();
-
-                } else {
-                    Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to get json for video " + response.raw().toString());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<YoutubeCommentData> call, Throwable t) {
-                t.printStackTrace();
-                Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to access youtube api server");
-            }
-        });
-    }
-
-    private void getYoutubeCommentNext() {
-
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(YOUTUBE_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeCommentData> call = service.getCommentListNext(accessToken, mNextPage, "snippet", mVideoId);
-        call.enqueue(new Callback<YoutubeCommentData>() {
-            @Override
-            public void onResponse(Call<YoutubeCommentData> call, Response<YoutubeCommentData> response) {
-
-                if (response.isSuccessful()) {
+                    if(response.body().getNextPageToken() == null){
+                        return;
+                    }
 
                     mNextPage = response.body().getNextPageToken();
                     mYoutubeDataset.addAll(response.body().getItems());
@@ -242,11 +241,8 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    getYoutubeComments();
-                } else {
 
-                }
+
             }
 
             @Override
