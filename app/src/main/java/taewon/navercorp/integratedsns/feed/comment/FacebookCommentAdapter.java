@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.feed.FeedDetail;
+package taewon.navercorp.integratedsns.feed.comment;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -21,11 +21,11 @@ import taewon.navercorp.integratedsns.model.FacebookFeedDetailData;
  * Created by USER on 2017-10-18.
  */
 
-public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.ViewHolder> {
+public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookCommentAdapter.ViewHolder> {
 
     private Context mContext;
     private FacebookFeedDetailData mFeedDetail;
-    private ArrayList<FacebookFeedDetailData.Comments.CommentData> mDataset = new ArrayList<>();
+    private ArrayList mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
     private int mContentType, mPlatformType;
@@ -44,7 +44,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
     private static final int PLATFORM_YOUTUBE = 2;
     private static final int PLATFORM_PINTEREST = 3;
 
-    public CommentListAdapter(Context context, FacebookFeedDetailData feedDetail, int contentType, int platformType) {
+    public FacebookCommentAdapter(Context context, FacebookFeedDetailData feedDetail, int contentType, int platformType) {
 
         mContext = context;
         mFeedDetail = feedDetail;
@@ -154,13 +154,15 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
 
     private void bindBodyViewItem(ViewHolder holder, int position) {
 
-        FacebookFeedDetailData.Comments.CommentData data = mDataset.get(position);
+        if (!mDataset.isEmpty()) {
+            FacebookFeedDetailData.Comments.CommentData data = (FacebookFeedDetailData.Comments.CommentData) mDataset.get(position);
 
-        holder.mCommentUserName.setText(data.getFrom().getName());
-        holder.mCommentText.setText(data.getMessage());
-        holder.mUploadTime.setText(data.getUploadTime());
+            holder.mCommentUserName.setText(data.getFrom().getName());
+            holder.mCommentText.setText(data.getMessage());
+            holder.mUploadTime.setText(data.getUploadTime());
 
-        Glide.with(mContext).load(data.getFrom().getPicture().getData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mCommentProfile);
+            Glide.with(mContext).load(data.getFrom().getPicture().getData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mCommentProfile);
+        }
     }
 
     @Override

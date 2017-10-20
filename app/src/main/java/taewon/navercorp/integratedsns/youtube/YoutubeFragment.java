@@ -146,7 +146,7 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener, S
 
         // get 'subscriptions' from youtube data api v3
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSubscriptionData> call = service.subscriptionList(accessToken, "snippet", MAX_COUNTS, true);
+        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_COUNTS, true);
         call.enqueue(new Callback<YoutubeSubscriptionData>() {
             @Override
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {

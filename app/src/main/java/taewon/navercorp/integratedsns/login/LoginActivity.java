@@ -58,7 +58,9 @@ public class LoginActivity extends AppCompatActivity
     private static final String[] GOOGLE_SCOPES = {
             YouTubeScopes.YOUTUBE_READONLY,
             YouTubeScopes.YOUTUBE_READONLY,
-            YouTubeScopes.YOUTUBEPARTNER};
+            YouTubeScopes.YOUTUBEPARTNER,
+            YouTubeScopes.YOUTUBE_FORCE_SSL
+    };
 
     // Auth for pinterest
     private PDKClient mPinterestClient;
@@ -96,7 +98,7 @@ public class LoginActivity extends AppCompatActivity
         // init google client
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.google_client_id))
-                .requestScopes(new Scope(YouTubeScopes.YOUTUBE), new Scope(YouTubeScopes.YOUTUBE_READONLY), new Scope(YouTubeScopes.YOUTUBEPARTNER))
+                .requestScopes(new Scope(YouTubeScopes.YOUTUBE), new Scope(YouTubeScopes.YOUTUBE_READONLY), new Scope(YouTubeScopes.YOUTUBEPARTNER), new Scope(YouTubeScopes.YOUTUBE_FORCE_SSL))
                 .requestEmail()
                 .build();
 

@@ -1,6 +1,7 @@
-package taewon.navercorp.integratedsns.feed.FeedDetail;
+package taewon.navercorp.integratedsns.feed.comment;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,27 +10,36 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 import com.google.gson.Gson;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.FacebookFeedDetailData;
+import taewon.navercorp.integratedsns.model.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
-import taewon.navercorp.integratedsns.model.YoutubeVideoCommentData;
 
-public class FeedDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
+
+    // for managing tokens
+    private SharedPreferences mPref;
+    private SharedPreferences.Editor mEditor;
 
     private RecyclerView mCommentList;
     private RecyclerView.Adapter mAdapter;
 
     private FacebookFeedDetailData mFeedDetail = new FacebookFeedDetailData();
-    private YoutubeVideoCommentData mYoutubeVideoCommentData = new YoutubeVideoCommentData();
-    private YoutubeSearchVideoData mYoutubeSearchVideoData = new YoutubeSearchVideoData();
+
+    private YoutubeCommentData mYoutubeCommentData = new YoutubeCommentData();
+    private YoutubeSearchVideoData.Item mYoutubeSearchVideoData;
 
     private int mContentType, mPlatformType;
     private String mArticleId, mVideoId, mPinId;
@@ -44,6 +54,9 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
     private static final int PLATFORM_YOUTUBE = 2;
     private static final int PLATFORM_PINTEREST = 3;
 
+    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
+    private static final int MAX_COUNTS = 10;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,20 +68,25 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
 
     private void initData() {
 
+        // init preference
+        mPref = CommentActivity.this.getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mEditor = mPref.edit();
+
         Intent intent = getIntent();
 
         mContentType = intent.getIntExtra("CONTENT_TYPE", 0);
         mPlatformType = intent.getIntExtra("PLATFORM_TYPE", 0);
 
-        switch(mPlatformType){
+        switch (mPlatformType) {
             case PLATFORM_FACEBOOK:
                 mArticleId = intent.getStringExtra("ARTICLE_ID");
                 getFacebookFeedDetail();
                 break;
 
             case PLATFORM_YOUTUBE:
+
                 mVideoId = intent.getStringExtra("VIDEO_ID");
-                mYoutubeSearchVideoData = (YoutubeSearchVideoData) intent.getSerializableExtra("VIDEO_CONTENT");
+                mYoutubeSearchVideoData = (YoutubeSearchVideoData.Item) intent.getSerializableExtra("VIDEO_CONTENT");
                 getYoutubeVideoComments();
                 break;
 
@@ -83,7 +101,7 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
     private void initView() {
 
         mCommentList = (RecyclerView) findViewById(R.id.recyclerView_commentList);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(FeedDetailActivity.this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
         mCommentList.setLayoutManager(layoutManager);
 
         mUserComment = (EditText) findViewById(R.id.editText_userComment);
@@ -108,7 +126,7 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
 
                         if (response.getError() == null) {
                             mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedDetailData.class);
-                            mAdapter = new CommentListAdapter(FeedDetailActivity.this, mFeedDetail, mContentType, mPlatformType);
+                            mAdapter = new FacebookCommentAdapter(CommentActivity.this, mFeedDetail, mContentType, mPlatformType);
                             mCommentList.setAdapter(mAdapter);
                         }
                     }
@@ -122,47 +140,53 @@ public class FeedDetailActivity extends AppCompatActivity implements View.OnClic
 
     private void getYoutubeVideoComments() {
 
+        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeCommentData> call = service.getCommentList(accessToken, "snippet", mVideoId);
+        call.enqueue(new Callback<YoutubeCommentData>() {
+            @Override
+            public void onResponse(Call<YoutubeCommentData> call, Response<YoutubeCommentData> response) {
+
+                if (response.isSuccessful()) {
+
+                    mYoutubeCommentData = response.body();
+                    mAdapter = new YoutubeCommentAdapter(CommentActivity.this, mYoutubeSearchVideoData, mYoutubeCommentData);
+                    mCommentList.setAdapter(mAdapter);
+
+                } else {
+                    Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to get json for video "+ response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<YoutubeCommentData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to access youtube api server");
+            }
+        });
     }
 
     private void getPinterestPinComments() {
 
-    }
 
-    private void setFacebookComment() {
-
-        Bundle params = new Bundle();
-        String comment = mUserComment.getText().toString();
-        params.putString("message", comment);
-
-        new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                String.format("/%s/comments", mArticleId),
-                params,
-                HttpMethod.POST,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-                        if(response.getError()==null){
-                            Toast.makeText(FeedDetailActivity.this, "comment post success !!!", Toast.LENGTH_SHORT).show();
-                            mAdapter.notifyDataSetChanged();
-                        } else {
-                            Log.e("ERROR_POST_COMMENT", response.getError().getErrorMessage());
-                        }
-                    }
-                }
-        ).executeAsync();
     }
 
     @Override
     public void onClick(View v) {
 
-        switch(v.getId()){
+        switch (v.getId()) {
 
             case R.id.button_camera:
 
                 break;
 
             case R.id.button_send:
-                setFacebookComment();
                 break;
         }
     }

@@ -24,7 +24,7 @@ import com.pinterest.android.pdk.PDKPin;
 import java.util.Vector;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.feed.FeedDetail.FeedDetailActivity;
+import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.FacebookFeedData;
 import taewon.navercorp.integratedsns.model.FavoFeedData;
 import taewon.navercorp.integratedsns.model.YoutubeSearchVideoData;
@@ -146,7 +146,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
     private void loadComments(int position, int platformType, int contentsType) {
 
-        Intent intent = new Intent(mContext, FeedDetailActivity.class);
+        Intent intent = new Intent(mContext, CommentActivity.class);
         intent.putExtra("PLATFORM_TYPE", platformType);
         intent.putExtra("CONTENTS_TYPE", contentsType);
 
@@ -159,8 +159,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             case PLATFORM_YOUTUBE:
 
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position).getYoutubeData().getSnippet());
+                bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position).getYoutubeData());
                 intent.putExtras(bundle);
+
                 intent.putExtra("VIDEO_ID", mDataset.get(position).getYoutubeData().getId().getVideoId());
                 break;
 

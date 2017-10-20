@@ -9,7 +9,7 @@ import java.util.List;
  * Created by USER on 2017-10-19.
  */
 
-public class YoutubeVideoCommentData {
+public class YoutubeCommentData {
 
     @SerializedName("kind")
     private String kind;
@@ -194,7 +194,7 @@ public class YoutubeVideoCommentData {
             @SerializedName("id")
             private String id;
             @SerializedName("snippet")
-            private Snippet_ snippet;
+            private Author snippet;
 
             public String getKind() {
                 return kind;
@@ -220,15 +220,15 @@ public class YoutubeVideoCommentData {
                 this.id = id;
             }
 
-            public Snippet_ getSnippet() {
+            public Author getSnippet() {
                 return snippet;
             }
 
-            public void setSnippet(Snippet_ snippet) {
+            public void setSnippet(Author snippet) {
                 this.snippet = snippet;
             }
 
-            public class Snippet_ {
+            public class Author {
 
                 @SerializedName("authorDisplayName")
                 private String authorDisplayName;

@@ -418,7 +418,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         // get 'subscriptions' from youtube data api v3
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSubscriptionData> call = service.subscriptionList(accessToken, "snippet", MAX_COUNTS, true);
+        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_COUNTS, true);
         call.enqueue(new Callback<YoutubeSubscriptionData>() {
             @Override
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
@@ -459,7 +459,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     .build();
 
             YoutubeService service = retrofit.create(YoutubeService.class);
-            Call<YoutubeSearchVideoData> call = service.searchVideoList(accessToken, "snippet", MAX_COUNTS, params[0]);
+            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, params[0]);
             call.enqueue(new Callback<YoutubeSearchVideoData>() {
                 @Override
                 public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {

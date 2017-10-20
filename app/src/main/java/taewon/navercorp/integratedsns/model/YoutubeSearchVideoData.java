@@ -10,7 +10,8 @@ import java.util.List;
  * Created by USER on 2017-10-11.
  */
 
-public class YoutubeSearchVideoData {
+@SuppressWarnings("serial")
+public class YoutubeSearchVideoData implements Serializable{
 
     @SerializedName("kind")
     @Expose
@@ -68,7 +69,8 @@ public class YoutubeSearchVideoData {
         this.items = items;
     }
 
-    public class PageInfo {
+    @SuppressWarnings("serial")
+    public class PageInfo implements Serializable{
 
         @SerializedName("totalResults")
         @Expose
@@ -94,19 +96,16 @@ public class YoutubeSearchVideoData {
         }
     }
 
-    public class Item {
+    @SuppressWarnings("serial")
+    public class Item implements Serializable {
 
         @SerializedName("kind")
-        @Expose
         private String kind;
         @SerializedName("etag")
-        @Expose
         private String etag;
         @SerializedName("id")
-        @Expose
         private Id id;
         @SerializedName("snippet")
-        @Expose
         private Snippet snippet;
 
         public String getKind() {
@@ -141,13 +140,12 @@ public class YoutubeSearchVideoData {
             this.snippet = snippet;
         }
 
-        public class Id {
+        @SuppressWarnings("serial")
+        public class Id implements Serializable{
 
             @SerializedName("kind")
-            @Expose
             private String kind;
             @SerializedName("videoId")
-            @Expose
             private String videoId;
 
             public String getKind() {
@@ -172,25 +170,18 @@ public class YoutubeSearchVideoData {
         public class Snippet implements Serializable{
 
             @SerializedName("publishedAt")
-            @Expose
             private String publishedAt;
             @SerializedName("channelId")
-            @Expose
             private String channelId;
             @SerializedName("title")
-            @Expose
             private String title;
             @SerializedName("description")
-            @Expose
             private String description;
             @SerializedName("thumbnails")
-            @Expose
             private Thumbnails thumbnails;
             @SerializedName("channelTitle")
-            @Expose
             private String channelTitle;
             @SerializedName("liveBroadcastContent")
-            @Expose
             private String liveBroadcastContent;
 
             public String getPublishedAt() {
@@ -249,7 +240,8 @@ public class YoutubeSearchVideoData {
                 this.liveBroadcastContent = liveBroadcastContent;
             }
 
-            public class Thumbnails {
+            @SuppressWarnings("serial")
+            public class Thumbnails implements Serializable {
 
                 @SerializedName("default")
                 @Expose
@@ -287,7 +279,8 @@ public class YoutubeSearchVideoData {
 
             }
 
-            public class High {
+            @SuppressWarnings("serial")
+            public class High implements Serializable {
 
                 @SerializedName("url")
                 @Expose
@@ -325,7 +318,8 @@ public class YoutubeSearchVideoData {
 
             }
 
-            public class Medium {
+            @SuppressWarnings("serial")
+            public class Medium implements Serializable{
 
                 @SerializedName("url")
                 @Expose
@@ -363,7 +357,8 @@ public class YoutubeSearchVideoData {
 
             }
 
-            public class Default {
+            @SuppressWarnings("serial")
+            public class Default implements Serializable {
 
                 @SerializedName("url")
                 @Expose
