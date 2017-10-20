@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.model;
+package taewon.navercorp.integratedsns.model.feed;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -24,7 +24,7 @@ public class YoutubeSearchVideoData implements Serializable{
     private String regionCode;
     @SerializedName("pageInfo")
     @Expose
-    private PageInfo pageInfo;
+    private PageInfo pageInfo = new PageInfo();
     @SerializedName("items")
     @Expose
     private List<Item> items = null;
@@ -69,6 +69,7 @@ public class YoutubeSearchVideoData implements Serializable{
         this.items = items;
     }
 
+
     @SuppressWarnings("serial")
     public class PageInfo implements Serializable{
 
@@ -106,7 +107,7 @@ public class YoutubeSearchVideoData implements Serializable{
         @SerializedName("id")
         private Id id;
         @SerializedName("snippet")
-        private Snippet snippet;
+        private Snippet snippet = new Snippet();
 
         public String getKind() {
             return kind;
@@ -184,6 +185,8 @@ public class YoutubeSearchVideoData implements Serializable{
             @SerializedName("liveBroadcastContent")
             private String liveBroadcastContent;
 
+            private String profileImage;
+
             public String getPublishedAt() {
                 return publishedAt;
             }
@@ -238,6 +241,14 @@ public class YoutubeSearchVideoData implements Serializable{
 
             public void setLiveBroadcastContent(String liveBroadcastContent) {
                 this.liveBroadcastContent = liveBroadcastContent;
+            }
+
+            public String getProfileImage() {
+                return profileImage;
+            }
+
+            public void setProfileImage(String profileImage) {
+                this.profileImage = profileImage;
             }
 
             @SuppressWarnings("serial")

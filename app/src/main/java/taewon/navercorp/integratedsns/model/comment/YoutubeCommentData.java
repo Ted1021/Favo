@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.model;
+package taewon.navercorp.integratedsns.model.comment;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

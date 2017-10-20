@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.model;
+package taewon.navercorp.integratedsns.model.feed;
 
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.gson.annotations.Expose;

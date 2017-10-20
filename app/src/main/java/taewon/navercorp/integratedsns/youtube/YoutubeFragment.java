@@ -27,7 +27,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
 
 import static android.content.Context.MODE_PRIVATE;
 

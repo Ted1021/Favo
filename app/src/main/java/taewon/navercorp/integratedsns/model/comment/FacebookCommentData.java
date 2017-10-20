@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.model;
+package taewon.navercorp.integratedsns.model.comment;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -9,7 +9,7 @@ import java.util.List;
  * Created by USER on 2017-10-18.
  */
 
-public class FacebookFeedDetailData {
+public class FacebookCommentData {
 
     @SerializedName("created_time")
     @Expose
@@ -22,13 +22,13 @@ public class FacebookFeedDetailData {
     private String fullPicture;
     @SerializedName("from")
     @Expose
-    private From from;
+    private From from = new From();
     @SerializedName("source")
     @Expose
     private String source;
     @SerializedName("comments")
     @Expose
-    private Comments comments;
+    private Comments comments = new Comments();
     @SerializedName("id")
     @Expose
     private String id;
@@ -96,7 +96,7 @@ public class FacebookFeedDetailData {
         private String name;
         @SerializedName("picture")
         @Expose
-        private Picture picture;
+        private Picture picture = new Picture();
         @SerializedName("id")
         @Expose
         private String id;
@@ -129,7 +129,7 @@ public class FacebookFeedDetailData {
 
             @SerializedName("data")
             @Expose
-            private Data data;
+            private Data data = new Data();
 
             public Data getData() {
                 return data;
@@ -161,10 +161,10 @@ public class FacebookFeedDetailData {
 
         @SerializedName("data")
         @Expose
-        private List<CommentData> data = null;
+        private List<CommentData> data;
         @SerializedName("paging")
         @Expose
-        private Paging paging;
+        private Paging paging = new Paging();
 
         public List<CommentData> getData() {
             return data;
@@ -185,7 +185,7 @@ public class FacebookFeedDetailData {
         public class CommentData {
 
             @SerializedName("from")
-            private CommentFrom from;
+            private CommentFrom from = new CommentFrom();
             @SerializedName("message")
             private String message;
             @SerializedName("created_time")
@@ -230,7 +230,7 @@ public class FacebookFeedDetailData {
                 @SerializedName("name")
                 private String name;
                 @SerializedName("picture")
-                private CommentPicture picture;
+                private CommentPicture picture = new CommentPicture();
                 @SerializedName("id")
                 private String id;
 
@@ -262,17 +262,17 @@ public class FacebookFeedDetailData {
 
                     @SerializedName("data")
                     @Expose
-                    private Data_ data;
+                    private Url data = new Url();
 
-                    public Data_ getData() {
+                    public Url getData() {
                         return data;
                     }
 
-                    public void setData(Data_ data) {
+                    public void setData(Url data) {
                         this.data = data;
                     }
 
-                    public class Data_ {
+                    public class Url {
 
                         @SerializedName("url")
                         @Expose
@@ -295,7 +295,7 @@ public class FacebookFeedDetailData {
 
             @SerializedName("cursors")
             @Expose
-            private Cursors cursors;
+            private Cursors cursors = new Cursors();
 
             public Cursors getCursors() {
                 return cursors;

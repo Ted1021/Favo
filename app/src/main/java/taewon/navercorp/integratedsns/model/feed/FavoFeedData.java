@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.model;
+package taewon.navercorp.integratedsns.model.feed;
 
 import com.pinterest.android.pdk.PDKPin;
 
