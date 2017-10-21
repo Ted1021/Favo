@@ -76,7 +76,7 @@ public class YoutubeDetailAdapter extends RecyclerView.Adapter<YoutubeDetailAdap
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View itemView = mLayoutInflater.inflate(R.layout.item_youtube_detail_list, parent, false);
+        View itemView = mLayoutInflater.inflate(R.layout.item_video_list, parent, false);
         return new ViewHolder(itemView);
     }
 
