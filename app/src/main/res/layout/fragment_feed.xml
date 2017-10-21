@@ -15,13 +15,13 @@
             android:id="@+id/imageView"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_above="@+id/textView"
+            android:layout_above="@+id/textView_pageName"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="11dp"
             app:srcCompat="@drawable/ic_disconnection" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textView_pageName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -34,7 +34,7 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textView"
+            android:layout_below="@+id/textView_pageName"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="12dp"
             android:text="Please connect to SNS"

@@ -3,6 +3,7 @@ package taewon.navercorp.integratedsns.model.comment;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -161,7 +162,7 @@ public class FacebookCommentData {
 
         @SerializedName("data")
         @Expose
-        private List<CommentData> data;
+        private List<CommentData> data = new ArrayList<>();
         @SerializedName("paging")
         @Expose
         private Paging paging = new Paging();

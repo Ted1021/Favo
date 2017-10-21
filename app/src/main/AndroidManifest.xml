@@ -34,7 +34,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".login.LoginActivity"
             android:configChanges="orientation|screenSize|keyboard">
@@ -47,20 +46,19 @@
                 <data android:scheme="pdk4928301781867311512" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".home.HomeActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-
         <activity
             android:name=".youtube.YoutubeDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-        <activity android:name=".profile.SettingActivity"
+        <activity
+            android:name=".profile.SettingActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-
-        <activity android:name=".feed.comment.CommentActivity"
-            android:configChanges="orientation|screenSize|keyboard"/>
-
+        <activity
+            android:name=".feed.comment.CommentActivity"
+            android:configChanges="orientation|screenSize|keyboard" />
+        <activity android:name=".subscription.facebook.PageDetailActivity"></activity>
     </application>
 
 </manifest>

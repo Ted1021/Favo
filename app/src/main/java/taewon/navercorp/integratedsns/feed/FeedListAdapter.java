@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -28,6 +29,7 @@ import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.feed.FacebookFeedData;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.subscription.facebook.PageDetailActivity;
 
 /**
  * @author 김태원
@@ -63,6 +65,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         private TextView mUserName, mUploadTime, mDescription;
         private ImageView mProfile, mPicture, mPlatformType;
         private Button mLike, mComment, mShare;
+        private LinearLayout mPageDetail;
 
         // video component
         private ImageButton mPlay;
@@ -88,6 +91,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             mShare = (Button) itemView.findViewById(R.id.button_share);
             mShare.setOnClickListener(this);
+
+            mPageDetail = (LinearLayout) itemView.findViewById(R.id.layout_page_detail);
+            mPageDetail.setOnClickListener(this);
 
             if (viewType == CONTENTS_VIDEO) {
 
@@ -115,6 +121,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
                 case R.id.button_comment:
                     loadComments(position, platformType, contentsType);
+                    break;
+
+                case R.id.layout_page_detail:
+                    mContext.startActivity(new Intent(mContext, PageDetailActivity.class));
                     break;
             }
         }

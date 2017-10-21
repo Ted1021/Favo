@@ -35,7 +35,6 @@ import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 
 public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
 
-    // for managing tokens
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
@@ -90,22 +89,22 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         mPlatformType = intent.getIntExtra("PLATFORM_TYPE", 0);
 
         switch (mPlatformType) {
+
             case PLATFORM_FACEBOOK:
+
                 mArticleId = intent.getStringExtra("ARTICLE_ID");
-                getFacebookFeedDetail();
+                getFacebookComment();
                 break;
 
             case PLATFORM_YOUTUBE:
 
                 mVideoId = intent.getStringExtra("VIDEO_ID");
-                Log.d("CHECK_VIDEO", mVideoId);
                 mYoutubeSearchVideoData = (YoutubeSearchVideoData.Item) intent.getSerializableExtra("VIDEO_CONTENT");
-//                getYoutubeComments();
                 break;
 
             case PLATFORM_PINTEREST:
-                mPinId = intent.getStringExtra("PIN_ID");
 
+                mPinId = intent.getStringExtra("PIN_ID");
                 break;
         }
 
@@ -127,8 +126,6 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         } else if (mPlatformType == PLATFORM_YOUTUBE) {
             mAdapter = new YoutubeCommentAdapter(CommentActivity.this, mYoutubeSearchVideoData, mYoutubeDataset);
             mCommentList.setAdapter(mAdapter);
-        } else {
-
         }
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
@@ -140,7 +137,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 switch (mPlatformType) {
 
                     case PLATFORM_FACEBOOK:
-
+                        getFacebookCommentNext();
                         break;
 
                     case PLATFORM_YOUTUBE:
@@ -156,9 +153,8 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         mCommentList.addOnScrollListener(mScrollListener);
     }
 
-    private void getFacebookFeedDetail() {
+    private void getFacebookComment() {
 
-        Log.d("CHECK_ID", "FeedDetailActivity >>>>> " + mArticleId);
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newGraphPathRequest(
                 accessToken,
@@ -168,10 +164,15 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                     public void onCompleted(GraphResponse response) {
 
                         if (response.getError() == null) {
+
                             mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
-                            if (mFeedDetail.getComments().getData() != null) {
-                                mFacebookDataset.addAll(mFeedDetail.getComments().getData());
+
+                            if (mFeedDetail.getComments().getPaging().getCursors().getAfter() == null) {
+                                mNextPage = null;
+                            } else {
+                                mNextPage = mFeedDetail.getComments().getPaging().getCursors().getAfter();
                             }
+                            mFacebookDataset.addAll(mFeedDetail.getComments().getData());
                             mAdapter = new FacebookCommentAdapter(CommentActivity.this, mFeedDetail, mFacebookDataset, mContentType);
                             mCommentList.setAdapter(mAdapter);
                         }
@@ -179,6 +180,40 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 });
 
         Bundle parameters = new Bundle();
+        parameters.putString("fields", "created_time,message,full_picture,from{name, picture{url}},attachments{subattachments},source,comments{from{name, picture{url}},message,created_time}");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
+    private void getFacebookCommentNext() {
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        GraphRequest request = GraphRequest.newGraphPathRequest(
+                accessToken,
+                mArticleId,
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+
+                        if (response.getError() == null) {
+
+                            mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
+
+                            if (mFeedDetail.getComments().getPaging().getCursors().getAfter() == null) {
+                                mNextPage = null;
+                            } else {
+                                mNextPage = mFeedDetail.getComments().getPaging().getCursors().getAfter();
+                            }
+                            mFacebookDataset.addAll(mFeedDetail.getComments().getData());
+                            mAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.e("ERROR_FACEBOOK", response.getError().toString());
+                        }
+                    }
+                });
+
+        Bundle parameters = new Bundle();
+        parameters.putString("after", mNextPage);
         parameters.putString("fields", "created_time,message,full_picture,from{name, picture{url}},attachments{subattachments},source,comments{from{name, picture{url}},message,created_time}");
         request.setParameters(parameters);
         request.executeAsync();
@@ -202,7 +237,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
                 if (response.isSuccessful()) {
 
-                    if(response.body().getNextPageToken() == null){
+                    if (response.body().getNextPageToken() == null) {
                         return;
                     }
 
@@ -242,6 +277,10 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
 
+                mScrollListener.resetState();
+                mNextPage = "";
+                mYoutubeDataset.clear();
+                getYoutubeComment();
 
             }
 
@@ -261,6 +300,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
 
         String comment = mUserComment.getText().toString();
+
         switch (v.getId()) {
 
             case R.id.button_camera:
@@ -268,6 +308,8 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case R.id.button_send:
+
+                mUserComment.setText(null);
 
                 if (mPlatformType == PLATFORM_YOUTUBE) {
                     setYoutubeComment(comment);
