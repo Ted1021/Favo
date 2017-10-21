@@ -37,6 +37,8 @@ public class FacebookFeedData {
 
     public class ArticleData {
 
+        @SerializedName("link")
+        private String link;
         @SerializedName("created_time")
         private String createdTime;
         @SerializedName("message")
@@ -53,6 +55,16 @@ public class FacebookFeedData {
         private String id;
         @SerializedName("comment")
         private Comments comments;
+        @SerializedName("likes")
+        private Likes likes;
+
+        public String getLink() {
+            return link;
+        }
+
+        public void setLink(String link) {
+            this.link = link;
+        }
 
         public String getCreatedTime() {
             return createdTime;
@@ -116,6 +128,15 @@ public class FacebookFeedData {
 
         public void setComments(Comments comments) {
             this.comments = comments;
+        }
+
+        public class Likes {
+
+            private class Summary {
+
+                @SerializedName("total_count")
+                private int totalCount;
+            }
         }
 
         public class From {
@@ -290,11 +311,11 @@ public class FacebookFeedData {
         public class Comments {
 
             @SerializedName("data")
-            @Expose
             private List<CommentData> data = null;
             @SerializedName("paging")
-            @Expose
             private Paging paging;
+            @SerializedName("summary")
+            private Summary summary;
 
             public List<CommentData> getData() {
                 return data;
@@ -310,6 +331,28 @@ public class FacebookFeedData {
 
             public void setPaging(Paging paging) {
                 this.paging = paging;
+            }
+
+            public Summary getSummary() {
+                return summary;
+            }
+
+            public void setSummary(Summary summary) {
+                this.summary = summary;
+            }
+
+            public class Summary {
+
+                @SerializedName("total_count")
+                private int totalCount;
+
+                public int getTotalCount() {
+                    return totalCount;
+                }
+
+                public void setTotalCount(int totalCount) {
+                    this.totalCount = totalCount;
+                }
             }
 
             public class CommentData {

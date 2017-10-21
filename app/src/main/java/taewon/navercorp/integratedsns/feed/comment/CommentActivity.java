@@ -137,7 +137,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 switch (mPlatformType) {
 
                     case PLATFORM_FACEBOOK:
-                        getFacebookCommentNext();
+//                        getFacebookCommentNext();
                         break;
 
                     case PLATFORM_YOUTUBE:
@@ -180,7 +180,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "created_time,message,full_picture,from{name, picture{url}},attachments{subattachments},source,comments{from{name, picture{url}},message,created_time}");
+        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(2048){url}},attachments{subattachments},source,comments{from{name, picture.height(2048){url}},message,created_time}");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -214,7 +214,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
         Bundle parameters = new Bundle();
         parameters.putString("after", mNextPage);
-        parameters.putString("fields", "created_time,message,full_picture,from{name, picture{url}},attachments{subattachments},source,comments{from{name, picture{url}},message,created_time}");
+        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(2048){url}},attachments{subattachments},source,comments{from{name, picture.height(2048){url}},message,created_time}");
         request.setParameters(parameters);
         request.executeAsync();
     }

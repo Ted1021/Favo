@@ -70,9 +70,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
-    // for facebook client
-    private OnRequestFacebookTokenListener mCallback;
-
     // for pinterest client
     private PDKClient mPinterestClient;
 
@@ -81,7 +78,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private BroadcastReceiver mAsyncFinishReceiver;
 
     // UI Components
-    private RecyclerView mFacebookList;
+    private RecyclerView mFeedList;
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private FeedListAdapter mAdapter;
 
@@ -103,18 +100,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private static final int PLATFORM_PINTEREST = 3;
 
     private int mAsyncCount = 0;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        try {
-            mCallback = (OnRequestFacebookTokenListener) context;
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("ERROR_CALLBACK", "Facebook Fragment >>>>> check callback logic");
-        }
-    }
 
     public FeedFragment() {
     }
@@ -178,11 +163,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
 
         // set recyclerView
-        mFacebookList = (RecyclerView) view.findViewById(R.id.recyclerView_facebook);
+        mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
         mAdapter = new FeedListAdapter(getContext(), mDataset);
-        mFacebookList.setAdapter(mAdapter);
+        mFeedList.setAdapter(mAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mFacebookList.setLayoutManager(layoutManager);
+        mFeedList.setLayoutManager(layoutManager);
     }
 
     private void checkToken() {
@@ -321,7 +306,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "created_time,message,full_picture,from{name, picture{url}},attachments{subattachments},source");
+        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(2048){url}},attachments{subattachments},source");
         parameters.putString("limit", "5");
         request.setParameters(parameters);
         request.executeAsync();

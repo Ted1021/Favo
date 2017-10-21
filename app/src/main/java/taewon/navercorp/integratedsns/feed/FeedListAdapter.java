@@ -124,7 +124,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     break;
 
                 case R.id.layout_page_detail:
-                    mContext.startActivity(new Intent(mContext, PageDetailActivity.class));
+                    loadPageDetail(position, platformType);
                     break;
             }
         }
@@ -136,7 +136,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         if (platformType == PLATFORM_FACEBOOK) {
             videoUrl = mDataset.get(position).getFacebookData().getSource();
         } else {
-            videoUrl = String.format("http://www.youtube.com/watch?v=%s",mDataset.get(position).getYoutubeData().getId().getVideoId());
+            videoUrl = String.format("http://www.youtube.com/watch?v=%s", mDataset.get(position).getYoutubeData().getId().getVideoId());
             Log.d("YOUTUBE_VIDEO_URL", mDataset.get(position).getYoutubeData().getId().getVideoId());
         }
 
@@ -147,7 +147,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         Uri uri = Uri.parse(videoUrl);
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 
-        if(platformType == PLATFORM_FACEBOOK){
+        if (platformType == PLATFORM_FACEBOOK) {
             intent.setDataAndType(uri, "video/*");
         }
 
@@ -160,7 +160,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         intent.putExtra("PLATFORM_TYPE", platformType);
         intent.putExtra("CONTENTS_TYPE", contentsType);
 
-        switch(platformType){
+        switch (platformType) {
 
             case PLATFORM_FACEBOOK:
                 intent.putExtra("ARTICLE_ID", mDataset.get(position).getFacebookData().getId());
@@ -173,6 +173,29 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 intent.putExtras(bundle);
 
                 intent.putExtra("VIDEO_ID", mDataset.get(position).getYoutubeData().getId().getVideoId());
+                break;
+
+            case PLATFORM_PINTEREST:
+
+                break;
+        }
+        mContext.startActivity(intent);
+    }
+
+    private void loadPageDetail(int position, int platformType) {
+
+        Intent intent = new Intent(mContext, PageDetailActivity.class);
+
+        switch (platformType) {
+
+            case PLATFORM_FACEBOOK:
+
+                intent.putExtra("PAGE_ID", mDataset.get(position).getFacebookData().getFrom().getId());
+
+                break;
+
+            case PLATFORM_YOUTUBE:
+
                 break;
 
             case PLATFORM_PINTEREST:
@@ -273,7 +296,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
         Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
         Glide.with(mContext).load(R.drawable.icon_youtube_small).into(holder.mPlatformType);
-        Log.d("CHECK_VIDEO_URL", "http://www.youtube.com/watch?v=" + id.getVideoId());
     }
 
     private void bindPinterestItem(ViewHolder holder, int position) {
