@@ -37,7 +37,6 @@ public class PageVideoAdapter extends RecyclerView.Adapter<PageVideoAdapter.View
     SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
-
     public PageVideoAdapter(Context context, ArrayList<FacebookPageVideoData.Video> dataset) {
 
         mContext = context;
@@ -123,7 +122,6 @@ public class PageVideoAdapter extends RecyclerView.Adapter<PageVideoAdapter.View
         holder.mRunTime.setText(String.format("%d:%d",min,sec));
 
         Glide.with(mContext).load(data.getPicture()).into(holder.mThumbnail);
-        holder.mThumbnail.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
     }
 
     @Override

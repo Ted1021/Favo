@@ -11,6 +11,7 @@ import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
 import taewon.navercorp.integratedsns.model.page.YoutubeChannelInfoData;
+import taewon.navercorp.integratedsns.model.page.YoutubeChannelPlaylistData;
 
 /**
  * @author 김태원
@@ -53,6 +54,11 @@ public interface YoutubeService {
                                                 @Query("part") String part,
                                                 @Query("id") String channelId);
 
+    @GET("youtube/v3/playlists")
+    Call<YoutubeChannelPlaylistData> getChannelPlaylist (@Header("Authorization") String auth,
+                                                         @Query("part") String part,
+                                                         @Query("maxResults") int maxResults,
+                                                         @Query("channelId") String channelId);
 
     @POST("youtube/v3/commentThreads")
     Call<Void> setComment(@Header("Authorization") String auth,
