@@ -21,7 +21,7 @@ import com.google.api.services.youtube.YouTubeScopes;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.profile.ProfileFragment;
-import taewon.navercorp.integratedsns.youtube.YoutubeFragment;
+import taewon.navercorp.integratedsns.search.SearchFragment;
 
 /**
  * @author 김태원
@@ -84,7 +84,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private void initView() {
 
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        mTabLayout.getTabAt(0).getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.facebook_color), PorterDuff.Mode.SRC_IN);
+        mTabLayout.getTabAt(0).getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.tumblr_color), PorterDuff.Mode.SRC_IN);
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
     }
 
@@ -115,20 +115,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                switch (tab.getPosition()) {
 
-                    case TAB_FEED:
-                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.facebook_color), PorterDuff.Mode.SRC_IN);
-                        break;
-
-                    case TAB_SEARCH:
-                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.youtube_color), PorterDuff.Mode.SRC_IN);
-                        break;
-
-                    case TAB_PROFILE:
-                        tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.tumblr_color), PorterDuff.Mode.SRC_IN);
-                        break;
-                }
+                tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.tumblr_color), PorterDuff.Mode.SRC_IN);
             }
 
             @Override
@@ -169,7 +157,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                     break;
 
                 case TAB_SEARCH:
-                    fragment = new YoutubeFragment();
+                    fragment = new SearchFragment();
                     break;
 
                 case TAB_PROFILE:

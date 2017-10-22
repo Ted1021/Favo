@@ -1,10 +1,12 @@
 package taewon.navercorp.integratedsns.splash;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
@@ -19,6 +21,8 @@ import taewon.navercorp.integratedsns.login.LoginActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
+    private ImageView mLogo;
+
     private static int SPLASH_DISPLAY_LENGTH = 2000;
 
     @Override
@@ -26,6 +30,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        mLogo = (ImageView) findViewById(R.id.imageView_logo);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -46,11 +51,13 @@ public class SplashActivity extends AppCompatActivity {
 
         if (facebookToken.equals("") && googleToken.equals("") && pinterestToken.equals("")) {
             intent = new Intent(SplashActivity.this, LoginActivity.class);
+            ActivityOptions options = ActivityOptions
+                    .makeSceneTransitionAnimation(this, mLogo, "logo");
+            startActivity(intent, options.toBundle());
         } else {
             intent = new Intent(SplashActivity.this, HomeActivity.class);
+            startActivity(intent);
         }
-
-        startActivity(intent);
         SplashActivity.this.finish();
     }
 }

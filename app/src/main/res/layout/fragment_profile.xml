@@ -6,37 +6,59 @@
     android:orientation="vertical"
     tools:context="taewon.navercorp.integratedsns.profile.ProfileFragment">
 
+    <ImageButton
+        android:id="@+id/button_setting"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="right"
+        android:layout_margin="16dp"
+        android:adjustViewBounds="true"
+        android:background="@drawable/settings_icon"
+        android:scaleType="centerInside" />
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="150dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/imageView_profile"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView_userName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageView_profile"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="16dp"
+                android:text="User Name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView_eamil"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:text="email" />
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/imageView_profile"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:layout_marginRight="16dp"
             app:srcCompat="@drawable/com_facebook_profile_picture_blank_square"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
-
-        <TextView
-            android:id="@+id/textView_userName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/imageView_profile"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp"
-            android:text="user name" />
-
-        <ImageButton
-            android:id="@+id/button_setting"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true"
-            android:layout_margin="8dp"
-            android:adjustViewBounds="true"
-            android:background="@drawable/settings_icon"
-            android:scaleType="centerInside" />
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 
@@ -53,17 +75,12 @@
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="facebook" />
+            android:text="list" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="youtube" />
-
-        <android.support.design.widget.TabItem
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="pinterest" />
+            android:text="mt pin" />
 
     </android.support.design.widget.TabLayout>
 

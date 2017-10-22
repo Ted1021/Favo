@@ -3,7 +3,6 @@ package taewon.navercorp.integratedsns.profile;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -13,12 +12,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.pinterest.android.pdk.PDKBoard;
 import com.pinterest.android.pdk.PDKCallback;
 import com.pinterest.android.pdk.PDKClient;
@@ -26,14 +29,14 @@ import com.pinterest.android.pdk.PDKException;
 import com.pinterest.android.pdk.PDKPin;
 import com.pinterest.android.pdk.PDKResponse;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import taewon.navercorp.integratedsns.R;
 
 import static android.content.Context.MODE_PRIVATE;
-import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 
 /**
  * @author 김태원
@@ -48,6 +51,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
 
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
+    private String mFacebookToken, mGoogleToken, mPinterestToken;
 
     private RecyclerView mRecyclerView;
     private PinterestListAdapter mAdapter;
@@ -55,12 +59,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
 
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
-    private Button mConnectTumblr;
 
     private PDKClient mPinterestClient;
 
     private ImageView mProfile;
-    private TextView mUserName;
+    private TextView mUserName, mId;
     private ImageButton mSetting;
     private ViewPager mViewPager;
 
@@ -73,8 +76,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
 
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        initData();
         initView(view);
+        initData();
 
         return view;
     }
@@ -84,8 +87,23 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
 
+        mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
+        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mFacebookToken);
+        mGoogleToken = mPref.getString(getString(R.string.google_token), "");
+        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mGoogleToken);
+        mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
+        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mPinterestToken);
+
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
         mPinterestClient = PDKClient.getInstance();
+
+        if (!mFacebookToken.equals("")) {
+            getFacebookUserInfo();
+        } else if (!mGoogleToken.equals("")){
+
+        } else {
+
+        }
     }
 
     private void initView(View view) {
@@ -107,7 +125,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
                 mDataset.clear();
                 for (PDKBoard board : response.getBoardList()) {
                     Log.d("CHECK_BOARD", " >>>>> " + board.getName());
-                    new GetFollowingPins().executeOnExecutor(THREAD_POOL_EXECUTOR, board.getUid());
+
                 }
             }
 
@@ -118,37 +136,31 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
         });
     }
 
-    private class GetFollowingPins extends AsyncTask<String, Void, Void> {
+    private void getFacebookUserInfo(){
 
-        @Override
-        protected Void doInBackground(String... params) {
+        GraphRequest request = GraphRequest.newMeRequest(
+                AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
 
-            mPinterestClient.getBoardPins(params[0], PIN_FIELDS, new PDKCallback() {
-                @Override
-                public void onSuccess(PDKResponse response) {
-                    super.onSuccess(response);
-
-                    mDataset.addAll(response.getPinList());
-                    Collections.sort(mDataset, new Comparator<PDKPin>() {
-                        @Override
-                        public int compare(PDKPin o1, PDKPin o2) {
-
-                            return o2.getCreatedAt().toString().compareToIgnoreCase(o1.getCreatedAt().toString());
+                        try {
+                            mUserName.setText(response.getJSONObject().getString("name"));
+                            Glide.with(getContext())
+                                    .load(response.getJSONObject().getJSONObject("picture").getJSONObject("data").getString("url"))
+                                    .apply(new RequestOptions().circleCropTransform())
+                                    .into(mProfile);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    });
-                    mAdapter.notifyDataSetChanged();
-                    mRefreshLayout.setRefreshing(false);
-                }
 
-                @Override
-                public void onFailure(PDKException exception) {
-                    super.onFailure(exception);
-                    exception.printStackTrace();
-                }
-            });
+                    }
+                });
 
-            return null;
-        }
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,picture.height(2048)");
+        request.setParameters(parameters);
+        request.executeAsync();
     }
 
 
