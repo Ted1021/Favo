@@ -20,6 +20,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
@@ -36,15 +38,20 @@ public class PageFeedAdapter extends RecyclerView.Adapter<PageFeedAdapter.ViewHo
     private ArrayList<FacebookFeedData.ArticleData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
+    SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+
     private static final int CONTENTS_IMAGE = 1;
     private static final int CONTENTS_VIDEO = 2;
     private static final int CONTENTS_MULTI = 3;
+
+    private static final int PLATFORM_FACEBOOK = 1;
+
 
     public PageFeedAdapter(Context context, ArrayList<FacebookFeedData.ArticleData> dataset) {
 
         mContext = context;
         mDataset = dataset;
-
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -53,7 +60,7 @@ public class PageFeedAdapter extends RecyclerView.Adapter<PageFeedAdapter.ViewHo
         // common components
         private TextView mUserName, mUploadTime, mDescription;
         private ImageView mProfile, mPicture, mPlatformType;
-        private Button mLike, mComment, mShare;
+        private Button mLike, mComment;
         private LinearLayout mPageDetail;
 
         // video component
@@ -67,6 +74,7 @@ public class PageFeedAdapter extends RecyclerView.Adapter<PageFeedAdapter.ViewHo
             mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
             mUploadTime = (TextView) itemView.findViewById(R.id.textView_uploadTime);
             mDescription = (TextView) itemView.findViewById(R.id.textView_description);
+            mDescription.setMaxLines(Integer.MAX_VALUE);
 
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
@@ -77,9 +85,6 @@ public class PageFeedAdapter extends RecyclerView.Adapter<PageFeedAdapter.ViewHo
 
             mComment = (Button) itemView.findViewById(R.id.button_comment);
             mComment.setOnClickListener(this);
-
-            mShare = (Button) itemView.findViewById(R.id.button_share);
-            mShare.setOnClickListener(this);
 
             mPageDetail = (LinearLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
@@ -99,7 +104,6 @@ public class PageFeedAdapter extends RecyclerView.Adapter<PageFeedAdapter.ViewHo
         public void onClick(View v) {
 
             int position = getLayoutPosition();
-//            int contentsType = mDataset.get(position).getContentsType();
 
             switch (v.getId()) {
 
@@ -134,16 +138,52 @@ public class PageFeedAdapter extends RecyclerView.Adapter<PageFeedAdapter.ViewHo
 
     private void loadComments(int position) {
 
+        int contentsType = mDataset.get(position).getContentsType();
+
         Intent intent = new Intent(mContext, CommentActivity.class);
-//        intent.putExtra("CONTENTS_TYPE", contentsType);
         intent.putExtra("ARTICLE_ID", mDataset.get(position).getId());
+        intent.putExtra("CONTENT_TYPE", contentsType);
+        intent.putExtra("PLATFORM_TYPE", PLATFORM_FACEBOOK);
         mContext.startActivity(intent);
     }
 
     @Override
+    public int getItemViewType(int position) {
+
+        int contentType = mDataset.get(position).getContentsType();
+        switch (contentType) {
+
+            case CONTENTS_IMAGE:
+                return CONTENTS_IMAGE;
+
+            case CONTENTS_VIDEO:
+                return CONTENTS_VIDEO;
+
+            case CONTENTS_MULTI:
+                return CONTENTS_MULTI;
+        }
+
+        return 1;
+    }
+
+    @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = mLayoutInflater.inflate(R.layout.item_image_article, parent, false);
-        return new ViewHolder(itemView, viewType);
+
+        View itemView;
+        switch (viewType) {
+            case CONTENTS_IMAGE:
+                itemView = mLayoutInflater.inflate(R.layout.item_image_article, parent, false);
+                return new ViewHolder(itemView, viewType);
+
+            case CONTENTS_VIDEO:
+                itemView = mLayoutInflater.inflate(R.layout.item_video_article, parent, false);
+                return new ViewHolder(itemView, viewType);
+
+            case CONTENTS_MULTI:
+                itemView = mLayoutInflater.inflate(R.layout.item_multi_image_article, parent, false);
+                return new ViewHolder(itemView, viewType);
+        }
+        return null;
     }
 
     @Override
@@ -152,10 +192,20 @@ public class PageFeedAdapter extends RecyclerView.Adapter<PageFeedAdapter.ViewHo
         FacebookFeedData.ArticleData data = mDataset.get(position);
 
         try {
-            holder.mUserName.setText(data.getFrom().getName());
-            holder.mUploadTime.setText(data.getCreatedTime());
-            holder.mDescription.setText(data.getMessage());
 
+            String date = null;
+            try {
+                date = mFormat.format(mDateConverter.parse(data.getCreatedTime()));
+                Log.d("CHECK_DATE", date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            holder.mUserName.setText(data.getFrom().getName());
+            holder.mUploadTime.setText(date);
+            holder.mDescription.setText(data.getMessage());
+            holder.mLike.setText(data.getLikes().getSummary().getTotalCount()+" 개");
+            holder.mComment.setText(data.getComments().getSummary().getTotalCount()+" 개");
 
             Glide.with(mContext).load(data.getFullPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
             Glide.with(mContext).load(data.getFrom().getPicture().getProfileData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);

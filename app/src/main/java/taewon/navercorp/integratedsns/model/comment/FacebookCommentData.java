@@ -12,27 +12,32 @@ import java.util.List;
 
 public class FacebookCommentData {
 
+    @SerializedName("link")
+    private String link;
     @SerializedName("created_time")
-    @Expose
     private String createdTime;
     @SerializedName("message")
-    @Expose
     private String message;
     @SerializedName("full_picture")
-    @Expose
     private String fullPicture;
     @SerializedName("from")
-    @Expose
     private From from = new From();
     @SerializedName("source")
-    @Expose
     private String source;
     @SerializedName("comments")
-    @Expose
     private Comments comments = new Comments();
+    @SerializedName("likes")
+    private Likes likes;
     @SerializedName("id")
-    @Expose
     private String id;
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
 
     public String getCreatedTime() {
         return createdTime;
@@ -88,6 +93,42 @@ public class FacebookCommentData {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Likes getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Likes likes) {
+        this.likes = likes;
+    }
+
+    public class Likes {
+
+        @SerializedName("summary")
+        private Summary summary;
+
+        public class Summary {
+
+            @SerializedName("total_count")
+            private int totalCount;
+
+            public int getTotalCount() {
+                return totalCount;
+            }
+
+            public void setTotalCount(int totalCount) {
+                this.totalCount = totalCount;
+            }
+        }
+
+        public Summary getSummary() {
+            return summary;
+        }
+
+        public void setSummary(Summary summary) {
+            this.summary = summary;
+        }
     }
 
     public class From {
@@ -161,11 +202,19 @@ public class FacebookCommentData {
     public class Comments {
 
         @SerializedName("data")
-        @Expose
         private List<CommentData> data = new ArrayList<>();
         @SerializedName("paging")
-        @Expose
         private Paging paging = new Paging();
+        @SerializedName("summary")
+        private Summary summary;
+
+        public Summary getSummary() {
+            return summary;
+        }
+
+        public void setSummary(Summary summary) {
+            this.summary = summary;
+        }
 
         public List<CommentData> getData() {
             return data;
@@ -181,6 +230,20 @@ public class FacebookCommentData {
 
         public void setPaging(Paging paging) {
             this.paging = paging;
+        }
+
+        public class Summary {
+
+            @SerializedName("total_count")
+            private int totalCount;
+
+            public int getTotalCount() {
+                return totalCount;
+            }
+
+            public void setTotalCount(int totalCount) {
+                this.totalCount = totalCount;
+            }
         }
 
         public class CommentData {

@@ -167,11 +167,12 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
                             mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
 
-                            if (mFeedDetail.getComments().getPaging().getCursors().getAfter() == null) {
-                                mNextPage = null;
-                            } else {
-                                mNextPage = mFeedDetail.getComments().getPaging().getCursors().getAfter();
-                            }
+//                            if (mFeedDetail.getComments().getPaging().getCursors().getAfter() == null) {
+//                                mNextPage = null;
+//                            } else {
+//                                mNextPage = mFeedDetail.getComments().getPaging().getCursors().getAfter();
+//                            }
+
                             mFacebookDataset.addAll(mFeedDetail.getComments().getData());
                             mAdapter = new FacebookCommentAdapter(CommentActivity.this, mFeedDetail, mFacebookDataset, mContentType);
                             mCommentList.setAdapter(mAdapter);
@@ -180,7 +181,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(2048){url}},attachments{subattachments},source,comments{from{name, picture.height(2048){url}},message,created_time}");
+        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(2048){url}},attachments{subattachments},source,likes.limit(0).summary(true),comments.summary(true){from{name, picture.height(2048){url}},message,created_time}");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -218,7 +219,6 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         request.setParameters(parameters);
         request.executeAsync();
     }
-
 
     private void getYoutubeComment() {
 
@@ -289,11 +289,6 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
             }
         });
-    }
-
-    private void getPinterestPinComments() {
-
-
     }
 
     @Override

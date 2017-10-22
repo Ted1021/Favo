@@ -27,10 +27,15 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     private RecyclerView mPageFeedList;
 
     private static final String ARG_PARAM1 = "PAGE_ID";
+    private static final String ARG_PARAM2 = "CONTENT_TYPE";
     private String mPageId;
 
     private ArrayList<FacebookFeedData.ArticleData> mDataset = new ArrayList<>();
     private PageFeedAdapter mAdapter;
+
+    private static final int CONTENTS_IMAGE = 1;
+    private static final int CONTENTS_VIDEO = 2;
+    private static final int CONTENTS_MULTI = 3;
 
     public PageFeedFragment() {
     }
@@ -93,8 +98,18 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                     public void onCompleted(GraphResponse response) {
 
                         if(response.getError() == null){
-                            FacebookFeedData data = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedData.class);
-                            mDataset.addAll(data.getData());
+
+                            FacebookFeedData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedData.class);
+                            for(FacebookFeedData.ArticleData data : result.getData()){
+
+                                if(data.getSource() != null){
+                                    data.setContentsType(CONTENTS_VIDEO);
+                                } else {
+                                    data.setContentsType(CONTENTS_IMAGE);
+                                }
+                                mDataset.add(data);
+                            }
+
                             mAdapter.notifyDataSetChanged();
 
                         } else {
@@ -106,7 +121,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "link,created_time,from{name, picture.height(2048){url}},message,description,full_picture,id,likes.limit(0).summary(true),comments.limit(0).summary(true)");
+        parameters.putString("fields", "link,created_time,from{name, picture.height(2048){url}},message,description,full_picture,id,likes.limit(0).summary(true),comments.limit(0).summary(true),source");
         request.setParameters(parameters);
         request.executeAsync();
     }

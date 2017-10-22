@@ -306,7 +306,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(2048){url}},attachments{subattachments},source");
+        parameters.putString("fields", "link,created_time,message,full_picture,likes.limit(0).summary(true),comments.limit(0).summary(true),from{name, picture.height(2048){url}},attachments{subattachments},source");
         parameters.putString("limit", "5");
         request.setParameters(parameters);
         request.executeAsync();

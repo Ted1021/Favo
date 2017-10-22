@@ -6,6 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
@@ -36,7 +43,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:layout_margin="32dp"
+                    android:layout_marginBottom="32dp"
+                    android:layout_marginLeft="32dp"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -60,7 +68,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8dp"
-                            android:gravity="center_vertical|center_horizontal"
+                            android:gravity="center_vertical"
                             android:text="Page Name"
                             android:textColor="@color/colorCremeWhite"
                             android:textSize="24sp" />
@@ -80,7 +88,7 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/mToolbar"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="50dp"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
@@ -106,7 +114,8 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                        android:textColor="@android:color/black" />
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
 
                 </LinearLayout>
 
@@ -136,20 +145,8 @@
                 android:layout_height="wrap_content"
                 android:text="video" />
 
-            <android.support.design.widget.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="photo" />
-
         </android.support.design.widget.TabLayout>
 
     </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>

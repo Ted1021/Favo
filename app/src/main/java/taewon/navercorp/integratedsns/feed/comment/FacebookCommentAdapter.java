@@ -2,6 +2,7 @@ package taewon.navercorp.integratedsns.feed.comment;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
@@ -27,6 +30,9 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
     private FacebookCommentData mFeedDetail;
     private ArrayList<FacebookCommentData.Comments.CommentData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
+
+    SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
     private int mContentType;
 
@@ -87,6 +93,7 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
             mArticleUserName = (TextView) itemView.findViewById(R.id.textView_userName);
             mArticleUploadTime = (TextView) itemView.findViewById(R.id.textView_uploadTime);
             mDescription = (TextView) itemView.findViewById(R.id.textView_description);
+            mDescription.setMaxLines(Integer.MAX_VALUE);
 
             mLike = (Button) itemView.findViewById(R.id.button_like);
             mComment = (Button) itemView.findViewById(R.id.button_comment);
@@ -121,6 +128,7 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
 
             View headerView = mLayoutInflater.inflate(R.layout.item_image_article, parent, false);
             return new ViewHolder(headerView, viewType);
+
         } else {
 
             View itemView = mLayoutInflater.inflate(R.layout.item_comment, parent, false);
@@ -140,9 +148,19 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
 
     private void bindHeaderViewItem(ViewHolder holder) {
 
+        String date = null;
+        try {
+            date = mFormat.format(mDateConverter.parse(mFeedDetail.getCreatedTime()));
+            Log.d("CHECK_DATE", date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         holder.mArticleUserName.setText(mFeedDetail.getFrom().getName());
-        holder.mArticleUploadTime.setText(mFeedDetail.getCreatedTime());
+        holder.mArticleUploadTime.setText(date);
         holder.mDescription.setText(mFeedDetail.getMessage());
+        holder.mLike.setText(mFeedDetail.getLikes().getSummary().getTotalCount()+" 개");
+        holder.mComment.setText(mFeedDetail.getComments().getSummary().getTotalCount()+" 개");
 
         Glide.with(mContext).load(mFeedDetail.getFullPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
         Glide.with(mContext).load(mFeedDetail.getFrom().getPicture().getData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mArticleProfile);
@@ -154,9 +172,17 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
         if (!mDataset.isEmpty()) {
             FacebookCommentData.Comments.CommentData data = mFeedDetail.getComments().getData().get(position);
 
+            String date = null;
+            try {
+                date = mFormat.format(mDateConverter.parse(data.getUploadTime()));
+                Log.d("CHECK_DATE", date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
             holder.mCommentUserName.setText(data.getFrom().getName());
             holder.mCommentText.setText(data.getMessage());
-            holder.mUploadTime.setText(data.getUploadTime());
+            holder.mUploadTime.setText(date);
 
             Glide.with(mContext).load(data.getFrom().getPicture().getData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mCommentProfile);
         }

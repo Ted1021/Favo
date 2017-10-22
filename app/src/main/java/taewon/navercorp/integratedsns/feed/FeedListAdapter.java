@@ -22,6 +22,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.pinterest.android.pdk.PDKPin;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 
 import taewon.navercorp.integratedsns.R;
@@ -43,6 +45,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     private Context mContext;
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private LayoutInflater mLayoutInflater;
+    SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
     private static final int CONTENTS_IMAGE = 1;
     private static final int CONTENTS_VIDEO = 2;
@@ -89,9 +93,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             mComment = (Button) itemView.findViewById(R.id.button_comment);
             mComment.setOnClickListener(this);
 
-            mShare = (Button) itemView.findViewById(R.id.button_share);
-            mShare.setOnClickListener(this);
-
             mPageDetail = (LinearLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
 
@@ -100,9 +101,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 mPicture.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
                 mPlay = (ImageButton) itemView.findViewById(R.id.button_play);
                 mPlay.setOnClickListener(this);
-
-            } else if (viewType == CONTENTS_MULTI) {
-
+            } else {
+                mPicture.setOnClickListener(this);
             }
         }
 
@@ -125,6 +125,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
                 case R.id.layout_page_detail:
                     loadPageDetail(position, platformType);
+                    break;
+
+                case R.id.imageView_picture:
+                    loadLink(position, platformType);
                     break;
             }
         }
@@ -184,17 +188,19 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
     private void loadPageDetail(int position, int platformType) {
 
-        Intent intent = new Intent(mContext, PageDetailActivity.class);
-
         switch (platformType) {
 
             case PLATFORM_FACEBOOK:
 
+                Intent intent = new Intent(mContext, PageDetailActivity.class);
+                intent.putExtra("CONTENT_TYPE", mDataset.get(position).getContentsType());
                 intent.putExtra("PAGE_ID", mDataset.get(position).getFacebookData().getFrom().getId());
+                mContext.startActivity(intent);
 
                 break;
 
             case PLATFORM_YOUTUBE:
+
 
                 break;
 
@@ -202,7 +208,34 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
                 break;
         }
-        mContext.startActivity(intent);
+    }
+
+    private void loadLink(int position, int platformType) {
+
+        Intent intent = null;
+        String url;
+        switch (platformType) {
+
+            case PLATFORM_FACEBOOK:
+
+                if (mDataset.get(position).getFacebookData().getLink() != null) {
+
+                    url = mDataset.get(position).getFacebookData().getLink();
+                    intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    mContext.startActivity(intent);
+                }
+                break;
+
+            case PLATFORM_PINTEREST:
+
+                if (mDataset.get(position).getPinterestData().getLink() != null) {
+
+                    url = mDataset.get(position).getPinterestData().getLink();
+                    intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    mContext.startActivity(intent);
+                }
+                break;
+        }
     }
 
     @Override
@@ -267,21 +300,23 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
         FacebookFeedData.ArticleData data = mDataset.get(position).getFacebookData();
 
+        String date = null;
         try {
-            holder.mUserName.setText(data.getFrom().getName());
-            holder.mUploadTime.setText(data.getCreatedTime());
-            holder.mDescription.setText(data.getMessage());
-
-
-            Glide.with(mContext).load(data.getFullPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-            Glide.with(mContext).load(data.getFrom().getPicture().getProfileData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
-            Glide.with(mContext).load(R.drawable.icon_facebook_small).into(holder.mPlatformType);
-
-        } catch (Exception e) {
-
+            date = mFormat.format(mDateConverter.parse(data.getCreatedTime()));
+            Log.d("CHECK_DATE", date);
+        } catch (ParseException e) {
             e.printStackTrace();
-            Log.e("ERROR_FACEBOOK", "Facebook List Adapter >>>>> fail to load json object " + position);
         }
+
+        holder.mUploadTime.setText(date);
+        holder.mUserName.setText(data.getFrom().getName());
+        holder.mDescription.setText(data.getMessage());
+        holder.mLike.setText(data.getLikes().getSummary().getTotalCount() + " 개");
+        holder.mComment.setText(data.getComments().getSummary().getTotalCount() + " 개");
+
+        Glide.with(mContext).load(data.getFullPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+        Glide.with(mContext).load(data.getFrom().getPicture().getProfileData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
+        Glide.with(mContext).load(R.drawable.icon_facebook_small).into(holder.mPlatformType);
     }
 
     private void bindYoutubeItem(ViewHolder holder, int position) {
@@ -289,8 +324,15 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         YoutubeSearchVideoData.Item.Snippet data = mDataset.get(position).getYoutubeData().getSnippet();
         YoutubeSearchVideoData.Item.Id id = mDataset.get(position).getYoutubeData().getId();
 
+        String date = null;
+        try {
+            date = mFormat.format(mDateConverter.parse(data.getPublishedAt()));
+            Log.d("CHECK_DATE", date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        holder.mUploadTime.setText(date);
         holder.mUserName.setText(data.getChannelTitle());
-        holder.mUploadTime.setText(data.getPublishedAt());
         holder.mDescription.setText(data.getDescription());
 
         Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
@@ -302,8 +344,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
         PDKPin data = mDataset.get(position).getPinterestData();
 
+        String date = mFormat.format(data.getCreatedAt());
         holder.mUserName.setText(data.getUid());
-        holder.mUploadTime.setText(data.getCreatedAt().toString());
+        holder.mUploadTime.setText(date);
         holder.mDescription.setText(data.getNote());
 
         Glide.with(mContext).load(data.getImageUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);

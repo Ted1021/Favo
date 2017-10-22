@@ -23,11 +23,11 @@ import com.google.gson.Gson;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.model.page.FacebookPageInfoData;
-import taewon.navercorp.integratedsns.profile.ProfileFragment;
 
 public class PageDetailActivity extends AppCompatActivity {
 
     private String mPageId;
+    private int mContentType;
 
     private ImageView mCover, mProfile;
     private TextView mTitle, mTitleToolbar, mFollowerCount;
@@ -39,7 +39,6 @@ public class PageDetailActivity extends AppCompatActivity {
     // fragment index
     private static final int TAB_FEED = 0;
     private static final int TAB_VIDEO = 1;
-    private static final int TAB_PHOTO = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +53,7 @@ public class PageDetailActivity extends AppCompatActivity {
     private void initData(){
 
         mPageId = getIntent().getStringExtra("PAGE_ID");
+        mContentType = getIntent().getIntExtra("CONTENT_TYPE", 0);
         getPageInfo();
     }
 
@@ -88,6 +88,7 @@ public class PageDetailActivity extends AppCompatActivity {
                             Glide.with(PageDetailActivity.this).load(mPageInfo.getCover().getSource()).apply(new RequestOptions().override(mCover.getMaxWidth())).into(mCover);
                             mCover.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
                             mTitle.setText(mPageInfo.getName());
+                            mTitleToolbar.setText(mPageInfo.getName());
                             mFollowerCount.setText(String.format("팔로워 : %s 명",mPageInfo.getFan_count()));
 
                         } else {
@@ -136,9 +137,6 @@ public class PageDetailActivity extends AppCompatActivity {
 
                     case TAB_VIDEO:
                         break;
-
-                    case TAB_PHOTO:
-                        break;
                 }
             }
 
@@ -175,10 +173,6 @@ public class PageDetailActivity extends AppCompatActivity {
 
                 case TAB_VIDEO:
                     fragment = PageVideoFragment.newInstance(mPageId);
-                    break;
-
-                case TAB_PHOTO:
-                    fragment = new ProfileFragment();
                     break;
             }
             return fragment;

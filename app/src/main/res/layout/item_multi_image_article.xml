@@ -60,6 +60,7 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:text="user name"
+                        android:textColor="@android:color/black"
                         android:textStyle="bold" />
 
                     <TextView
@@ -67,11 +68,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="center_vertical"
                         android:text="upload time"
                         android:textSize="10sp" />
 
                 </LinearLayout>
+
+                <Button
+                    android:id="@+id/button_pin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:drawableRight="@drawable/ic_action_pin"
+                    android:gravity="center_vertical" />
 
             </LinearLayout>
 
@@ -82,8 +90,10 @@
                 android:layout_margin="8dp"
                 android:layout_weight="1"
                 android:ellipsize="end"
-                android:maxLength="3"
-                android:text="story" />
+                android:maxLength="5"
+                android:text="story"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/imageView_picture"
@@ -111,37 +121,27 @@
                 <Button
                     android:id="@+id/button_like"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
                     android:drawableLeft="@drawable/ic_like"
+                    android:gravity="left|center_vertical"
                     android:text="like"
                     android:textColor="@color/unselected_color"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
 
                 <Button
                     android:id="@+id/button_comment"
                     style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="8dp"
                     android:drawableLeft="@drawable/ic_comment"
+                    android:gravity="left|center_vertical"
                     android:text="comment"
                     android:textColor="@color/unselected_color"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
 
-                <Button
-                    android:id="@+id/button_share"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableLeft="@drawable/ic_share"
-                    android:text="share"
-                    android:textColor="@color/unselected_color"
-                    android:textSize="12sp" />
             </LinearLayout>
-
 
         </LinearLayout>
 

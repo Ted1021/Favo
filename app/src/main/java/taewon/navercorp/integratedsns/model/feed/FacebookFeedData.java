@@ -3,6 +3,7 @@ package taewon.navercorp.integratedsns.model.feed;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ import java.util.List;
 public class FacebookFeedData {
 
     @SerializedName("data")
-    private List<ArticleData> data = null;
+    private List<ArticleData> data = new ArrayList<>();
     @SerializedName("paging")
     private Paging paging;
 
@@ -46,17 +47,27 @@ public class FacebookFeedData {
         @SerializedName("full_picture")
         private String fullPicture;
         @SerializedName("from")
-        private From from;
+        private From from = new From();
         @SerializedName("source")
         private String source;
         @SerializedName("attachments")
-        private Attachments attachments;
+        private Attachments attachments = new Attachments();
         @SerializedName("id")
         private String id;
-        @SerializedName("comment")
-        private Comments comments;
+        @SerializedName("comments")
+        private Comments comments = new Comments();
         @SerializedName("likes")
-        private Likes likes;
+        private Likes likes = new Likes();
+
+        private int contentsType;
+
+        public int getContentsType() {
+            return contentsType;
+        }
+
+        public void setContentsType(int contentsType) {
+            this.contentsType = contentsType;
+        }
 
         public String getLink() {
             return link;
@@ -130,12 +141,39 @@ public class FacebookFeedData {
             this.comments = comments;
         }
 
+        public Likes getLikes() {
+            return likes;
+        }
+
+        public void setLikes(Likes likes) {
+            this.likes = likes;
+        }
+
         public class Likes {
 
-            private class Summary {
+            @SerializedName("summary")
+            private Summary summary;
+
+            public class Summary {
 
                 @SerializedName("total_count")
                 private int totalCount;
+
+                public int getTotalCount() {
+                    return totalCount;
+                }
+
+                public void setTotalCount(int totalCount) {
+                    this.totalCount = totalCount;
+                }
+            }
+
+            public Summary getSummary() {
+                return summary;
+            }
+
+            public void setSummary(Summary summary) {
+                this.summary = summary;
             }
         }
 
