@@ -58,7 +58,8 @@
         <activity
             android:name=".feed.comment.CommentActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-        <activity android:name=".subscription.facebook.PageDetailActivity"></activity>
+        <activity android:name=".subscription.facebook.PageDetailActivity" />
+        <activity android:name=".subscription.youtube.ChannelDetailActivity"></activity>
     </application>
 
 </manifest>

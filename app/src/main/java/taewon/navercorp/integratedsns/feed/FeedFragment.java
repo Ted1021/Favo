@@ -418,7 +418,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
 
-                    // TODO - Google Token Refresh 로직이 구현되기 전까지의 임시방편...
                     mEditor.putString(getString(R.string.google_token), "");
                     mEditor.commit();
                     checkToken();
@@ -447,7 +446,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     .build();
 
             YoutubeService service = retrofit.create(YoutubeService.class);
-            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, params[0]);
+            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, params[0],"date", "video");
             call.enqueue(new Callback<YoutubeSearchVideoData>() {
                 @Override
                 public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {

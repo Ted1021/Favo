@@ -93,7 +93,7 @@
                 android:maxLines="5"
                 android:text="story"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <FrameLayout
                 android:layout_width="match_parent"

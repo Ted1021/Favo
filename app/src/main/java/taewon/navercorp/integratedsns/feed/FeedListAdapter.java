@@ -32,6 +32,7 @@ import taewon.navercorp.integratedsns.model.feed.FacebookFeedData;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.subscription.facebook.PageDetailActivity;
+import taewon.navercorp.integratedsns.subscription.youtube.ChannelDetailActivity;
 
 /**
  * @author 김태원
@@ -188,11 +189,12 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
     private void loadPageDetail(int position, int platformType) {
 
+        Intent intent;
         switch (platformType) {
 
             case PLATFORM_FACEBOOK:
 
-                Intent intent = new Intent(mContext, PageDetailActivity.class);
+                intent = new Intent(mContext, PageDetailActivity.class);
                 intent.putExtra("CONTENT_TYPE", mDataset.get(position).getContentsType());
                 intent.putExtra("PAGE_ID", mDataset.get(position).getFacebookData().getFrom().getId());
                 mContext.startActivity(intent);
@@ -201,7 +203,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             case PLATFORM_YOUTUBE:
 
-
+                intent = new Intent(mContext, ChannelDetailActivity.class);
+                intent.putExtra("CHANNEL_ID", mDataset.get(position).getYoutubeData().getSnippet().getChannelId());
+                intent.putExtra("PROFILE_URL", mDataset.get(position).getYoutubeData().getSnippet().getProfileImage());
+                mContext.startActivity(intent);
                 break;
 
             case PLATFORM_PINTEREST:
@@ -333,7 +338,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         }
         holder.mUploadTime.setText(date);
         holder.mUserName.setText(data.getChannelTitle());
-        holder.mDescription.setText(data.getDescription());
+        holder.mDescription.setText(data.getTitle());
 
         Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
         Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);

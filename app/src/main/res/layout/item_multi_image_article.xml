@@ -93,7 +93,7 @@
                 android:maxLength="5"
                 android:text="story"
                 android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <ImageView
                 android:id="@+id/imageView_picture"

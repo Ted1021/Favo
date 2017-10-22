@@ -59,8 +59,9 @@ public class PageDetailActivity extends AppCompatActivity {
 
     private void initView(){
 
-        mCover = (ImageView) findViewById(R.id.imageView_pageCover);
         mProfile = (ImageView) findViewById(R.id.imageView_pageProfile);
+        mCover = (ImageView) findViewById(R.id.imageView_pageCover);
+        mCover.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
 
         mTitle = (TextView) findViewById(R.id.textView_pageName);
         mTitleToolbar = (TextView) findViewById(R.id.textView_pageName_toolbar);
@@ -86,7 +87,7 @@ public class PageDetailActivity extends AppCompatActivity {
 
                             Glide.with(PageDetailActivity.this).load(mPageInfo.getPicture().getData().getUrl()).into(mProfile);
                             Glide.with(PageDetailActivity.this).load(mPageInfo.getCover().getSource()).apply(new RequestOptions().override(mCover.getMaxWidth())).into(mCover);
-                            mCover.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
+
                             mTitle.setText(mPageInfo.getName());
                             mTitleToolbar.setText(mPageInfo.getName());
                             mFollowerCount.setText(String.format("팔로워 : %s 명",mPageInfo.getFan_count()));
@@ -180,7 +181,7 @@ public class PageDetailActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 3;
+            return 2;
         }
     }
 }
