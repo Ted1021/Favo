@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,25 +26,25 @@ import com.pinterest.android.pdk.PDKBoard;
 import com.pinterest.android.pdk.PDKCallback;
 import com.pinterest.android.pdk.PDKClient;
 import com.pinterest.android.pdk.PDKException;
-import com.pinterest.android.pdk.PDKPin;
 import com.pinterest.android.pdk.PDKResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.feed.FeedFragment;
+import taewon.navercorp.integratedsns.profile.following.FollowingListFragment;
+import taewon.navercorp.integratedsns.profile.pin.MyPinFragment;
 
 import static android.content.Context.MODE_PRIVATE;
 
 /**
  * @author 김태원
- * @file TumblrFragment.java
- * @brief show tumblr contents, search & add tumblr channels
+ * @file ProfileFragment.java
+ * @brief show user profile, subscription list and my pin
  * @date 2017.10.13
  */
-public class ProfileFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class ProfileFragment extends Fragment implements View.OnClickListener{
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
@@ -53,11 +53,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
     private SharedPreferences.Editor mEditor;
     private String mFacebookToken, mGoogleToken, mPinterestToken;
 
-    private RecyclerView mRecyclerView;
-    private PinterestListAdapter mAdapter;
-    private ArrayList<PDKPin> mDataset = new ArrayList<>();
-
-    private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
 
     private PDKClient mPinterestClient;
@@ -66,6 +61,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
     private TextView mUserName, mId;
     private ImageButton mSetting;
     private ViewPager mViewPager;
+
+    private static final int TAB_COUNT =2;
+    private static final int TAB_SUBSCRIPTIONS = 0;
+    private static final int TAB_MY_PIN = 1;
 
     public ProfileFragment() {
     }
@@ -88,15 +87,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
         mEditor = mPref.edit();
 
         mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mFacebookToken);
         mGoogleToken = mPref.getString(getString(R.string.google_token), "");
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mGoogleToken);
         mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mPinterestToken);
 
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
         mPinterestClient = PDKClient.getInstance();
 
+        // init platform profile logic
         if (!mFacebookToken.equals("")) {
             getFacebookUserInfo();
         } else if (!mGoogleToken.equals("")){
@@ -110,9 +107,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
 
         mProfile = (ImageView) view.findViewById(R.id.imageView_profile);
         mUserName = (TextView) view.findViewById(R.id.textView_userName);
-        mViewPager = (ViewPager) view.findViewById(R.id.viewPager);
         mSetting = (ImageButton) view.findViewById(R.id.button_setting);
         mSetting.setOnClickListener(this);
+
+        mViewPager = (ViewPager) view.findViewById(R.id.viewPager);
+        mViewPager.setAdapter(new ViewPagerAdapter(getChildFragmentManager()));
     }
 
     private void getFollowingBoards() {
@@ -122,7 +121,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
             public void onSuccess(PDKResponse response) {
                 super.onSuccess(response);
 
-                mDataset.clear();
                 for (PDKBoard board : response.getBoardList()) {
                     Log.d("CHECK_BOARD", " >>>>> " + board.getName());
 
@@ -178,8 +176,32 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, S
         }
     }
 
-    @Override
-    public void onRefresh() {
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
 
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            Fragment fragment = new FeedFragment();
+            switch (position) {
+
+                case TAB_SUBSCRIPTIONS:
+                    fragment = new FollowingListFragment();
+                    break;
+
+                case TAB_MY_PIN:
+                    fragment = new MyPinFragment();
+                    break;
+            }
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return TAB_COUNT;
+        }
     }
 }
