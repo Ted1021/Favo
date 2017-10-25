@@ -355,7 +355,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mDescription.setText(data.getNote());
 
         Glide.with(mContext).load(data.getImageUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-        Glide.with(mContext).load(R.drawable.icon_profile).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
+        Glide.with(mContext).load(data.getImageUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
         Glide.with(mContext).load(R.drawable.icon_pinterest_small).into(holder.mPlatformType);
     }
 

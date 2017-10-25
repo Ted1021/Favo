@@ -82,7 +82,6 @@ public class ChannelDetailActivity extends AppCompatActivity {
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
     }
 
-
     private void setAction() {
 
         // set viewPager action

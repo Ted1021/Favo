@@ -160,7 +160,6 @@ public class YoutubeFragment extends Fragment implements View.OnClickListener, S
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
 
-                    // TODO - Google Token Refresh 로직이 구현되기 전까지의 임시방편...
                     mEditor.putString(getString(R.string.google_token), "");
                     mEditor.commit();
                     checkToken();

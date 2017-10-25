@@ -29,7 +29,7 @@ public class PDKPin extends PDKModel {
         PDKPin pin = new PDKPin();
         try {
             if (obj instanceof JSONObject) {
-                JSONObject dataObj = (JSONObject)obj;
+                JSONObject dataObj = (JSONObject) obj;
                 if (dataObj.has("id")) {
                     pin.setUid(dataObj.getString("id"));
                 }
@@ -40,7 +40,7 @@ public class PDKPin extends PDKModel {
                     pin.setNote(dataObj.getString("note"));
                 }
                 if (dataObj.has("metadata")) {
-                   pin.setMetadata(dataObj.get("metadata").toString());
+                    pin.setMetadata(dataObj.get("metadata").toString());
                 }
                 if (dataObj.has("counts")) {
                     JSONObject countsObj = dataObj.getJSONObject("counts");
@@ -65,14 +65,14 @@ public class PDKPin extends PDKModel {
                 }
                 if (dataObj.has("created_at")) {
                     pin.setCreatedAt(
-                        Utils.getDateFormatter().parse(dataObj.getString("created_at")));
+                            Utils.getDateFormatter().parse(dataObj.getString("created_at")));
                 }
                 if (dataObj.has("image")) {
                     JSONObject imageObj = dataObj.getJSONObject("image");
                     Iterator<String> keys = imageObj.keys();
 
                     //TODO: for now we'll have just one image map. We will change this logic after appathon
-                    while(keys.hasNext()) {
+                    while (keys.hasNext()) {
                         String key = keys.next();
                         if (imageObj.get(key) instanceof JSONObject) {
                             JSONObject iObj = imageObj.getJSONObject(key);
@@ -96,7 +96,7 @@ public class PDKPin extends PDKModel {
         try {
             if (obj instanceof JSONArray) {
 
-                JSONArray jAarray = (JSONArray)obj;
+                JSONArray jAarray = (JSONArray) obj;
                 int size = jAarray.length();
                 for (int i = 0; i < size; i++) {
                     JSONObject dataObj = jAarray.getJSONObject(i);

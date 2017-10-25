@@ -4,6 +4,7 @@ package taewon.navercorp.integratedsns.profile;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -61,9 +62,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
     private TextView mUserName, mId;
     private ImageButton mSetting;
     private ViewPager mViewPager;
+    private TabLayout mTabLayout;
 
     private static final int TAB_COUNT =2;
-    private static final int TAB_SUBSCRIPTIONS = 0;
+    private static final int TAB_FOLLOWING = 0;
     private static final int TAB_MY_PIN = 1;
 
     public ProfileFragment() {
@@ -77,6 +79,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
 
         initView(view);
         initData();
+        setAction();
 
         return view;
     }
@@ -111,7 +114,59 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
         mSetting.setOnClickListener(this);
 
         mViewPager = (ViewPager) view.findViewById(R.id.viewPager);
+        mTabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
+    }
+
+    private void setAction() {
+
+        // set viewPager action
         mViewPager.setAdapter(new ViewPagerAdapter(getChildFragmentManager()));
+        mViewPager.setCurrentItem(0);
+        mViewPager.setOffscreenPageLimit(2);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        // set tabLayout action
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+
+                    case TAB_FOLLOWING:
+                        break;
+
+                    case TAB_MY_PIN:
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        // set interaction between viewPager & tabLayout
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
     }
 
     private void getFollowingBoards() {
@@ -188,7 +243,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
             Fragment fragment = new FeedFragment();
             switch (position) {
 
-                case TAB_SUBSCRIPTIONS:
+                case TAB_FOLLOWING:
                     fragment = new FollowingListFragment();
                     break;
 

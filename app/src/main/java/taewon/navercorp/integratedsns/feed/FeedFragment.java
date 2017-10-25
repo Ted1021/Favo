@@ -86,7 +86,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private RelativeLayout mLayoutDisconnection;
 
     private static final String BOARD_FIELDS = "id,name";
-    private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
+    private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
 
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
     private static final int MAX_COUNTS = 10;
@@ -237,7 +237,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 for (int i = 0; i < results.length(); i++) {
                                     pageInfo = results.getJSONObject(i);
                                     getFacebookPageFeed(pageInfo.getString("id"));
-                                    Log.d("CHECK_PAGE_ID", ">>>>>>> "+ pageInfo.getString("id"));
+                                    Log.d("CHECK_PAGE_ID", ">>>>>>> " + pageInfo.getString("id"));
                                 }
 
                             } catch (JSONException e) {
@@ -353,6 +353,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setPinterestData(pin);
                         data.setPubDate(pin.getCreatedAt());
 
+                        Log.d("CHECK_PINTEREST", ">>>>>>>>>>>>>>>>>>>>");
+//                        Log.d("CHECK_PINTEREST", pin.getUser().toString());
+
                         mDataset.add(data);
                     }
 
@@ -446,7 +449,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     .build();
 
             YoutubeService service = retrofit.create(YoutubeService.class);
-            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, params[0],"date", "video");
+            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, params[0], "date", "video");
             call.enqueue(new Callback<YoutubeSearchVideoData>() {
                 @Override
                 public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
