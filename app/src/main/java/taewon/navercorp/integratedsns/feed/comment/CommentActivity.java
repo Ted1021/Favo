@@ -166,22 +166,18 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                         if (response.getError() == null) {
 
                             mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
-
-//                            if (mFeedDetail.getComments().getPaging().getCursors().getAfter() == null) {
-//                                mNextPage = null;
-//                            } else {
-//                                mNextPage = mFeedDetail.getComments().getPaging().getCursors().getAfter();
-//                            }
-
                             mFacebookDataset.addAll(mFeedDetail.getComments().getData());
                             mAdapter = new FacebookCommentAdapter(CommentActivity.this, mFeedDetail, mFacebookDataset, mContentType);
                             mCommentList.setAdapter(mAdapter);
+
+                        } else {
+                            Log.e("CHECK_COMMENT", response.getError().toString());
                         }
                     }
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(2048){url}},attachments{subattachments},source,likes.limit(0).summary(true),comments.summary(true){from{name, picture.height(2048){url}},message,created_time}");
+        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(1024){url}},attachments{subattachments},source,likes.limit(0).summary(true),comments.summary(true){from{name, picture.height(1024){url}},message,created_time}");
         request.setParameters(parameters);
         request.executeAsync();
     }

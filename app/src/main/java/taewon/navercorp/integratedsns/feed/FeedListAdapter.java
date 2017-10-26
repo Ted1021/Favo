@@ -169,6 +169,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             case PLATFORM_FACEBOOK:
                 intent.putExtra("ARTICLE_ID", mDataset.get(position).getFacebookData().getId());
+                Log.d("CHECK_FACEBOOK_ID", mDataset.get(position).getFacebookData().getId());
                 break;
 
             case PLATFORM_YOUTUBE:

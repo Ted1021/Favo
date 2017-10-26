@@ -24,7 +24,7 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.model.page.FacebookPageInfoData;
 
-public class PageDetailActivity extends AppCompatActivity {
+public class PageDetailActivity extends AppCompatActivity{
 
     private String mPageId;
     private int mContentType;

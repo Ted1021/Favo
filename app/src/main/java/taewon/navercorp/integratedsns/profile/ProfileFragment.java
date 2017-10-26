@@ -1,13 +1,17 @@
 package taewon.navercorp.integratedsns.profile;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -45,17 +48,17 @@ import static android.content.Context.MODE_PRIVATE;
  * @brief show user profile, subscription list and my pin
  * @date 2017.10.13
  */
-public class ProfileFragment extends Fragment implements View.OnClickListener{
+public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
 
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
+
+    private BroadcastReceiver mTokenUpdateReceiver;
+
     private String mFacebookToken, mGoogleToken, mPinterestToken;
-
-    private RelativeLayout mLayoutDisconnection;
-
     private PDKClient mPinterestClient;
 
     private ImageView mProfile;
@@ -64,7 +67,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
 
-    private static final int TAB_COUNT =2;
+    private static final int TAB_COUNT = 2;
     private static final int TAB_FOLLOWING = 0;
     private static final int TAB_MY_PIN = 1;
 
@@ -96,14 +99,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
         mPinterestClient = PDKClient.getInstance();
 
-        // init platform profile logic
-        if (!mFacebookToken.equals("")) {
-            getFacebookUserInfo();
-        } else if (!mGoogleToken.equals("")){
+        // init update token status receiver
+        mTokenUpdateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+//                setProfileInfo();
+            }
+        };
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
 
-        } else {
-
-        }
+        setProfileInfo();
     }
 
     private void initView(View view) {
@@ -115,6 +120,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
 
         mViewPager = (ViewPager) view.findViewById(R.id.viewPager);
         mTabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
+    }
+
+    private void setProfileInfo(){
+
+        if (!mFacebookToken.equals("")) {
+            getFacebookUserInfo();
+        } else if (!mGoogleToken.equals("")) {
+
+        } else {
+
+        }
     }
 
     private void setAction() {
@@ -189,7 +205,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
         });
     }
 
-    private void getFacebookUserInfo(){
+    private void getFacebookUserInfo() {
 
         GraphRequest request = GraphRequest.newMeRequest(
                 AccessToken.getCurrentAccessToken(),

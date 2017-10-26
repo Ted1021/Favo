@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -48,7 +49,7 @@ import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FollowingListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class FollowingListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
@@ -61,6 +62,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     private RecyclerView mFollowingList;
     private FollowingListAdapter mAdapter;
     private SwipeRefreshLayout mRefreshLayout;
+    private RelativeLayout mLayoutDisconnection;
 
     private ArrayList<FollowingInfo> mDataset = new ArrayList<>();
 
@@ -106,26 +108,22 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
     private void initData() {
 
-        // init preference
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), Context.MODE_PRIVATE);
-        mEditor = mPref.edit();
-
-        mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        mGoogleToken = mPref.getString(getString(R.string.google_token), "");
-        mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
-
-        // init pinterest client
-        PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
-        mPinterestClient = PDKClient.getInstance();
-
         // init update token status receiver
         mTokenUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-//                checkToken();
+                setFollowingList(mCurrentPlatform);
             }
         };
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
+
+        // init preference
+        mPref = getContext().getSharedPreferences(getString(R.string.tokens), Context.MODE_PRIVATE);
+        mEditor = mPref.edit();
+
+        // init pinterest client
+        PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
+        mPinterestClient = PDKClient.getInstance();
     }
 
     private void initView(View view) {
@@ -147,6 +145,9 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
             }
         });
 
+        // view for disconnection
+        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
+
         mFollowingList = (RecyclerView) view.findViewById(R.id.recyclerView_following);
         mAdapter = new FollowingListAdapter(getContext(), mDataset);
         mFollowingList.setAdapter(mAdapter);
@@ -156,50 +157,35 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
     private void setFollowingList(int position) {
 
-//        mLayoutDisconnection.setVisibility(View.VISIBLE);
+        mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
+        mGoogleToken = mPref.getString(getString(R.string.google_token), "");
+        mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
+
+        mLayoutDisconnection.setVisibility(View.VISIBLE);
         switch (position) {
 
             case PLATFORM_FACEBOOK:
                 if (!mFacebookToken.equals("")) {
-//            mLayoutDisconnection.setVisibility(View.GONE);
+            mLayoutDisconnection.setVisibility(View.GONE);
                     getFacebookUserPages();
                 }
                 break;
 
             case PLAFORM_YOUTUBE:
                 if (!mGoogleToken.equals("")) {
-//            mLayoutDisconnection.setVisibility(View.GONE);
+            mLayoutDisconnection.setVisibility(View.GONE);
                     getYoutubeSubscriptionList();
                 }
                 break;
 
             case PLATFORM_PINTEREST:
                 if (!mPinterestToken.equals("")) {
-//            mLayoutDisconnection.setVisibility(View.GONE);
+            mLayoutDisconnection.setVisibility(View.GONE);
                     getPinterestFollowingBoards();
                 }
                 break;
         }
     }
-
-//    private void checkToken() {
-//
-////        mLayoutDisconnection.setVisibility(View.VISIBLE);
-//        if (!mFacebookToken.equals("")) {
-////            mLayoutDisconnection.setVisibility(View.GONE);
-//            getFacebookUserPages();
-//        }
-//
-//        if (!mGoogleToken.equals("")) {
-////            mLayoutDisconnection.setVisibility(View.GONE);
-//            getYoutubeSubscriptionList();
-//        }
-//
-//        if (!mPinterestToken.equals("")) {
-////            mLayoutDisconnection.setVisibility(View.GONE);
-//            getPinterestFollowingBoards();
-//        }
-//    }
 
     // Facebook API Call
     private void getFacebookUserPages() {
@@ -314,7 +300,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
                     data.setUserName(board.getName());
                     data.setProfile(board.getImageUrl());
-                    Log.e(getClass().getName(), " >>>>>>>>>>>> " + board.getImageUrl() + " "+ board.getName() + " ");
+                    Log.e(getClass().getName(), " >>>>>>>>>>>> " + board.getImageUrl() + " " + board.getName() + " ");
 
                     mDataset.add(data);
                 }
@@ -332,30 +318,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
-
-        Log.d("CHECK_POSITION", ">>>>>>>>>>>>>>>>>>> "+mCurrentPlatform);
-        switch (mCurrentPlatform) {
-
-            case PLATFORM_FACEBOOK:
-                if (!mFacebookToken.equals("")) {
-//            mLayoutDisconnection.setVisibility(View.GONE);
-                    getFacebookUserPages();
-                }
-                break;
-
-            case PLAFORM_YOUTUBE:
-                if (!mGoogleToken.equals("")) {
-//            mLayoutDisconnection.setVisibility(View.GONE);
-                    getYoutubeSubscriptionList();
-                }
-                break;
-
-            case PLATFORM_PINTEREST:
-                if (!mPinterestToken.equals("")) {
-//            mLayoutDisconnection.setVisibility(View.GONE);
-                    getPinterestFollowingBoards();
-                }
-                break;
-        }
+        setFollowingList(mCurrentPlatform);
     }
 }

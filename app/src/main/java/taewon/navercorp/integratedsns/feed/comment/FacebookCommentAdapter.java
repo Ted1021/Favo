@@ -159,8 +159,8 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
         holder.mArticleUserName.setText(mFeedDetail.getFrom().getName());
         holder.mArticleUploadTime.setText(date);
         holder.mDescription.setText(mFeedDetail.getMessage());
-        holder.mLike.setText(mFeedDetail.getLikes().getSummary().getTotalCount()+" 개");
-        holder.mComment.setText(mFeedDetail.getComments().getSummary().getTotalCount()+" 개");
+        holder.mLike.setText(mFeedDetail.getLikes().getSummary().getTotalCount() + " 개");
+        holder.mComment.setText(mFeedDetail.getComments().getSummary().getTotalCount() + " 개");
 
         Glide.with(mContext).load(mFeedDetail.getFullPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
         Glide.with(mContext).load(mFeedDetail.getFrom().getPicture().getData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mArticleProfile);
@@ -169,13 +169,13 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
 
     private void bindBodyViewItem(ViewHolder holder, int position) {
 
+        Log.d("CHECK_COMMENT", mDataset.size()+"");
         if (!mDataset.isEmpty()) {
             FacebookCommentData.Comments.CommentData data = mFeedDetail.getComments().getData().get(position);
 
             String date = null;
             try {
                 date = mFormat.format(mDateConverter.parse(data.getUploadTime()));
-                Log.d("CHECK_DATE", date);
             } catch (ParseException e) {
                 e.printStackTrace();
             }

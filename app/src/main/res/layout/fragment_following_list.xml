@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context="taewon.navercorp.integratedsns.profile.following.FollowingListFragment">
 
@@ -12,6 +13,42 @@
         android:layout_gravity="right"
         android:layout_marginBottom="8dp"
         android:entries="@array/platform"/>
+
+    <RelativeLayout
+        android:id="@+id/layout_disconnection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_above="@+id/textView_pageName"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="11dp"
+            app:srcCompat="@drawable/ic_disconnection" />
+
+        <TextView
+            android:id="@+id/textView_pageName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="No data"
+            android:textColor="@color/lightGray"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView_pageName"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
+            android:text="Please connect to SNS"
+            android:textColor="@color/unselected_color" />
+
+    </RelativeLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/refreshLayout"
