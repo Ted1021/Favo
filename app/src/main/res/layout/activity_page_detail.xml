@@ -61,6 +61,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|center_horizontal"
                         android:layout_marginLeft="8dp"
+                        android:gravity="left"
                         android:orientation="vertical">
 
                         <TextView
@@ -73,12 +74,11 @@
                             android:textColor="@color/colorCremeWhite"
                             android:textSize="24sp" />
 
-                        <TextView
-                            android:id="@+id/textView_followers"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="follower"
-                            android:textSize="12sp" />
+                        <com.facebook.share.widget.LikeView
+                            android:id="@+id/button_pageLike"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="left"></com.facebook.share.widget.LikeView>
 
                     </LinearLayout>
                 </LinearLayout>

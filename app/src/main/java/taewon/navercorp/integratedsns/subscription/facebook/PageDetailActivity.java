@@ -18,20 +18,22 @@ import com.bumptech.glide.request.RequestOptions;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.share.widget.LikeView;
 import com.google.gson.Gson;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.model.page.FacebookPageInfoData;
 
-public class PageDetailActivity extends AppCompatActivity{
+public class PageDetailActivity extends AppCompatActivity {
 
     private String mPageId;
 
     private ImageView mCover, mProfile;
-    private TextView mTitle, mTitleToolbar, mFollowerCount;
+    private TextView mTitle, mTitleToolbar;
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
+    private LikeView mPageLikeButton;
 
     private FacebookPageInfoData mPageInfo = new FacebookPageInfoData();
 
@@ -49,13 +51,13 @@ public class PageDetailActivity extends AppCompatActivity{
         setAction();
     }
 
-    private void initData(){
+    private void initData() {
 
         mPageId = getIntent().getStringExtra("PAGE_ID");
         getPageInfo();
     }
 
-    private void initView(){
+    private void initView() {
 
         mProfile = (ImageView) findViewById(R.id.imageView_pageProfile);
         mCover = (ImageView) findViewById(R.id.imageView_pageCover);
@@ -63,13 +65,15 @@ public class PageDetailActivity extends AppCompatActivity{
 
         mTitle = (TextView) findViewById(R.id.textView_pageName);
         mTitleToolbar = (TextView) findViewById(R.id.textView_pageName_toolbar);
-        mFollowerCount = (TextView) findViewById(R.id.textView_followers);
 
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
+
+        mPageLikeButton = (LikeView) findViewById(R.id.button_pageLike);
+        mPageLikeButton.setObjectIdAndType(mPageId, LikeView.ObjectType.PAGE);
     }
 
-    private void getPageInfo(){
+    private void getPageInfo() {
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newGraphPathRequest(
@@ -79,7 +83,7 @@ public class PageDetailActivity extends AppCompatActivity{
                     @Override
                     public void onCompleted(GraphResponse response) {
 
-                        if(response.getError() == null){
+                        if (response.getError() == null) {
 
                             mPageInfo = new Gson().fromJson(response.getJSONObject().toString(), FacebookPageInfoData.class);
 
@@ -88,10 +92,9 @@ public class PageDetailActivity extends AppCompatActivity{
 
                             mTitle.setText(mPageInfo.getName());
                             mTitleToolbar.setText(mPageInfo.getName());
-                            mFollowerCount.setText(String.format("팔로워 : %s 명",mPageInfo.getFan_count()));
 
                         } else {
-                            Log.e(getClass().getName(), "Error load facebook page : "+response.getRawResponse());
+                            Log.e(getClass().getName(), "Error load facebook page : " + response.getRawResponse());
                         }
                     }
                 });
