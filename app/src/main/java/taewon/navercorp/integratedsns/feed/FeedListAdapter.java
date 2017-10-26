@@ -196,7 +196,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             case PLATFORM_FACEBOOK:
 
                 intent = new Intent(mContext, PageDetailActivity.class);
-                intent.putExtra("CONTENT_TYPE", mDataset.get(position).getContentsType());
+//                intent.putExtra("CONTENT_TYPE", mDataset.get(position).getContentsType());
                 intent.putExtra("PAGE_ID", mDataset.get(position).getFacebookData().getFrom().getId());
                 mContext.startActivity(intent);
 

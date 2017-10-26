@@ -194,7 +194,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                 for (PDKBoard board : response.getBoardList()) {
                     Log.d("CHECK_BOARD", " >>>>> " + board.getName());
-
                 }
             }
 

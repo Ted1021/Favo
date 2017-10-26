@@ -43,7 +43,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.FollowingInfo;
+import taewon.navercorp.integratedsns.model.FollowingInfoData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
 
 /**
@@ -64,13 +64,13 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
 
-    private ArrayList<FollowingInfo> mDataset = new ArrayList<>();
+    private ArrayList<FollowingInfoData> mDataset = new ArrayList<>();
 
     private String mFacebookToken;
     private String mGoogleToken;
     private String mPinterestToken;
 
-    private int mCurrentPlatform = 0;
+    private int mCurrentPlatform = 1;
 
     private static final String BOARD_FIELDS = "id,name, created_at, creator, image, url";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
@@ -78,9 +78,9 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
     private static final int MAX_COUNTS = 10;
 
-    private static final int PLATFORM_FACEBOOK = 0;
-    private static final int PLAFORM_YOUTUBE = 1;
-    private static final int PLATFORM_PINTEREST = 2;
+    private static final int PLATFORM_FACEBOOK = 1;
+    private static final int PLATFORM_YOUTUBE = 2;
+    private static final int PLATFORM_PINTEREST = 3;
 
     public FollowingListFragment() {
 
@@ -135,8 +135,8 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mCurrentPlatform = position;
-                setFollowingList(position);
+                mCurrentPlatform = position + 1;
+                setFollowingList(mCurrentPlatform);
             }
 
             @Override
@@ -166,21 +166,21 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
             case PLATFORM_FACEBOOK:
                 if (!mFacebookToken.equals("")) {
-            mLayoutDisconnection.setVisibility(View.GONE);
+                    mLayoutDisconnection.setVisibility(View.GONE);
                     getFacebookUserPages();
                 }
                 break;
 
-            case PLAFORM_YOUTUBE:
+            case PLATFORM_YOUTUBE:
                 if (!mGoogleToken.equals("")) {
-            mLayoutDisconnection.setVisibility(View.GONE);
+                    mLayoutDisconnection.setVisibility(View.GONE);
                     getYoutubeSubscriptionList();
                 }
                 break;
 
             case PLATFORM_PINTEREST:
                 if (!mPinterestToken.equals("")) {
-            mLayoutDisconnection.setVisibility(View.GONE);
+                    mLayoutDisconnection.setVisibility(View.GONE);
                     getPinterestFollowingBoards();
                 }
                 break;
@@ -208,11 +208,14 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
                                 for (int i = 0; i < results.length(); i++) {
                                     pageInfo = results.getJSONObject(i);
-                                    FollowingInfo data = new FollowingInfo();
+                                    FollowingInfoData data = new FollowingInfoData();
 
-                                    data.setProfile(pageInfo.getJSONObject("picture").getJSONObject("data").getString("url"));
                                     data.setUserName(pageInfo.getString("name"));
+                                    data.setProfile(pageInfo.getJSONObject("picture").getJSONObject("data").getString("url"));
+                                    data.set_id(pageInfo.getString("id"));
+                                    data.setPlatformType(PLATFORM_FACEBOOK);
 
+                                    Log.d("CHECK_FOLLOWING", " >>>>>>>>>> facebook " + data.get_id() + " " + data.getPlatformType());
                                     mDataset.add(data);
                                 }
                                 mAdapter.notifyDataSetChanged();
@@ -228,8 +231,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
                 });
 
         Bundle parameters = new Bundle();
-//        parameters.putString("limit", "10");
-        parameters.putString("fields", "name, picture.height(1024){url}");
+        parameters.putString("fields", "name, picture.height(1024){url},id");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -258,10 +260,14 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
                     mDataset.clear();
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
-                        FollowingInfo data = new FollowingInfo();
+                        FollowingInfoData data = new FollowingInfoData();
 
                         data.setUserName(item.getSnippet().getTitle());
                         data.setProfile(item.getSnippet().getThumbnails().getHigh().getUrl());
+                        data.set_id(item.getSnippet().getResourceId().getChannelId());
+                        data.setPlatformType(PLATFORM_YOUTUBE);
+
+                        Log.d("CHECK_FOLLOWING", " >>>>>>>>>> youtube " + data.get_id() + " " + data.getPlatformType());
 
                         mDataset.add(data);
                     }
@@ -296,7 +302,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
                 mDataset.clear();
                 for (PDKBoard board : response.getBoardList()) {
 
-                    FollowingInfo data = new FollowingInfo();
+                    FollowingInfoData data = new FollowingInfoData();
 
                     data.setUserName(board.getName());
                     data.setProfile(board.getImageUrl());

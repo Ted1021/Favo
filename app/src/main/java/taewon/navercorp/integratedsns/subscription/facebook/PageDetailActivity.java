@@ -27,7 +27,6 @@ import taewon.navercorp.integratedsns.model.page.FacebookPageInfoData;
 public class PageDetailActivity extends AppCompatActivity{
 
     private String mPageId;
-    private int mContentType;
 
     private ImageView mCover, mProfile;
     private TextView mTitle, mTitleToolbar, mFollowerCount;
@@ -53,7 +52,6 @@ public class PageDetailActivity extends AppCompatActivity{
     private void initData(){
 
         mPageId = getIntent().getStringExtra("PAGE_ID");
-        mContentType = getIntent().getIntExtra("CONTENT_TYPE", 0);
         getPageInfo();
     }
 
