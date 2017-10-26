@@ -73,12 +73,11 @@
                             android:textColor="@color/colorCremeWhite"
                             android:textSize="24sp" />
 
-                        <TextView
-                            android:id="@+id/textView_followers"
+                        <Button
+                            android:id="@+id/button_following"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="follower"
-                            android:textSize="12sp" />
+                            android:text="following" />
 
                     </LinearLayout>
                 </LinearLayout>

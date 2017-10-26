@@ -11,6 +11,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,7 +29,7 @@ import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.page.YoutubeChannelInfoData;
 
-public class ChannelDetailActivity extends AppCompatActivity {
+public class ChannelDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
@@ -35,9 +37,10 @@ public class ChannelDetailActivity extends AppCompatActivity {
     private String mChannelId, mProfileUrl;
 
     private ImageView mCover, mProfile;
-    private TextView mTitle, mTitleToolbar, mFollowerCount;
+    private TextView mTitle, mTitleToolbar;
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
+    private Button mFollowingButton;
 
     private YoutubeChannelInfoData mChannelInfo = new YoutubeChannelInfoData();
 
@@ -76,10 +79,12 @@ public class ChannelDetailActivity extends AppCompatActivity {
 
         mTitle = (TextView) findViewById(R.id.textView_pageName);
         mTitleToolbar = (TextView) findViewById(R.id.textView_pageName_toolbar);
-        mFollowerCount = (TextView) findViewById(R.id.textView_followers);
 
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
+
+        mFollowingButton = (Button) findViewById(R.id.button_following);
+        mFollowingButton.setOnClickListener(this);
     }
 
     private void setAction() {
@@ -169,6 +174,17 @@ public class ChannelDetailActivity extends AppCompatActivity {
                 Log.e(getClass().getName(), "Error load youtube page ");
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        switch(v.getId()){
+
+            case R.id.button_following:
+
+                break;
+        }
     }
 
     private class ViewPagerAdapter extends FragmentStatePagerAdapter {
