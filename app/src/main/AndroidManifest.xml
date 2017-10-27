@@ -46,6 +46,7 @@
                 <data android:scheme="pdk4928301781867311512" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".home.HomeActivity"
             android:configChanges="orientation|screenSize|keyboard" />
@@ -58,8 +59,15 @@
         <activity
             android:name=".feed.comment.CommentActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-        <activity android:name=".subscription.facebook.PageDetailActivity" />
-        <activity android:name=".subscription.youtube.ChannelDetailActivity"></activity>
+
+        <activity android:name=".subscription.facebook.PageDetailActivity"
+            android:configChanges="orientation|screenSize|keyboard"/>
+
+        <activity android:name=".subscription.youtube.ChannelDetailActivity"
+            android:configChanges="orientation|screenSize|keyboard"/>
+
+        <activity android:name=".feed.VideoActivity"
+            android:configChanges="orientation|screenSize|keyboard"/>
     </application>
 
 </manifest>
