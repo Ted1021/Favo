@@ -164,7 +164,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         // set recyclerView
         mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
-        mAdapter = new FeedListAdapter(getActivity(), mDataset);
+        mAdapter = new FeedListAdapter(getContext(), mDataset);
         mFeedList.setAdapter(mAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mFeedList.setLayoutManager(layoutManager);

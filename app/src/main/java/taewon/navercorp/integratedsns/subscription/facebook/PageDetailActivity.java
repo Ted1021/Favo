@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -88,7 +87,7 @@ public class PageDetailActivity extends AppCompatActivity {
                             mPageInfo = new Gson().fromJson(response.getJSONObject().toString(), FacebookPageInfoData.class);
 
                             Glide.with(PageDetailActivity.this).load(mPageInfo.getPicture().getData().getUrl()).into(mProfile);
-                            Glide.with(PageDetailActivity.this).load(mPageInfo.getCover().getSource()).apply(new RequestOptions().override(mCover.getMaxWidth())).into(mCover);
+                            Glide.with(PageDetailActivity.this).load(mPageInfo.getCover().getSource()).into(mCover);
 
                             mTitle.setText(mPageInfo.getName());
                             mTitleToolbar.setText(mPageInfo.getName());

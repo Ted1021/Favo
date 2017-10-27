@@ -1,6 +1,5 @@
 package taewon.navercorp.integratedsns.feed;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -44,7 +43,7 @@ import taewon.navercorp.integratedsns.subscription.youtube.ChannelDetailActivity
 
 public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHolder> {
 
-    private Activity mActivity;
+    private Context mContext;
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private LayoutInflater mLayoutInflater;
     SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -58,11 +57,11 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     private static final int PLATFORM_YOUTUBE = 2;
     private static final int PLATFORM_PINTEREST = 3;
 
-    public FeedListAdapter(Activity activity, Vector<FavoFeedData> dataset) {
+    public FeedListAdapter(Context context, Vector<FavoFeedData> dataset) {
 
-        mActivity = activity;
+        mContext = context;
         mDataset = dataset;
-        mLayoutInflater = (LayoutInflater) mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -151,19 +150,19 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             intent = new Intent(Intent.ACTION_VIEW, uri);
             intent.setDataAndType(uri, "video/*");
-            mActivity.startActivity(intent);
+            mContext.startActivity(intent);
 
         } else {
             videoUrl = mDataset.get(position).getYoutubeData().getId().getVideoId();
-            intent = new Intent(mActivity, VideoActivity.class);
+            intent = new Intent(mContext, VideoActivity.class);
             intent.putExtra("VIDEO_ID", videoUrl);
-            mActivity.startActivity(intent);
+            mContext.startActivity(intent);
         }
     }
 
     private void loadComments(int position, int platformType, int contentsType) {
 
-        Intent intent = new Intent(mActivity, CommentActivity.class);
+        Intent intent = new Intent(mContext, CommentActivity.class);
         intent.putExtra("PLATFORM_TYPE", platformType);
         intent.putExtra("CONTENTS_TYPE", contentsType);
 
@@ -187,7 +186,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
                 break;
         }
-        mActivity.startActivity(intent);
+        mContext.startActivity(intent);
     }
 
     private void loadPageDetail(int position, int platformType) {
@@ -197,19 +196,19 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             case PLATFORM_FACEBOOK:
 
-                intent = new Intent(mActivity, PageDetailActivity.class);
+                intent = new Intent(mContext, PageDetailActivity.class);
 //                intent.putExtra("CONTENT_TYPE", mDataset.get(position).getContentsType());
                 intent.putExtra("PAGE_ID", mDataset.get(position).getFacebookData().getFrom().getId());
-                mActivity.startActivity(intent);
+                mContext.startActivity(intent);
 
                 break;
 
             case PLATFORM_YOUTUBE:
 
-                intent = new Intent(mActivity, ChannelDetailActivity.class);
+                intent = new Intent(mContext, ChannelDetailActivity.class);
                 intent.putExtra("CHANNEL_ID", mDataset.get(position).getYoutubeData().getSnippet().getChannelId());
                 intent.putExtra("PROFILE_URL", mDataset.get(position).getYoutubeData().getSnippet().getProfileImage());
-                mActivity.startActivity(intent);
+                mContext.startActivity(intent);
                 break;
 
             case PLATFORM_PINTEREST:
@@ -230,7 +229,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
                     url = mDataset.get(position).getFacebookData().getLink();
                     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    mActivity.startActivity(intent);
+                    mContext.startActivity(intent);
                 }
                 break;
 
@@ -240,7 +239,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
                     url = mDataset.get(position).getPinterestData().getLink();
                     intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    mActivity.startActivity(intent);
+                    mContext.startActivity(intent);
                 }
                 break;
         }
@@ -248,7 +247,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
 //    private void loadYoutubeVideo(final String videoId) {
 //
-//        android.app.FragmentManager fragmentManager = mActivity.getFragmentManager();
+//        android.app.FragmentManager fragmentManager = mContext.getFragmentManager();
 //        YouTubePlayerFragment playerFragment = (YouTubePlayerFragment) fragmentManager.findFragmentByTag("youtube_video");
 //        if (playerFragment == null) {
 //            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -256,7 +255,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 //            fragmentTransaction.add(R.id.layout_container, playerFragment, "youtube_video").addToBackStack(null).commit();
 //        }
 //
-//        playerFragment.initialize(mActivity.getString(R.string.google_api_key), new YouTubePlayer.OnInitializedListener() {
+//        playerFragment.initialize(mContext.getString(R.string.google_api_key), new YouTubePlayer.OnInitializedListener() {
 //            @Override
 //            public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
 //                youTubePlayer.cueVideo(videoId);
@@ -345,9 +344,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mLike.setText(data.getLikes().getSummary().getTotalCount() + " 개");
         holder.mComment.setText(data.getComments().getSummary().getTotalCount() + " 개");
 
-        Glide.with(mActivity).load(data.getFullPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-        Glide.with(mActivity).load(data.getFrom().getPicture().getProfileData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
-        Glide.with(mActivity).load(R.drawable.icon_facebook_small).into(holder.mPlatformType);
+        Glide.with(mContext).load(data.getFullPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+        Glide.with(mContext).load(data.getFrom().getPicture().getProfileData().getUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
+        Glide.with(mContext).load(R.drawable.icon_facebook_small).into(holder.mPlatformType);
     }
 
     private void bindYoutubeItem(ViewHolder holder, int position) {
@@ -366,9 +365,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mUserName.setText(data.getChannelTitle());
         holder.mDescription.setText(data.getTitle());
 
-        Glide.with(mActivity).load(data.getThumbnails().getHigh().getUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-        Glide.with(mActivity).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
-        Glide.with(mActivity).load(R.drawable.icon_youtube_small).into(holder.mPlatformType);
+        Glide.with(mContext).load(data.getThumbnails().getHigh().getUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+        Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
+        Glide.with(mContext).load(R.drawable.icon_youtube_small).into(holder.mPlatformType);
     }
 
     private void bindPinterestItem(ViewHolder holder, int position) {
@@ -380,9 +379,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mUploadTime.setText(date);
         holder.mDescription.setText(data.getNote());
 
-        Glide.with(mActivity).load(data.getImageUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-        Glide.with(mActivity).load(data.getImageUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
-        Glide.with(mActivity).load(R.drawable.icon_pinterest_small).into(holder.mPlatformType);
+        Glide.with(mContext).load(data.getImageUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+        Glide.with(mContext).load(data.getImageUrl()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
+        Glide.with(mContext).load(R.drawable.icon_pinterest_small).into(holder.mPlatformType);
     }
 
     @Override

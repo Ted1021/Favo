@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -161,7 +160,7 @@ public class ChannelDetailActivity extends AppCompatActivity implements View.OnC
                     mTitle.setText(mChannelInfo.getItems().get(0).getSnippet().getTitle());
                     mTitleToolbar.setText(mChannelInfo.getItems().get(0).getSnippet().getTitle());
 
-                    Glide.with(ChannelDetailActivity.this).load(mChannelInfo.getItems().get(0).getBrandingSettings().getImage().getBannerMobileExtraHdImageUrl()).apply(new RequestOptions().override(mCover.getMaxWidth())).into(mCover);
+                    Glide.with(ChannelDetailActivity.this).load(mChannelInfo.getItems().get(0).getBrandingSettings().getImage().getBannerMobileExtraHdImageUrl()).into(mCover);
                     Glide.with(ChannelDetailActivity.this).load(mProfileUrl).into(mProfile);
                 } else {
                     Log.e(getClass().getName(), "Error load youtube page : "+response.raw().toString());
