@@ -6,9 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.Auth;
@@ -30,10 +29,9 @@ import taewon.navercorp.integratedsns.search.SearchFragment;
  * @date 2017.09.27
  */
 
-public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, FragmentManager.OnBackStackChangedListener{
 
     TabLayout mTabLayout;
-    ViewPager mViewPager;
 
     // Auth for google (Youtube)
     public static GoogleApiClient mGoogleApiClient;
@@ -42,6 +40,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final int FRAG_COUNT = 3;
 
     // fragment index
+    private static final String BACK_STACK_ROOT_TAG = "root_fragment";
     private static final int TAB_FEED = 0;
     private static final int TAB_SEARCH = 1;
     private static final int TAB_PROFILE = 2;
@@ -64,6 +63,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         initData();
         initView();
         setAction();
+        addFragmentOnTop(new FeedFragment());
     }
 
     private void initData() {
@@ -84,38 +84,32 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private void initView() {
 
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        mTabLayout.getTabAt(0).getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.tumblr_color), PorterDuff.Mode.SRC_IN);
-        mViewPager = (ViewPager) findViewById(R.id.viewPager);
     }
 
     private void setAction() {
-
-        // set viewPager action
-        mViewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
-        mViewPager.setCurrentItem(0);
-        mViewPager.setOffscreenPageLimit(4);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
 
         // set tabLayout action
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
 
+                Fragment fragment = new FeedFragment();
+                switch (tab.getPosition()) {
+
+                    case TAB_FEED:
+                        fragment = new FeedFragment();
+                        break;
+
+                    case TAB_SEARCH:
+                        fragment = new SearchFragment();
+                        break;
+
+                    case TAB_PROFILE:
+                        fragment = new ProfileFragment();
+                        break;
+                }
+
+                replaceFragment(fragment);
                 tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.tumblr_color), PorterDuff.Mode.SRC_IN);
             }
 
@@ -129,10 +123,6 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
             }
         });
-
-        // set interaction between viewPager & tabLayout
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
     }
 
     @Override
@@ -140,36 +130,24 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     }
 
-    private class ViewPagerAdapter extends FragmentStatePagerAdapter {
+    public void replaceFragment(Fragment fragment){
 
-        public ViewPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.addOnBackStackChangedListener(this);
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.layout_container, fragment).addToBackStack(null).commit();
+    }
 
-        @Override
-        public Fragment getItem(int position) {
+    public void addFragmentOnTop(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.layout_container, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
 
-            Fragment fragment = new FeedFragment();
-            switch (position) {
+    @Override
+    public void onBackStackChanged() {
 
-                case TAB_FEED:
-                    fragment = new FeedFragment();
-                    break;
-
-                case TAB_SEARCH:
-                    fragment = new SearchFragment();
-                    break;
-
-                case TAB_PROFILE:
-                    fragment = new ProfileFragment();
-                    break;
-            }
-            return fragment;
-        }
-
-        @Override
-        public int getCount() {
-            return FRAG_COUNT;
-        }
     }
 }
