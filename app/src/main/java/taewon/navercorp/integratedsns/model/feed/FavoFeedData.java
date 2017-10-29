@@ -1,17 +1,18 @@
 package taewon.navercorp.integratedsns.model.feed;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by tedkim on 2017. 10. 15..
  */
 
-public class FavoFeedData {
+@SuppressWarnings("serial")
+public class FavoFeedData implements Serializable{
 
     private int platformType;
     private int contentsType;
     private Date pubDate;
-
     private String pageId;
     private String feedId;
     private String profileImage;
@@ -22,7 +23,6 @@ public class FavoFeedData {
     private String videoUrl;
     private String description;
     private String[] subattachments;
-
     private int likeCount;
     private int commentCount;
 

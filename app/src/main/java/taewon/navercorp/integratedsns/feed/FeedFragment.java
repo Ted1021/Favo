@@ -281,6 +281,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     data.setPlatformType(PLATFORM_FACEBOOK);
                                     if (!(article.getSource() == null)) {
                                         data.setContentsType(CONTENTS_VIDEO);
+                                        data.setVideoUrl(article.getSource());
                                     } else {
                                         data.setContentsType(CONTENTS_IMAGE);
                                     }

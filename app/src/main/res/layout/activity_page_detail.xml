@@ -77,8 +77,8 @@
                         <com.facebook.share.widget.LikeView
                             android:id="@+id/button_pageLike"
                             android:layout_width="wrap_content"
-                            android:layout_height="match_parent">
-                        </com.facebook.share.widget.LikeView>
+                            android:layout_height="match_parent"
+                            android:background="@color/appColor"></com.facebook.share.widget.LikeView>
 
                     </LinearLayout>
                 </LinearLayout>

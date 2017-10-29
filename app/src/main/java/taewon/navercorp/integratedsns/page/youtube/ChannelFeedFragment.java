@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.subscription.youtube;
+package taewon.navercorp.integratedsns.page.youtube;
 
 
 import android.content.SharedPreferences;
@@ -21,35 +21,38 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.page.YoutubeChannelPlaylistData;
+import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class ChannelPlaylistFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class ChannelFeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
     private SwipeRefreshLayout mRefreshLayout;
-    private RecyclerView mChannelPlaylist;
+    private RecyclerView mChannelFeedList;
 
-    private String mChannelId;
+    private ArrayList<YoutubeSearchVideoData.Item> mDataset = new ArrayList<>();
+    private ChannelFeedAdapter mAdapter;
 
-    private ArrayList<YoutubeChannelPlaylistData.Item> mDataset = new ArrayList<>();
-    private ChannelPlaylistAdapter mAdapter;
+    private String mChannelId, mProfileUrl;
+
+    private static final String ARG_PARAM1 = "CHANNEL_ID";
+    private static final String ARG_PARAM2 = "PROFILE_URL";
 
     private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
-    private static final String ARG_PARAM1 = "CHANNEL_ID";
-    private static final int MAX_COUNT = 50;
+    private static final int MAX_COUNTS = 50;
 
-    public ChannelPlaylistFragment() {
+    public ChannelFeedFragment() {
 
     }
 
-    public static ChannelPlaylistFragment newInstance(String param1) {
-        ChannelPlaylistFragment fragment = new ChannelPlaylistFragment();
+    public static ChannelFeedFragment newInstance(String param1, String param2) {
+        ChannelFeedFragment fragment = new ChannelFeedFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,17 +62,19 @@ public class ChannelPlaylistFragment extends Fragment implements SwipeRefreshLay
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mChannelId = getArguments().getString(ARG_PARAM1);
+            mProfileUrl = getArguments().getString(ARG_PARAM2);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_channel_playlist, container, false);
+        View view = inflater.inflate(R.layout.fragment_channel_feed, container, false);
 
         initData();
         initView(view);
-        getChannelPlaylist();
+        getChannelVideos();
+
         return view;
     }
 
@@ -86,15 +91,15 @@ public class ChannelPlaylistFragment extends Fragment implements SwipeRefreshLay
         mRefreshLayout.setOnRefreshListener(this);
         mRefreshLayout.setRefreshing(true);
 
-        mChannelPlaylist = (RecyclerView) view.findViewById(R.id.recyclerView_playlist);
-        mAdapter = new ChannelPlaylistAdapter(getContext(), mDataset);
-        mChannelPlaylist.setAdapter(mAdapter);
+        mChannelFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
+        mAdapter = new ChannelFeedAdapter(getContext(), mDataset, mProfileUrl);
+        mChannelFeedList.setAdapter(mAdapter);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mChannelPlaylist.setLayoutManager(layoutManager);
+        mChannelFeedList.setLayoutManager(layoutManager);
     }
 
-    private void getChannelPlaylist() {
+    private void getChannelVideos() {
 
         String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
 
@@ -104,34 +109,40 @@ public class ChannelPlaylistFragment extends Fragment implements SwipeRefreshLay
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeChannelPlaylistData> call = service.getChannelPlaylist(accessToken, "snippet,contentDetails", MAX_COUNT, mChannelId);
-        call.enqueue(new Callback<YoutubeChannelPlaylistData>() {
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, mChannelId, "date", "video");
+        call.enqueue(new Callback<YoutubeSearchVideoData>() {
             @Override
-            public void onResponse(Call<YoutubeChannelPlaylistData> call, Response<YoutubeChannelPlaylistData> response) {
+            public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
 
-                if (response.isSuccessful()) {
+                if(response.isSuccessful()){
 
-                    mDataset.addAll(response.body().getItems());
+                    for(YoutubeSearchVideoData.Item data : response.body().getItems()){
+
+                        data.getSnippet().setProfileImage(mProfileUrl);
+                        mDataset.add(data);
+                    }
                     mAdapter.notifyDataSetChanged();
 
                 } else {
-                    Log.e(getClass().getName(), response.raw().toString());
+                    Log.e(getClass().getName(), "fail to get youtube video " + response.raw().toString());
                 }
                 mRefreshLayout.setRefreshing(false);
             }
 
             @Override
-            public void onFailure(Call<YoutubeChannelPlaylistData> call, Throwable t) {
+            public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
 
                 t.printStackTrace();
                 mRefreshLayout.setRefreshing(false);
             }
+
         });
+
     }
 
     @Override
     public void onRefresh() {
         mDataset.clear();
-        getChannelPlaylist();
+        getChannelVideos();
     }
 }

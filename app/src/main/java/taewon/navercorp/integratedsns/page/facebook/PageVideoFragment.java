@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.subscription.facebook;
+package taewon.navercorp.integratedsns.page.facebook;
 
 
 import android.os.Bundle;

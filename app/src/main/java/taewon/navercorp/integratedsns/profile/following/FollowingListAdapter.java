@@ -17,8 +17,8 @@ import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.FollowingInfoData;
-import taewon.navercorp.integratedsns.subscription.facebook.PageDetailActivity;
-import taewon.navercorp.integratedsns.subscription.youtube.ChannelDetailActivity;
+import taewon.navercorp.integratedsns.page.facebook.PageDetailActivity;
+import taewon.navercorp.integratedsns.page.youtube.ChannelDetailActivity;
 
 /**
  * Created by USER on 2017-10-25.

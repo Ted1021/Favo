@@ -1,5 +1,7 @@
-package taewon.navercorp.integratedsns.subscription.facebook;
+package taewon.navercorp.integratedsns.page.facebook;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -20,13 +22,25 @@ import com.facebook.GraphResponse;
 import com.facebook.share.widget.LikeView;
 import com.google.gson.Gson;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
+import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.page.FacebookPageInfoData;
+import taewon.navercorp.integratedsns.model.page.FavoPageInfoData;
+import taewon.navercorp.integratedsns.model.page.YoutubeChannelInfoData;
 
 public class PageDetailActivity extends AppCompatActivity {
 
+    private SharedPreferences mPref;
+
     private String mPageId;
+    private int mPlatformType;
+    private String mProfileImage;
 
     private ImageView mCover, mProfile;
     private TextView mTitle, mTitleToolbar;
@@ -34,11 +48,17 @@ public class PageDetailActivity extends AppCompatActivity {
     private TabLayout mTabLayout;
     private LikeView mPageLikeButton;
 
-    private FacebookPageInfoData mPageInfo = new FacebookPageInfoData();
+    private FavoPageInfoData mPageData = new FavoPageInfoData();
+
+    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
 
     // fragment index
     private static final int TAB_FEED = 0;
     private static final int TAB_VIDEO = 1;
+
+    private static final int PLATFORM_FACEBOOK = 1;
+    private static final int PLATFORM_YOUTUBE = 2;
+    private static final int PLATFORM_PINTEREST = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +72,24 @@ public class PageDetailActivity extends AppCompatActivity {
 
     private void initData() {
 
-        mPageId = getIntent().getStringExtra("PAGE_ID");
-        getPageInfo();
+        // init preference
+        mPref = PageDetailActivity.this.getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+
+        Intent intent = getIntent();
+        mPlatformType = intent.getIntExtra("PLATFORM_TYPE", 1);
+        switch (mPlatformType) {
+
+            case PLATFORM_FACEBOOK:
+                mPageId = intent.getStringExtra("PAGE_ID");
+                getFacebookPageInfo();
+                break;
+
+            case PLATFORM_YOUTUBE:
+                mPageId = intent.getStringExtra("CHANNEL_ID");
+                mProfileImage = intent.getStringExtra("PROFILE_URL");
+                getYoutubeChannelInfo();
+                break;
+        }
     }
 
     private void initView() {
@@ -72,7 +108,16 @@ public class PageDetailActivity extends AppCompatActivity {
         mPageLikeButton.setObjectIdAndType(mPageId, LikeView.ObjectType.PAGE);
     }
 
-    private void getPageInfo() {
+    private void bindItem() {
+
+        mTitle.setText(mPageData.getPageName());
+        mTitleToolbar.setText(mPageData.getPageName());
+
+        Glide.with(PageDetailActivity.this).load(mPageData.getProfileImage()).into(mProfile);
+        Glide.with(PageDetailActivity.this).load(mPageData.getCoverImage()).into(mCover);
+    }
+
+    private void getFacebookPageInfo() {
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newGraphPathRequest(
@@ -84,13 +129,15 @@ public class PageDetailActivity extends AppCompatActivity {
 
                         if (response.getError() == null) {
 
-                            mPageInfo = new Gson().fromJson(response.getJSONObject().toString(), FacebookPageInfoData.class);
+                            FacebookPageInfoData pageInfo = new Gson().fromJson(response.getJSONObject().toString(), FacebookPageInfoData.class);
 
-                            Glide.with(PageDetailActivity.this).load(mPageInfo.getPicture().getData().getUrl()).into(mProfile);
-                            Glide.with(PageDetailActivity.this).load(mPageInfo.getCover().getSource()).into(mCover);
+                            mPageData.setProfileImage(pageInfo.getPicture().getData().getUrl());
+                            mPageData.setCoverImage(pageInfo.getCover().getSource());
+                            mPageData.setPageName(pageInfo.getName());
+                            mPageData.setDescription(pageInfo.getDescription());
+                            mPageData.setSubscriptionCount(pageInfo.getFan_count());
 
-                            mTitle.setText(mPageInfo.getName());
-                            mTitleToolbar.setText(mPageInfo.getName());
+                            bindItem();
 
                         } else {
                             Log.e(getClass().getName(), "Error load facebook page : " + response.getRawResponse());
@@ -102,6 +149,44 @@ public class PageDetailActivity extends AppCompatActivity {
         parameters.putString("fields", "name,about,picture.height(2048){url},cover{source},fan_count,description");
         request.setParameters(parameters);
         request.executeAsync();
+    }
+
+    private void getYoutubeChannelInfo() {
+
+        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeChannelInfoData> call = service.getChannelInfo(accessToken, "snippet,brandingSettings", mPageId);
+        call.enqueue(new Callback<YoutubeChannelInfoData>() {
+            @Override
+            public void onResponse(Call<YoutubeChannelInfoData> call, Response<YoutubeChannelInfoData> response) {
+
+                if (response.isSuccessful()) {
+                    YoutubeChannelInfoData channelInfo = response.body();
+
+                    mPageData.setProfileImage(channelInfo.getItems().get(0).getSnippet().getThumbnails().getHigh().getUrl());
+                    mPageData.setCoverImage(channelInfo.getItems().get(0).getBrandingSettings().getImage().getBannerMobileExtraHdImageUrl());
+                    mPageData.setPageName(channelInfo.getItems().get(0).getSnippet().getTitle());
+                    mPageData.setDescription(channelInfo.getItems().get(0).getSnippet().getDescription());
+
+                    bindItem();
+
+                } else {
+                    Log.e(getClass().getName(), "Error load youtube page : " + response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<YoutubeChannelInfoData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e(getClass().getName(), "Error load youtube page ");
+            }
+        });
     }
 
     private void setAction() {
@@ -169,7 +254,7 @@ public class PageDetailActivity extends AppCompatActivity {
             switch (position) {
 
                 case TAB_FEED:
-                    fragment = PageFeedFragment.newInstance(mPageId);
+                    fragment = PageFeedFragment.newInstance(mPageId, mPlatformType, mProfileImage);
                     break;
 
                 case TAB_VIDEO:

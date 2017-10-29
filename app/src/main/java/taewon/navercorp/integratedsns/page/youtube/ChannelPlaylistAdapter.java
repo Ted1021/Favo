@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.subscription.youtube;
+package taewon.navercorp.integratedsns.page.youtube;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

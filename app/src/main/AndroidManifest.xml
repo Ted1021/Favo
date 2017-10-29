@@ -60,10 +60,10 @@
             android:name=".feed.comment.CommentActivity"
             android:configChanges="orientation|screenSize|keyboard" />
 
-        <activity android:name=".subscription.facebook.PageDetailActivity"
+        <activity android:name=".page.facebook.PageDetailActivity"
             android:configChanges="orientation|screenSize|keyboard"/>
 
-        <activity android:name=".subscription.youtube.ChannelDetailActivity"
+        <activity android:name=".page.youtube.ChannelDetailActivity"
             android:configChanges="orientation|screenSize|keyboard"/>
 
         <activity android:name=".feed.VideoActivity"

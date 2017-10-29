@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -25,8 +26,7 @@ import java.util.Vector;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
-import taewon.navercorp.integratedsns.subscription.facebook.PageDetailActivity;
-import taewon.navercorp.integratedsns.subscription.youtube.ChannelDetailActivity;
+import taewon.navercorp.integratedsns.page.facebook.PageDetailActivity;
 
 /**
  * @author 김태원
@@ -168,9 +168,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             case PLATFORM_YOUTUBE:
 
-//                Bundle bundle = new Bundle();
-//                bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position).getYoutubeData());
-//                intent.putExtras(bundle);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position));
+                intent.putExtras(bundle);
 
                 intent.putExtra("VIDEO_ID", mDataset.get(position).getFeedId());
                 break;
@@ -184,29 +184,26 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
     private void loadPageDetail(int position, int platformType) {
 
-        Intent intent;
+        Intent intent = new Intent(mContext, PageDetailActivity.class);
+        intent.putExtra("PLATFORM_TYPE", platformType);
+
         switch (platformType) {
 
             case PLATFORM_FACEBOOK:
-
-                intent = new Intent(mContext, PageDetailActivity.class);
                 intent.putExtra("PAGE_ID", mDataset.get(position).getPageId());
-                mContext.startActivity(intent);
-
                 break;
 
             case PLATFORM_YOUTUBE:
-
-                intent = new Intent(mContext, ChannelDetailActivity.class);
                 intent.putExtra("CHANNEL_ID", mDataset.get(position).getPageId());
                 intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
-                mContext.startActivity(intent);
                 break;
 
             case PLATFORM_PINTEREST:
 
                 break;
         }
+        mContext.startActivity(intent);
+
     }
 
     private void loadLink(int position) {
