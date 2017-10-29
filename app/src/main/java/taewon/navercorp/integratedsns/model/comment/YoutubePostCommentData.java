@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by USER on 2017-10-20.
  */
 
-public class YoutubeComment {
+public class YoutubePostCommentData {
 
     @SerializedName("snippet")
     private Snippet snippet = new Snippet();

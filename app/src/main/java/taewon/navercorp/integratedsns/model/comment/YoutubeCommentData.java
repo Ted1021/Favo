@@ -9,7 +9,7 @@ import java.util.List;
  * Created by USER on 2017-10-19.
  */
 
-public class YoutubeCommentData {
+public class YoutubeCommentData extends FavoCommentData {
 
     @SerializedName("kind")
     private String kind;

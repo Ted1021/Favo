@@ -1,7 +1,5 @@
 package taewon.navercorp.integratedsns.model.feed;
 
-import com.pinterest.android.pdk.PDKPin;
-
 import java.util.Date;
 
 /**
@@ -14,9 +12,19 @@ public class FavoFeedData {
     private int contentsType;
     private Date pubDate;
 
-    private FacebookFeedData.ArticleData facebookData;
-    private YoutubeSearchVideoData.Item youtubeData;
-    private PDKPin pinterestData;
+    private String pageId;
+    private String feedId;
+    private String profileImage;
+    private String userName;
+    private String createdTime;
+    private String picture;
+    private String link;
+    private String videoUrl;
+    private String description;
+    private String[] subattachments;
+
+    private int likeCount;
+    private int commentCount;
 
     public int getPlatformType() {
         return platformType;
@@ -42,27 +50,107 @@ public class FavoFeedData {
         this.pubDate = pubDate;
     }
 
-    public FacebookFeedData.ArticleData getFacebookData() {
-        return facebookData;
+    public String getProfileImage() {
+        return profileImage;
     }
 
-    public void setFacebookData(FacebookFeedData.ArticleData facebookData) {
-        this.facebookData = facebookData;
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
-    public YoutubeSearchVideoData.Item getYoutubeData() {
-        return youtubeData;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setYoutubeData(YoutubeSearchVideoData.Item youtubeData) {
-        this.youtubeData = youtubeData;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public PDKPin getPinterestData() {
-        return pinterestData;
+    public String getPicture() {
+        return picture;
     }
 
-    public void setPinterestData(PDKPin pinterestData) {
-        this.pinterestData = pinterestData;
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
+    public String[] getSubattatchments() {
+        return subattachments;
+    }
+
+    public void setSubattatchments(String[] subattatchments) {
+        this.subattachments = subattatchments;
+    }
+
+    public String getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(String createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPageId() {
+        return pageId;
+    }
+
+    public void setPageId(String pageId) {
+        this.pageId = pageId;
+    }
+
+    public String getFeedId() {
+        return feedId;
+    }
+
+    public void setFeedId(String feedId) {
+        this.feedId = feedId;
+    }
+
+    public String[] getSubattachments() {
+        return subattachments;
+    }
+
+    public void setSubattachments(String[] subattachments) {
+        this.subattachments = subattachments;
     }
 }

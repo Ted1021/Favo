@@ -6,7 +6,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-import taewon.navercorp.integratedsns.model.comment.YoutubeComment;
+import taewon.navercorp.integratedsns.model.comment.YoutubePostCommentData;
 import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
@@ -63,6 +63,6 @@ public interface YoutubeService {
     @POST("youtube/v3/commentThreads")
     Call<Void> setComment(@Header("Authorization") String auth,
                           @Query("part") String part,
-                          @Body YoutubeComment comment
+                          @Body YoutubePostCommentData comment
     );
 }

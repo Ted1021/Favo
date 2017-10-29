@@ -85,6 +85,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
 
+    SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
 
@@ -237,7 +240,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 for (int i = 0; i < results.length(); i++) {
                                     pageInfo = results.getJSONObject(i);
                                     getFacebookPageFeed(pageInfo.getString("id"));
-                                    Log.d("CHECK_PAGE_ID", ">>>>>>> " + pageInfo.getString("id"));
                                 }
 
                             } catch (JSONException e) {
@@ -250,7 +252,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("limit", "10");
+        parameters.putString("limit", "25");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -276,17 +278,27 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     article = result.getData().get(i);
                                     FavoFeedData data = new FavoFeedData();
 
-                                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                                    Date date = format.parse(article.getCreatedTime());
+                                    data.setPlatformType(PLATFORM_FACEBOOK);
                                     if (!(article.getSource() == null)) {
                                         data.setContentsType(CONTENTS_VIDEO);
                                     } else {
                                         data.setContentsType(CONTENTS_IMAGE);
                                     }
-
+                                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                                    Date date = format.parse(article.getCreatedTime());
                                     data.setPubDate(date);
-                                    data.setFacebookData(result.getData().get(i));
-                                    data.setPlatformType(PLATFORM_FACEBOOK);
+
+                                    data.setPageId(article.getFrom().getId());
+                                    data.setFeedId(article.getId());
+                                    data.setProfileImage(article.getFrom().getPicture().getProfileData().getUrl());
+                                    data.setUserName(article.getFrom().getName());
+                                    data.setCreatedTime(mFormat.format(date));
+                                    data.setPicture(article.getFullPicture());
+                                    data.setLink(article.getLink());
+                                    data.setDescription(article.getMessage());
+                                    // TODO - subattachments
+                                    data.setLikeCount(article.getLikes().getSummary().getTotalCount());
+                                    data.setCommentCount(article.getComments().getSummary().getTotalCount());
 
                                     mDataset.add(data);
                                 }
@@ -350,11 +362,15 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                         data.setPlatformType(PLATFORM_PINTEREST);
                         data.setContentsType(CONTENTS_IMAGE);
-                        data.setPinterestData(pin);
                         data.setPubDate(pin.getCreatedAt());
 
-                        Log.d("CHECK_PINTEREST", ">>>>>>>>>>>>>>>>>>>>");
-//                        Log.d("CHECK_PINTEREST", pin.getUser().toString());
+                        data.setFeedId(pin.getUid());
+                        data.setProfileImage(pin.getImageUrl());
+                        data.setUserName(pin.getUid());
+                        data.setCreatedTime(mFormat.format(pin.getCreatedAt()));
+                        data.setPicture(pin.getImageUrl());
+                        data.setLink(pin.getLink());
+                        data.setDescription(pin.getNote());
 
                         mDataset.add(data);
                     }
@@ -458,20 +474,27 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         for (YoutubeSearchVideoData.Item item : response.body().getItems()) {
 
                             FavoFeedData data = new FavoFeedData();
+                            Date date = null;
 
                             data.setPlatformType(PLATFORM_YOUTUBE);
                             data.setContentsType(CONTENTS_VIDEO);
-                            item.getSnippet().setProfileImage(profileUrl);
-                            data.setYoutubeData(item);
-
                             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                             try {
-                                Date date = format.parse(item.getSnippet().getPublishedAt());
-                                data.setPubDate(date);
-
+                                date = format.parse(item.getSnippet().getPublishedAt());
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
+                            data.setPubDate(date);
+
+                            data.setPageId(item.getSnippet().getChannelId());
+                            data.setFeedId(item.getId().getVideoId());
+                            data.setProfileImage(profileUrl);
+                            data.setUserName(item.getSnippet().getChannelTitle());
+                            data.setCreatedTime(mFormat.format(date));
+                            data.setPicture(item.getSnippet().getThumbnails().getHigh().getUrl());
+                            data.setVideoUrl(item.getId().getVideoId());
+                            data.setDescription(item.getSnippet().getTitle());
+
                             mDataset.add(data);
                         }
                     } else {

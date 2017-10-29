@@ -28,7 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.comment.FacebookCommentData;
-import taewon.navercorp.integratedsns.model.comment.YoutubeComment;
+import taewon.navercorp.integratedsns.model.comment.YoutubePostCommentData;
 import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
@@ -256,7 +256,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
     private void setYoutubeComment(String userComment) {
 
-        YoutubeComment commentData = new YoutubeComment();
+        YoutubePostCommentData commentData = new YoutubePostCommentData();
         commentData.getSnippet().setVideoId(mVideoId);
         commentData.getSnippet().getTopLevelComment().getSnippet().setTextOriginal(userComment);
 
