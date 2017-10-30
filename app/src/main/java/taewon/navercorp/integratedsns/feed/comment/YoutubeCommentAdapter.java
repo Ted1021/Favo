@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
-import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 
 /**
  * Created by USER on 2017-10-20.
@@ -25,7 +25,7 @@ import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAdapter.ViewHolder> {
 
     private Context mContext;
-    private YoutubeSearchVideoData.Item mVideoData;
+    private FavoFeedData mVideoData;
     private ArrayList<YoutubeCommentData.Item> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
@@ -33,7 +33,7 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_ITEM = 1;
 
-    public YoutubeCommentAdapter(Context context, YoutubeSearchVideoData.Item videoData, ArrayList<YoutubeCommentData.Item> dataset) {
+    public YoutubeCommentAdapter(Context context, FavoFeedData videoData, ArrayList<YoutubeCommentData.Item> dataset) {
 
         mContext = context;
         mVideoData = videoData;
@@ -126,12 +126,12 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
 
     private void bindHeaderViewItem(ViewHolder holder) {
 
-        holder.mArticleUserName.setText(mVideoData.getSnippet().getChannelTitle());
-        holder.mArticleUploadTime.setText(mVideoData.getSnippet().getPublishedAt());
-        holder.mDescription.setText(mVideoData.getSnippet().getTitle());
+        holder.mArticleUserName.setText(mVideoData.getUserName());
+        holder.mArticleUploadTime.setText(mVideoData.getCreatedTime());
+        holder.mDescription.setText(mVideoData.getDescription());
 
-        Glide.with(mContext).load(mVideoData.getSnippet().getThumbnails().getHigh().getUrl()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-        Glide.with(mContext).load(mVideoData.getSnippet().getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mArticleProfile);
+        Glide.with(mContext).load(mVideoData.getPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+        Glide.with(mContext).load(mVideoData.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mArticleProfile);
         Glide.with(mContext).load(R.drawable.icon_youtube_small).into(holder.mPlatformType);
     }
 

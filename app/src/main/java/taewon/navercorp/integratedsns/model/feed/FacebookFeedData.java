@@ -13,7 +13,7 @@ import java.util.List;
  * @date 2017.09.29
  */
 
-public class FacebookFeedData {
+public class FacebookFeedData extends FavoFeedData{
 
     @SerializedName("data")
     private List<ArticleData> data = new ArrayList<>();

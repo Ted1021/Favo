@@ -28,9 +28,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.comment.FacebookCommentData;
-import taewon.navercorp.integratedsns.model.comment.YoutubePostCommentData;
 import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
-import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.comment.YoutubePostCommentData;
+import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 
 public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
@@ -45,7 +45,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
     private ArrayList<FacebookCommentData.Comments.CommentData> mFacebookDataset = new ArrayList<>();
 
     private ArrayList<YoutubeCommentData.Item> mYoutubeDataset = new ArrayList<>();
-    private YoutubeSearchVideoData.Item mYoutubeSearchVideoData;
+    private FavoFeedData mYoutubeSearchVideoData;
 
     private int mContentType, mPlatformType;
     private String mArticleId, mVideoId, mPinId;
@@ -99,7 +99,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
             case PLATFORM_YOUTUBE:
 
                 mVideoId = intent.getStringExtra("VIDEO_ID");
-                mYoutubeSearchVideoData = (YoutubeSearchVideoData.Item) intent.getSerializableExtra("VIDEO_CONTENT");
+                mYoutubeSearchVideoData = (FavoFeedData) intent.getSerializableExtra("VIDEO_CONTENT");
                 break;
 
             case PLATFORM_PINTEREST:

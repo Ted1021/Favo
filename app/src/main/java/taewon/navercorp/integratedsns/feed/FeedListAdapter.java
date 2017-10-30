@@ -6,9 +6,11 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -23,6 +25,7 @@ import com.bumptech.glide.request.RequestOptions;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
 
+import io.realm.Realm;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
@@ -63,7 +66,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         // common components
         private TextView mUserName, mUploadTime, mDescription;
         private ImageView mProfile, mPicture, mPlatformType;
-        private Button mLike, mComment, mShare;
+        private Button mLike, mComment, mShare, mMore;
         private LinearLayout mPageDetail;
 
         // video component
@@ -87,6 +90,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             mComment = (Button) itemView.findViewById(R.id.button_comment);
             mComment.setOnClickListener(this);
+
+            mMore = (Button) itemView.findViewById(R.id.button_more);
+            mMore.setOnClickListener(this);
 
             mPageDetail = (LinearLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
@@ -125,94 +131,124 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 case R.id.imageView_picture:
                     loadLink(position);
                     break;
+
+                case R.id.button_more:
+                    loadPopupMenu(position);
+                    break;
             }
         }
-    }
 
-    private void loadVideo(int position, int platformType) {
+        private void loadVideo(int position, int platformType) {
 
-        String videoUrl = null;
-        Intent intent = null;
-        if (platformType == PLATFORM_FACEBOOK) {
+            String videoUrl = null;
+            Intent intent = null;
+            if (platformType == PLATFORM_FACEBOOK) {
 
-            videoUrl = mDataset.get(position).getVideoUrl();
-            if (TextUtils.isEmpty(videoUrl)) {
-                return;
+                videoUrl = mDataset.get(position).getVideoUrl();
+                if (TextUtils.isEmpty(videoUrl)) {
+                    return;
+                }
+
+                Uri uri = Uri.parse(videoUrl);
+
+                intent = new Intent(Intent.ACTION_VIEW, uri);
+                intent.setDataAndType(uri, "video/*");
+                mContext.startActivity(intent);
+
+            } else {
+                videoUrl = mDataset.get(position).getVideoUrl();
+                intent = new Intent(mContext, VideoActivity.class);
+                intent.putExtra("VIDEO_ID", videoUrl);
+                mContext.startActivity(intent);
             }
+        }
 
-            Uri uri = Uri.parse(videoUrl);
+        private void loadComments(int position, int platformType, int contentsType) {
 
-            intent = new Intent(Intent.ACTION_VIEW, uri);
-            intent.setDataAndType(uri, "video/*");
-            mContext.startActivity(intent);
+            Intent intent = new Intent(mContext, CommentActivity.class);
+            intent.putExtra("PLATFORM_TYPE", platformType);
+            intent.putExtra("CONTENTS_TYPE", contentsType);
 
-        } else {
-            videoUrl = mDataset.get(position).getVideoUrl();
-            intent = new Intent(mContext, VideoActivity.class);
-            intent.putExtra("VIDEO_ID", videoUrl);
+            switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    intent.putExtra("ARTICLE_ID", mDataset.get(position).getFeedId());
+                    break;
+
+                case PLATFORM_YOUTUBE:
+
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position));
+                    intent.putExtras(bundle);
+
+                    intent.putExtra("VIDEO_ID", mDataset.get(position).getFeedId());
+                    break;
+
+                case PLATFORM_PINTEREST:
+
+                    break;
+            }
             mContext.startActivity(intent);
         }
-    }
 
-    private void loadComments(int position, int platformType, int contentsType) {
+        private void loadPageDetail(int position, int platformType) {
 
-        Intent intent = new Intent(mContext, CommentActivity.class);
-        intent.putExtra("PLATFORM_TYPE", platformType);
-        intent.putExtra("CONTENTS_TYPE", contentsType);
+            Intent intent = new Intent(mContext, PageDetailActivity.class);
+            intent.putExtra("PLATFORM_TYPE", platformType);
 
-        switch (platformType) {
+            switch (platformType) {
 
-            case PLATFORM_FACEBOOK:
-                intent.putExtra("ARTICLE_ID", mDataset.get(position).getFeedId());
-                break;
+                case PLATFORM_FACEBOOK:
+                    intent.putExtra("PAGE_ID", mDataset.get(position).getPageId());
+                    break;
 
-            case PLATFORM_YOUTUBE:
+                case PLATFORM_YOUTUBE:
+                    intent.putExtra("CHANNEL_ID", mDataset.get(position).getPageId());
+                    intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
+                    break;
 
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position));
-                intent.putExtras(bundle);
+                case PLATFORM_PINTEREST:
 
-                intent.putExtra("VIDEO_ID", mDataset.get(position).getFeedId());
-                break;
-
-            case PLATFORM_PINTEREST:
-
-                break;
-        }
-        mContext.startActivity(intent);
-    }
-
-    private void loadPageDetail(int position, int platformType) {
-
-        Intent intent = new Intent(mContext, PageDetailActivity.class);
-        intent.putExtra("PLATFORM_TYPE", platformType);
-
-        switch (platformType) {
-
-            case PLATFORM_FACEBOOK:
-                intent.putExtra("PAGE_ID", mDataset.get(position).getPageId());
-                break;
-
-            case PLATFORM_YOUTUBE:
-                intent.putExtra("CHANNEL_ID", mDataset.get(position).getPageId());
-                intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
-                break;
-
-            case PLATFORM_PINTEREST:
-
-                break;
-        }
-        mContext.startActivity(intent);
-
-    }
-
-    private void loadLink(int position) {
-
-        Intent intent = null;
-        String url = mDataset.get(position).getLink();
-        if (url != null) {
-            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    break;
+            }
             mContext.startActivity(intent);
+
+        }
+
+        private void loadLink(int position) {
+
+            Intent intent = null;
+            String url = mDataset.get(position).getLink();
+            if (url != null) {
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                mContext.startActivity(intent);
+            }
+        }
+
+        private void loadPopupMenu(final int position) {
+            PopupMenu popupMenu = new PopupMenu(mContext, mMore);
+            popupMenu.getMenuInflater().inflate(R.menu.feed_popup_menu, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+
+                    if (item.getTitle().equals("Save")) {
+
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                realm.copyToRealmOrUpdate(mDataset.get(position));
+                            }
+                        });
+
+                    } else {
+
+                    }
+                    return true;
+                }
+            });
+            popupMenu.show();
         }
     }
 
