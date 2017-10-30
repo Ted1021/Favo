@@ -1,15 +1,18 @@
 package taewon.navercorp.integratedsns.model.feed;
 
-import java.io.Serializable;
 import java.util.Date;
 
+import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
+
 /**
- * Created by tedkim on 2017. 10. 15..
+ * Created by USER on 2017-10-30.
  */
 
-@SuppressWarnings("serial")
-public class FavoFeedData implements Serializable{
+public class FavoMyPinData extends RealmObject {
 
+    @PrimaryKey
     private String feedId;
     private int platformType;
     private int contentsType;
@@ -22,6 +25,7 @@ public class FavoFeedData implements Serializable{
     private String link;
     private String videoUrl;
     private String description;
+    @Ignore
     private String[] subattachments;
     private int likeCount;
     private int commentCount;

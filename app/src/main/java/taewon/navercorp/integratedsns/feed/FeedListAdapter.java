@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +30,9 @@ import io.realm.Realm;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
+import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.facebook.PageDetailActivity;
+import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
 
 /**
  * @author 김태원
@@ -43,6 +46,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     private Context mContext;
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private LayoutInflater mLayoutInflater;
+    private Realm mRealm;
+
     SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
@@ -54,10 +59,11 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     private static final int PLATFORM_YOUTUBE = 2;
     private static final int PLATFORM_PINTEREST = 3;
 
-    public FeedListAdapter(Context context, Vector<FavoFeedData> dataset) {
+    public FeedListAdapter(Context context, Vector<FavoFeedData> dataset, Realm realm) {
 
         mContext = context;
         mDataset = dataset;
+        mRealm = realm;
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -226,6 +232,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         }
 
         private void loadPopupMenu(final int position) {
+
             PopupMenu popupMenu = new PopupMenu(mContext, mMore);
             popupMenu.getMenuInflater().inflate(R.menu.feed_popup_menu, popupMenu.getMenu());
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -234,17 +241,18 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
                     if (item.getTitle().equals("Save")) {
 
-                        Realm realm = Realm.getDefaultInstance();
-                        realm.executeTransaction(new Realm.Transaction() {
+                        final FavoMyPinData myPin = RealmDataConvertingHelper.convertToRealmObject(mDataset.get(position));
+                        mRealm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
-                                realm.copyToRealmOrUpdate(mDataset.get(position));
+                                realm.copyToRealmOrUpdate(myPin);
                             }
                         });
 
                     } else {
 
                     }
+
                     return true;
                 }
             });

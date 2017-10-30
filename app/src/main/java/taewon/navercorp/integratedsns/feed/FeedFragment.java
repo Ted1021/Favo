@@ -42,6 +42,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Vector;
 
+import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -85,6 +86,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
 
+    private Realm mRealm;
+
     SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
@@ -124,11 +127,17 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public void onDestroyView() {
         super.onDestroyView();
 
+        // close Realm Instance
+        mRealm.close();
+
         // destroy broadcast receiver along with fragment life cycle
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mTokenUpdateReceiver);
     }
 
     private void initData() {
+
+        // init Realm Instance
+        mRealm = Realm.getDefaultInstance();
 
         // init preference
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
@@ -167,7 +176,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         // set recyclerView
         mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
-        mAdapter = new FeedListAdapter(getContext(), mDataset);
+        mAdapter = new FeedListAdapter(getContext(), mDataset, mRealm);
         mFeedList.setAdapter(mAdapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mFeedList.setLayoutManager(layoutManager);

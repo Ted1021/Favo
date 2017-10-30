@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
+import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -49,6 +50,8 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private FeedListAdapter mAdapter;
+
+    private Realm mRealm;
 
     SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
@@ -98,13 +101,22 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         View view = inflater.inflate(R.layout.fragment_page_feed, container, false);
 
-        initView(view);
         initData();
+        initView(view);
 
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        mRealm.close();
+        super.onDestroyView();
+    }
+
     private void initData() {
+
+        // init Realm
+        mRealm = Realm.getDefaultInstance();
 
         // init preference
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
@@ -128,7 +140,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
         mRefreshLayout.setRefreshing(true);
 
         mPageFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
-        mAdapter = new FeedListAdapter(getContext(), mDataset);
+        mAdapter = new FeedListAdapter(getContext(), mDataset, mRealm);
         mPageFeedList.setAdapter(mAdapter);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());

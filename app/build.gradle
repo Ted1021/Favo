@@ -32,7 +32,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    // for google apis
+    // google apis
     compile 'com.google.android.gms:play-services-auth:10.2.1'
     compile files('libs/YouTubeAndroidPlayerApi.jar')
     compile 'pub.devrel:easypermissions:0.3.0'
@@ -46,20 +46,23 @@ dependencies {
         exclude group: 'org.apache.httpcomponents'
     }
 
-    // for facebook apis
+    // facebook apis
     compile 'com.facebook.android:facebook-login:4.27.0'
     compile 'com.facebook.android:facebook-core:4.27.0'
 
-    // for pinterest apis
+    // pinterest apis
     compile project(':pdk')
 
-    // for network service
+    // retrofit
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.google.code.gson:gson:2.8.2'
 
-    // for image loading
+    // glide
     compile 'com.github.bumptech.glide:glide:4.0.0'
+
+    // realm
+    compile 'io.realm:android-adapters:2.0.0'
 
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
