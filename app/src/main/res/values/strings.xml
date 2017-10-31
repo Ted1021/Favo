@@ -14,9 +14,10 @@
     <string name="pinterest_app_id">4928301781867311512</string>
     <string name="pinterest_token">pinterest_token</string>
 
+    <string name="band_token">band_token</string>
+
     <string name="facebook_login_fail">페이스북 로그인에 실패 하였습니다.</string>
     <string name="google_login_fail">구글 로그인에 실패 하였습니다.</string>
-    <string name="tumblr_login_fail">텀블러 로그인에 실패 하였습니다.</string>
 
     <string name="platform_facebook">facebook</string>
     <string name="platform_youtube">youtube</string>

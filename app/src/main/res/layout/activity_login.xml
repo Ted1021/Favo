@@ -61,6 +61,20 @@
             android:text="Connect to Pinterest"
             android:textColor="@color/colorCremeWhite" />
 
+        <Button
+            android:id="@+id/button_band_login"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Connect to Band" />
+
+        <Button
+            android:id="@+id/button_giphy_login"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Connect to GIPHY" />
+
     </LinearLayout>
 
 

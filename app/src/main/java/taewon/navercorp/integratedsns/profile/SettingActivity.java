@@ -13,7 +13,12 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
+import com.android.volley.VolleyError;
+import com.campmobile.android.bandsdk.BandManager;
+import com.campmobile.android.bandsdk.BandManagerFactory;
+import com.campmobile.android.bandsdk.api.ApiCallbacks;
+import com.campmobile.android.bandsdk.api.LoginCallbacks;
+import com.campmobile.android.bandsdk.entity.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -65,13 +70,17 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             PDKClient.PDKCLIENT_PERMISSION_WRITE_RELATIONSHIPS
     };
 
+    // Auth for Band
+    private BandManager mBandManager;
+    LoginCallbacks<AccessToken> mBandLoginApiCallbacks;
+
     // managing tokens
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
 
     // UI Components
-    private Switch mFacebookSwitch, mYoutubeSwitch, mPinterestSwitch;
-    private String mFacebookToken, mGoogleToken, mPinterestToken;
+    private Switch mFacebookSwitch, mYoutubeSwitch, mPinterestSwitch, mBandSwitch;
+    private String mFacebookToken, mGoogleToken, mPinterestToken, mBandToken;
 
     // Auth Request Code
     private static final int REQ_FACEBOOK_SIGN_IN = 100;
@@ -95,11 +104,9 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mEditor = mPref.edit();
 
         mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mFacebookToken);
         mGoogleToken = mPref.getString(getString(R.string.google_token), "");
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mGoogleToken);
         mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
-        Log.d("CHECK_TOKEN", "Setting Activity >>>>> init " + mPinterestToken);
+        mBandToken = mPref.getString(getString(R.string.band_token), "");
 
         // init google client
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -121,6 +128,9 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         // init pinterest client
         mPinterestClient = PDKClient.configureInstance(this, getString(R.string.pinterest_app_id));
         mPinterestClient.onConnect(SettingActivity.this);
+
+        // init band client
+        mBandManager = BandManagerFactory.getSingleton();
     }
 
     private void initView() {
@@ -128,6 +138,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mFacebookSwitch = (Switch) findViewById(R.id.switch_facebook);
         mYoutubeSwitch = (Switch) findViewById(R.id.switch_youtube);
         mPinterestSwitch = (Switch) findViewById(R.id.switch_pinterest);
+        mBandSwitch = (Switch) findViewById(R.id.switch_band);
 
         checkTokens();
     }
@@ -178,6 +189,21 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
                 }
             }
         });
+
+        mBandSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (mBandToken.equals("")) {
+                        getBandToken();
+                    }
+                } else {
+                    if (!mBandToken.equals("")) {
+                        deleteBandToken();
+                    }
+                }
+            }
+        });
     }
 
     // send status of tokens to "FeedFragment"
@@ -205,6 +231,12 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             mPinterestSwitch.setChecked(true);
         } else {
             mPinterestSwitch.setChecked(false);
+        }
+
+        if (!mBandToken.equals("")) {
+            mBandSwitch.setChecked(true);
+        } else {
+            mBandSwitch.setChecked(false);
         }
     }
 
@@ -242,7 +274,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
     private void deleteFacebookToken() {
 
-        if (AccessToken.getCurrentAccessToken() != null) {
+        if (com.facebook.AccessToken.getCurrentAccessToken() != null) {
             // call expire facebook token
             LoginManager.getInstance().logOut();
 
@@ -305,6 +337,39 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mEditor.commit();
         Toast.makeText(SettingActivity.this, "disconnect pinterest successfully!!", Toast.LENGTH_SHORT).show();
         sendTokenStatus();
+    }
+
+    private void getBandToken() {
+
+        mBandLoginApiCallbacks = new LoginCallbacks<AccessToken>() {
+            @Override
+            public void onResponse(AccessToken response) {
+                mEditor.putString(getString(R.string.band_token), response.getAccessToken());
+                mEditor.commit();
+                Log.d("CHECK_TOKEN", mPref.getString(getString(R.string.band_token), ""));
+                Toast.makeText(SettingActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                Log.e("ERROR_LOGIN", "Error band login");
+            }
+        };
+        mBandManager.login(SettingActivity.this, mBandLoginApiCallbacks);
+    }
+
+    private void deleteBandToken() {
+        mBandManager.logout(new ApiCallbacks<Void>() {
+            @Override
+            public void onResponse(Void response) {
+                Toast.makeText(SettingActivity.this, "Logout succeeded.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(VolleyError error) {
+                Log.e("ERROR_TOKEN", "Fail to band logout");
+            }
+        });
     }
 
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {

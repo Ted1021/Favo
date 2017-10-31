@@ -12,9 +12,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.campmobile.android.bandsdk.BandManager;
+import com.campmobile.android.bandsdk.BandManagerFactory;
+import com.campmobile.android.bandsdk.api.LoginCallbacks;
+import com.campmobile.android.bandsdk.entity.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.GoogleAuthException;
@@ -48,7 +53,7 @@ import taewon.navercorp.integratedsns.home.HomeActivity;
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
-    private Button mFacebookLogin, mGoogleLogin, mTumblrLogin;
+    private Button mFacebookLogin, mGoogleLogin, mPinterestLogin, mBandLogin, mGiphyLogin;
 
     // Auth for facebook
     private CallbackManager mCallbackManager;
@@ -72,10 +77,16 @@ public class LoginActivity extends AppCompatActivity
             PDKClient.PDKCLIENT_PERMISSION_WRITE_RELATIONSHIPS
     };
 
+    // Auth for Band
+    private BandManager mBandManager;
+    LoginCallbacks<AccessToken> mBandLoginApiCallbacks;
+
     // Auth Request Code
-    private static final int REQ_FACEBOOK_SIGN_IN = 100;
+    private static final int REQ_FACEBOOK_SIGN_IN = FacebookSdk.getCallbackRequestCodeOffset() + 0;
     private static final int REQ_GOOGLE_SIGN_IN = 101;
     private static final int REQ_PINTEREST_SIGN_IN = 8772;
+    private static final int REQ_BAND_SIGN_IN = 102;
+    private static final int REQ_GIPHY_SIGN_IN = 103;
 
     // managing tokens
     private SharedPreferences mPref;
@@ -116,6 +127,9 @@ public class LoginActivity extends AppCompatActivity
         // init pinterest client
         mPinterestClient = PDKClient.configureInstance(this, getString(R.string.pinterest_app_id));
         mPinterestClient.onConnect(LoginActivity.this);
+
+        // init band client
+        mBandManager = BandManagerFactory.getSingleton();
     }
 
     private void initView() {
@@ -126,8 +140,14 @@ public class LoginActivity extends AppCompatActivity
         mGoogleLogin = (Button) findViewById(R.id.button_google_login);
         mGoogleLogin.setOnClickListener(this);
 
-        mTumblrLogin = (Button) findViewById(R.id.button_tumblr_login);
-        mTumblrLogin.setOnClickListener(this);
+        mPinterestLogin = (Button) findViewById(R.id.button_tumblr_login);
+        mPinterestLogin.setOnClickListener(this);
+
+        mBandLogin = (Button) findViewById(R.id.button_band_login);
+        mBandLogin.setOnClickListener(this);
+
+        mGiphyLogin = (Button) findViewById(R.id.button_giphy_login);
+        mGiphyLogin.setOnClickListener(this);
     }
 
     @Override
@@ -146,6 +166,14 @@ public class LoginActivity extends AppCompatActivity
             case R.id.button_tumblr_login:
                 getPinterestToken();
                 break;
+
+            case R.id.button_band_login:
+                getBandToken();
+                break;
+
+            case R.id.button_giphy_login:
+                getGiphyToken();
+                break;
         }
     }
 
@@ -161,7 +189,8 @@ public class LoginActivity extends AppCompatActivity
                 // set facebook preference
                 mEditor.putString(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
                 mEditor.commit();
-                Log.d("CHECK_PREF", "Login Activity >>>>" + mPref.getString(getString(R.string.facebook_token), ""));
+
+                Toast.makeText(LoginActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(intent);
@@ -195,7 +224,8 @@ public class LoginActivity extends AppCompatActivity
             public void onSuccess(PDKResponse response) {
                 mEditor.putString(getString(R.string.pinterest_token), response.getUser().getUid());
                 mEditor.commit();
-                Log.d("CHECK_TOKEN","Login activity >>>>> pinterest "+response.getUser().getUid());
+
+                Toast.makeText(LoginActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(intent);
@@ -207,6 +237,32 @@ public class LoginActivity extends AppCompatActivity
                 Log.e("ERROR_LOGIN", exception.getDetailMessage());
             }
         });
+    }
+
+    private void getBandToken() {
+
+        mBandLoginApiCallbacks = new LoginCallbacks<AccessToken>() {
+            @Override
+            public void onResponse(AccessToken response) {
+                mEditor.putString(getString(R.string.band_token), response.getAccessToken());
+                mEditor.commit();
+                Log.d("CHECK_TOKEN", mPref.getString(getString(R.string.band_token), ""));
+                Toast.makeText(LoginActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                startActivity(intent);
+                LoginActivity.this.finish();
+            }
+
+            @Override
+            public void onCancel() {
+                Log.e("ERROR_LOGIN", "Error band login");
+            }
+        };
+        mBandManager.login(LoginActivity.this, mBandLoginApiCallbacks);
+    }
+
+    private void getGiphyToken() {
 
     }
 
@@ -223,7 +279,8 @@ public class LoginActivity extends AppCompatActivity
             try {
                 mEditor.putString(getString(R.string.google_token), credential.getToken());
                 mEditor.commit();
-                Log.d("CHECK_TOKEN", "Login Activity >>>>> " + credential.getToken());
+
+                Toast.makeText(LoginActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -274,14 +331,22 @@ public class LoginActivity extends AppCompatActivity
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             googleSignInResult(result);
         }
-
         // pinterest login activity result
         else if (requestCode == REQ_PINTEREST_SIGN_IN) {
             mPinterestClient.onOauthResponse(requestCode, resultCode, data);
         }
         // facebook login activity result
-        else {
+        else if (requestCode == REQ_FACEBOOK_SIGN_IN) {
             mCallbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+        // giphy login activity result
+        else if (requestCode == REQ_GIPHY_SIGN_IN) {
+
+        }
+
+        // band login activity result
+        else {
+            mBandManager.onActivityResult(LoginActivity.this, requestCode, resultCode, data, mBandLoginApiCallbacks);
         }
     }
 }

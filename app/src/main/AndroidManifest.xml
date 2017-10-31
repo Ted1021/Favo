@@ -45,6 +45,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="pdk4928301781867311512" />
+                <data android:scheme="bandsdk219449230" />
             </intent-filter>
         </activity>
 
