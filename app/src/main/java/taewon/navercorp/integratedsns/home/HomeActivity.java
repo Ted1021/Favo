@@ -110,7 +110,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
 
                 replaceFragment(fragment);
-                tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, R.color.tumblr_color), PorterDuff.Mode.SRC_IN);
+                tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, android.R.color.white), PorterDuff.Mode.SRC_IN);
             }
 
             @Override

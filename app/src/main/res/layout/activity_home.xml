@@ -10,7 +10,8 @@
         android:id="@+id/layout_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/view">
+        android:layout_above="@+id/view"
+        android:background="@color/appColorDark">
 
     </FrameLayout>
 
@@ -19,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_above="@+id/tabLayout"
-        android:background="@color/lightGray" />
+        android:background="@color/appColorHighlight" />
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabLayout"
@@ -27,6 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
+        android:background="@color/appColorHighlight"
         android:elevation="4dp"
         app:tabIndicatorColor="@android:color/transparent"
         app:tabTextAppearance="@style/CustomTabItemTextSize">

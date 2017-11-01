@@ -6,8 +6,8 @@
     <color name="colorCremeWhite">#fafafa</color>
 
     <color name="appColor">#36465d</color>
-    <color name="appColorDark">#2f3d51</color>
-    <color name="appColorHighlight">#0A2939</color>
+    <color name="appColorHighlight">#222222</color>
+    <color name="appColorDark">#282828</color>
 
     <color name="facebook_color">#3b5998</color>
     <color name="youtube_color">#cc181e</color>
@@ -15,7 +15,7 @@
     <color name="tumblr_color">#36465d</color>
     <color name="settings_color">#000</color>
 
-    <color name="unselected_color">#aaaaaa</color>
+    <color name="unselected_color">#848484</color>
     <color name="lightGray">#aaaaaa</color>
     <color name="transparent_dark">#8e8e8e</color>
 

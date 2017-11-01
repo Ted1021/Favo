@@ -35,5 +35,7 @@ public class AppController extends Application {
         // init Band sdk
         BandManager bandManager = BandManagerFactory.getSingleton();
         bandManager.init(AppController.this, getString(R.string.band_client_id), getString(R.string.band_client_secret), true);
+
+
     }
 }

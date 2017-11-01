@@ -4,7 +4,8 @@
     xmlns:facebook="http://schemas.android.com/tools"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/appColorDark">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
@@ -23,7 +24,7 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@android:color/white"
+            app:contentScrim="@color/appColorHighlight"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <FrameLayout
@@ -114,7 +115,7 @@
                         android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                        android:textColor="@android:color/black"
+                        android:textColor="@android:color/white"
                         android:textSize="14sp" />
 
                 </LinearLayout>
@@ -129,9 +130,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentStart="false"
-            android:background="@color/cardview_light_background"
-            app:tabIndicatorColor="@color/com_facebook_button_login_background_color"
-            app:tabSelectedTextColor="@android:color/black"
+            android:background="@color/appColorHighlight"
+            app:tabIndicatorColor="@color/colorCremeWhite"
+            app:tabSelectedTextColor="@android:color/white"
             app:tabTextAppearance="@style/CustomTabItemTextSize"
             app:tabTextColor="@color/lightGray">
 

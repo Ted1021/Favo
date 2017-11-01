@@ -2,19 +2,17 @@ package taewon.navercorp.integratedsns.feed;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -48,8 +46,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     private LayoutInflater mLayoutInflater;
     private Realm mRealm;
 
-    SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+    private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
     private static final int CONTENTS_IMAGE = 1;
     private static final int CONTENTS_VIDEO = 2;
@@ -70,10 +68,11 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // common components
-        private TextView mUserName, mUploadTime, mDescription;
+        private TextView mUserName, mUploadTime, mDescription, mComment;
         private ImageView mProfile, mPicture, mPlatformType;
-        private Button mLike, mComment, mShare, mMore;
-        private LinearLayout mPageDetail;
+        private Button mShare, mMore;
+        private FrameLayout mPageDetail;
+        private LinearLayout mCommentDetail;
 
         // video component
         private ImageButton mPlay;
@@ -91,23 +90,27 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
             mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
 
-            mLike = (Button) itemView.findViewById(R.id.button_like);
-            mLike.setOnClickListener(this);
+//            mLike = (Button) itemView.findViewById(R.id.button_like);
+//            mLike.setOnClickListener(this);
 
-            mComment = (Button) itemView.findViewById(R.id.button_comment);
+            mComment = (TextView) itemView.findViewById(R.id.textView_comment);
             mComment.setOnClickListener(this);
 
             mMore = (Button) itemView.findViewById(R.id.button_more);
             mMore.setOnClickListener(this);
 
-            mPageDetail = (LinearLayout) itemView.findViewById(R.id.layout_page_detail);
+            mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
+
+            mCommentDetail = (LinearLayout) itemView.findViewById(R.id.layout_comment);
+            mCommentDetail.setOnClickListener(this);
 
             if (viewType == CONTENTS_VIDEO) {
 
-                mPicture.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
-                mPlay = (ImageButton) itemView.findViewById(R.id.button_play);
-                mPlay.setOnClickListener(this);
+//                mPicture.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
+//                mPlay = (ImageButton) itemView.findViewById(R.id.button_play);
+//                mPlay.setOnClickListener(this);
+
             } else {
                 mPicture.setOnClickListener(this);
             }
@@ -126,7 +129,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     loadVideo(position, platformType);
                     break;
 
-                case R.id.button_comment:
+                case R.id.layout_comment:
                     loadComments(position, platformType, contentsType);
                     break;
 
@@ -284,15 +287,16 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         View itemView;
         switch (viewType) {
             case CONTENTS_IMAGE:
-                itemView = mLayoutInflater.inflate(R.layout.item_image_article, parent, false);
+                itemView = mLayoutInflater.inflate(R.layout.item_image_article_test, parent, false);
                 return new ViewHolder(itemView, viewType);
 
             case CONTENTS_VIDEO:
-                itemView = mLayoutInflater.inflate(R.layout.item_video_article, parent, false);
+//                itemView = mLayoutInflater.inflate(R.layout.item_video_article, parent, false);
+                itemView = mLayoutInflater.inflate(R.layout.item_image_article_test, parent, false);
                 return new ViewHolder(itemView, viewType);
 
             case CONTENTS_MULTI:
-                itemView = mLayoutInflater.inflate(R.layout.item_multi_image_article, parent, false);
+                itemView = mLayoutInflater.inflate(R.layout.item_multi_image_article_test, parent, false);
                 return new ViewHolder(itemView, viewType);
         }
         return null;
@@ -306,10 +310,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mUploadTime.setText(data.getCreatedTime());
         holder.mUserName.setText(data.getUserName());
         holder.mDescription.setText(data.getDescription());
-        holder.mLike.setText(data.getLikeCount() + "");
+//        holder.mLike.setText(data.getLikeCount() + "");
         holder.mComment.setText(data.getCommentCount() + "");
 
-        Glide.with(mContext).load(data.getPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+        Glide.with(mContext).load(data.getPicture()).into(holder.mPicture);
         Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
 
         switch (data.getPlatformType()) {
