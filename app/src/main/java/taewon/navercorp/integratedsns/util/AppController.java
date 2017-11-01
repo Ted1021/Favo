@@ -2,6 +2,7 @@ package taewon.navercorp.integratedsns.util;
 
 import android.app.Application;
 
+import com.bumptech.glide.Glide;
 import com.campmobile.android.bandsdk.BandManager;
 import com.campmobile.android.bandsdk.BandManagerFactory;
 
@@ -35,7 +36,17 @@ public class AppController extends Application {
         // init Band sdk
         BandManager bandManager = BandManagerFactory.getSingleton();
         bandManager.init(AppController.this, getString(R.string.band_client_id), getString(R.string.band_client_secret), true);
+    }
 
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        Glide.get(this).clearMemory();
+    }
 
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        Glide.get(this).trimMemory(level);
     }
 }

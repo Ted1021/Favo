@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -149,5 +150,19 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     public void onBackStackChanged() {
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // app 이 종료되면 cache 삭제
+        Glide.get(getApplicationContext()).clearMemory();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Glide.get(getApplicationContext()).clearDiskCache();
+            }
+        }).start();
     }
 }
