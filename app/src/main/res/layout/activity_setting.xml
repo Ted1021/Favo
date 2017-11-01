@@ -33,6 +33,13 @@
         android:id="@+id/switch_band"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:text="Connect to Band" />
+
+    <Switch
+        android:id="@+id/switch_giphy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Connect to Giphy" />
 
 </LinearLayout>

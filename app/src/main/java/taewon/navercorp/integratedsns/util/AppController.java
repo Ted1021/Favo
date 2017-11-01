@@ -6,6 +6,7 @@ import com.campmobile.android.bandsdk.BandManager;
 import com.campmobile.android.bandsdk.BandManagerFactory;
 
 import io.realm.Realm;
+import taewon.navercorp.integratedsns.R;
 
 /**
  * Created by USER on 2017-10-30.
@@ -21,8 +22,8 @@ public class AppController extends Application {
     public static final int PLATFORM_YOUTUBE = 2;
     public static final int PLATFORM_PINTEREST = 3;
 
-    private static final String BAND_CLIENT_ID = "219449230";
-    private static final String BAND_CLIENT_SECRET = "LRGkEU_Pm8ixZk7Y9348Z2X2ylve2L5M";
+    private static final String GIPHY_BASE_URL = "api.giphy.com";
+    private static final String YOUTUBE_BASE_URL = "";
 
     @Override
     public void onCreate() {
@@ -33,6 +34,6 @@ public class AppController extends Application {
 
         // init Band sdk
         BandManager bandManager = BandManagerFactory.getSingleton();
-        bandManager.init(AppController.this, BAND_CLIENT_ID, BAND_CLIENT_SECRET, true);
+        bandManager.init(AppController.this, getString(R.string.band_client_id), getString(R.string.band_client_secret), true);
     }
 }

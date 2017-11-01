@@ -15,6 +15,10 @@
     <string name="pinterest_token">pinterest_token</string>
 
     <string name="band_token">band_token</string>
+    <string name="band_client_id">219449230</string>
+    <string name="band_client_secret">LRGkEU_Pm8ixZk7Y9348Z2X2ylve2L5M</string>
+
+    <string name="giphy_api_key">yfEUjOH0kmWK01krPXrhn2dgrs3n6CYB</string>
 
     <string name="facebook_login_fail">페이스북 로그인에 실패 하였습니다.</string>
     <string name="google_login_fail">구글 로그인에 실패 하였습니다.</string>
