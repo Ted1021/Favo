@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimaryDark">#282828</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorCremeWhite">#fafafa</color>
 
@@ -15,8 +15,12 @@
     <color name="tumblr_color">#36465d</color>
     <color name="settings_color">#000</color>
 
-    <color name="unselected_color">#848484</color>
-    <color name="lightGray">#aaaaaa</color>
+    <color name="unselected_color">#606060</color>
+
     <color name="transparent_dark">#8e8e8e</color>
+
+    <color name="deepGray">#212121</color>
+    <color name="darkGray">#303030</color>
+    <color name="lightGray">#424242</color>
 
 </resources>

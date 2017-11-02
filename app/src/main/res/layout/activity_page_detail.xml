@@ -5,26 +5,20 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/appColorDark">
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+    android:background="@color/darkGray">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/deepGray"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/appColorHighlight"
+            app:contentScrim="@color/deepGray"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <FrameLayout
@@ -79,7 +73,9 @@
                             android:id="@+id/button_pageLike"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:background="@color/appColor"></com.facebook.share.widget.LikeView>
+                            android:background="@color/appColor">
+
+                        </com.facebook.share.widget.LikeView>
 
                     </LinearLayout>
                 </LinearLayout>
@@ -91,8 +87,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Dark">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -130,11 +125,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentStart="false"
-            android:background="@color/appColorHighlight"
-            app:tabIndicatorColor="@color/colorCremeWhite"
+            android:background="@color/deepGray"
+            app:tabIndicatorColor="@android:color/transparent"
             app:tabSelectedTextColor="@android:color/white"
             app:tabTextAppearance="@style/CustomTabItemTextSize"
-            app:tabTextColor="@color/lightGray">
+            app:tabTextColor="@color/unselected_color">
 
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
@@ -149,5 +144,11 @@
         </android.support.design.widget.TabLayout>
 
     </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>

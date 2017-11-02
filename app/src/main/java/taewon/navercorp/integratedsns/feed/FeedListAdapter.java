@@ -313,8 +313,12 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 //        holder.mLike.setText(data.getLikeCount() + "");
         holder.mComment.setText(data.getCommentCount() + "");
 
-        Glide.with(mContext).load(data.getPicture()).into(holder.mPicture);
-        Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
+        Glide.with(mContext).load(data.getPicture())
+                .apply(new RequestOptions().centerCrop())
+                .into(holder.mPicture);
+        Glide.with(mContext).load(data.getProfileImage())
+                .apply(new RequestOptions().circleCropTransform())
+                .into(holder.mProfile);
 
         switch (data.getPlatformType()) {
 
