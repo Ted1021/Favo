@@ -306,7 +306,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
                     data.setUserName(board.getName());
                     data.setProfile(board.getImageUrl());
-                    Log.e(getClass().getName(), " >>>>>>>>>>>> " + board.getImageUrl() + " " + board.getName() + " ");
 
                     mDataset.add(data);
                 }

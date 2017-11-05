@@ -114,7 +114,9 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
     @Override
     public void onRefresh() {
+
         mDataset.clear();
+        mAdapter.notifyDataSetChanged();
         getPageVideoList();
     }
 }

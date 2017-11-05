@@ -274,6 +274,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onRefresh() {
 
         mDataset.clear();
+        mAdapter.notifyDataSetChanged();
         initData();
     }
 }

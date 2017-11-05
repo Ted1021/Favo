@@ -87,6 +87,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private RelativeLayout mLayoutDisconnection;
 
     private Realm mRealm;
+    private boolean isRefreshing;
 
     SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
@@ -190,6 +191,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
 
         mDataset.clear();
+        mAdapter.notifyDataSetChanged();
+
         mLayoutDisconnection.setVisibility(View.VISIBLE);
         if (!facebookToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
@@ -539,6 +542,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     @Override
     public void onRefresh() {
+
+        mDataset.clear();
+        mAdapter.notifyDataSetChanged();
         checkToken();
     }
 }
