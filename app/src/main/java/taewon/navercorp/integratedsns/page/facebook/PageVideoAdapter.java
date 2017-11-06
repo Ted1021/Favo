@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -121,7 +122,9 @@ public class PageVideoAdapter extends RecyclerView.Adapter<PageVideoAdapter.View
         holder.mCreatedTime.setText(date);
         holder.mRunTime.setText(String.format("%d:%d",min,sec));
 
-        Glide.with(mContext).load(data.getPicture()).into(holder.mThumbnail);
+        Glide.with(mContext).load(data.getPicture())
+                .transition(new DrawableTransitionOptions().crossFade())
+                .into(holder.mThumbnail);
     }
 
     @Override

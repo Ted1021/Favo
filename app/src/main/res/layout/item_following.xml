@@ -24,10 +24,13 @@
             android:layout_height="200dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
+            android:ellipsize="end"
             android:gravity="center_vertical|center_horizontal"
+            android:maxLines="1"
             android:text="TextView"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="@android:color/white"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
 
     </RelativeLayout>
