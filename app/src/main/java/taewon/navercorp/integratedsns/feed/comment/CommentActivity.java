@@ -33,6 +33,11 @@ import taewon.navercorp.integratedsns.model.comment.YoutubePostCommentData;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
+
 public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
 
     private SharedPreferences mPref;
@@ -54,18 +59,10 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
     private EndlessRecyclerViewScrollListener mScrollListener;
 
-    private static final int CONTENTS_IMAGE = 1;
-    private static final int CONTENTS_VIDEO = 2;
-    private static final int CONTENTS_MULTI = 3;
-
-    private static final int PLATFORM_FACEBOOK = 1;
-    private static final int PLATFORM_YOUTUBE = 2;
-    private static final int PLATFORM_PINTEREST = 3;
-
-    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
-    private static final int MAX_COUNTS = 10;
     private String mNextPage;
     private String mPrevPage;
+
+    private static final int MAX_COUNTS = 10;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override

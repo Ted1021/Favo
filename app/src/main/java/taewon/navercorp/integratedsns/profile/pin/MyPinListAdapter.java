@@ -22,6 +22,9 @@ import io.realm.RealmRecyclerViewAdapter;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
 
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_MULTI_IMAGE;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
@@ -34,10 +37,6 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
 
     private Context mContext;
     private LayoutInflater mLayoutInflater;
-
-    private static final int CONTENTS_IMAGE = 1;
-    private static final int CONTENTS_VIDEO = 2;
-    private static final int CONTENTS_MULTI = 3;
 
     public MyPinListAdapter(@Nullable OrderedRealmCollection<FavoMyPinData> data, boolean autoUpdate, Context context) {
         super(data, autoUpdate);
@@ -109,8 +108,8 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
             case CONTENTS_VIDEO:
                 return CONTENTS_VIDEO;
 
-            case CONTENTS_MULTI:
-                return CONTENTS_MULTI;
+            case CONTENTS_MULTI_IMAGE:
+                return CONTENTS_MULTI_IMAGE;
         }
 
         return -1;
@@ -129,7 +128,7 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
                 itemView = mLayoutInflater.inflate(R.layout.item_video_article, parent, false);
                 return new ViewHolder(itemView, viewType);
 
-            case CONTENTS_MULTI:
+            case CONTENTS_MULTI_IMAGE:
                 itemView = mLayoutInflater.inflate(R.layout.item_multi_image_article, parent, false);
                 return new ViewHolder(itemView, viewType);
         }

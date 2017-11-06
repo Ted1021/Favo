@@ -46,6 +46,11 @@ import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.FollowingInfoData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
 
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -74,13 +79,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
     private static final String BOARD_FIELDS = "id,name, created_at, creator, image, url";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
-
-    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
     private static final int MAX_COUNTS = 10;
-
-    private static final int PLATFORM_FACEBOOK = 1;
-    private static final int PLATFORM_YOUTUBE = 2;
-    private static final int PLATFORM_PINTEREST = 3;
 
     public FollowingListFragment() {
 
@@ -200,7 +199,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
                     public void onCompleted(GraphResponse response) {
                         if (response.getError() == null) {
 
-                            mDataset.clear();
                             try {
 
                                 JSONArray results = response.getJSONObject().getJSONArray("data");
@@ -215,7 +213,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
                                     data.set_id(pageInfo.getString("id"));
                                     data.setPlatformType(PLATFORM_FACEBOOK);
 
-                                    Log.d("CHECK_FOLLOWING", " >>>>>>>>>> facebook " + data.get_id() + " " + data.getPlatformType());
                                     mDataset.add(data);
                                 }
                                 mAdapter.notifyDataSetChanged();
@@ -258,7 +255,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
                 if (response.isSuccessful()) {
 
-                    mDataset.clear();
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
                         FollowingInfoData data = new FollowingInfoData();
 
@@ -266,8 +262,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
                         data.setProfile(item.getSnippet().getThumbnails().getHigh().getUrl());
                         data.set_id(item.getSnippet().getResourceId().getChannelId());
                         data.setPlatformType(PLATFORM_YOUTUBE);
-
-                        Log.d("CHECK_FOLLOWING", " >>>>>>>>>> youtube " + data.get_id() + " " + data.getPlatformType());
 
                         mDataset.add(data);
                     }
@@ -299,7 +293,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
             public void onSuccess(PDKResponse response) {
                 super.onSuccess(response);
 
-                mDataset.clear();
                 for (PDKBoard board : response.getBoardList()) {
 
                     FollowingInfoData data = new FollowingInfoData();
@@ -323,6 +316,9 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
+
+        mDataset.clear();
+        mAdapter.notifyDataSetChanged();
         setFollowingList(mCurrentPlatform);
     }
 }

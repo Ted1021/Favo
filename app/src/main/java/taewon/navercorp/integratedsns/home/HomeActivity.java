@@ -36,25 +36,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     // Auth for google (Youtube)
     public static GoogleApiClient mGoogleApiClient;
-    private static final String[] SCOPES = {YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBEPARTNER};
-
-    private static final int FRAG_COUNT = 3;
 
     // fragment index
-    private static final String BACK_STACK_ROOT_TAG = "root_fragment";
     private static final int TAB_FEED = 0;
     private static final int TAB_SEARCH = 1;
     private static final int TAB_PROFILE = 2;
-
-    // Auth Request Code
-    private static final int REQ_FACEBOOK_SIGN_IN = 100;
-    private static final int REQ_GOOGLE_SIGN_IN = 101;
-
-    // state check
-    private static boolean isInitLoadFacebook = true;
-    private static boolean isInitLoadYoutube = true;
-
-    private static int REQ_REFRESH = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

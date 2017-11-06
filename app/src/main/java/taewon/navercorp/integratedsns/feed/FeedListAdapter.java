@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.text.SimpleDateFormat;
@@ -31,6 +33,13 @@ import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.facebook.PageDetailActivity;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
+
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_MULTI_IMAGE;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 /**
  * @author 김태원
@@ -45,17 +54,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private LayoutInflater mLayoutInflater;
     private Realm mRealm;
+    private RequestListener mRequestListener;
 
     private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
-
-    private static final int CONTENTS_IMAGE = 1;
-    private static final int CONTENTS_VIDEO = 2;
-    private static final int CONTENTS_MULTI = 3;
-
-    private static final int PLATFORM_FACEBOOK = 1;
-    private static final int PLATFORM_YOUTUBE = 2;
-    private static final int PLATFORM_PINTEREST = 3;
 
     public FeedListAdapter(Context context, Vector<FavoFeedData> dataset, Realm realm) {
 
@@ -197,6 +199,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
                     break;
             }
+
             mContext.startActivity(intent);
         }
 
@@ -274,8 +277,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             case CONTENTS_VIDEO:
                 return CONTENTS_VIDEO;
 
-            case CONTENTS_MULTI:
-                return CONTENTS_MULTI;
+            case CONTENTS_MULTI_IMAGE:
+                return CONTENTS_MULTI_IMAGE;
         }
 
         return -1;
@@ -295,7 +298,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 itemView = mLayoutInflater.inflate(R.layout.item_image_article_test, parent, false);
                 return new ViewHolder(itemView, viewType);
 
-            case CONTENTS_MULTI:
+            case CONTENTS_MULTI_IMAGE:
                 itemView = mLayoutInflater.inflate(R.layout.item_multi_image_article_test, parent, false);
                 return new ViewHolder(itemView, viewType);
         }
@@ -303,7 +306,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
 
         FavoFeedData data = mDataset.get(position);
 
@@ -313,12 +316,15 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 //        holder.mLike.setText(data.getLikeCount() + "");
         holder.mComment.setText(data.getCommentCount() + "");
 
-        Glide.with(mContext).load(data.getPicture())
-                .apply(new RequestOptions().centerCrop())
-                .into(holder.mPicture);
-        Glide.with(mContext).load(data.getProfileImage())
+        Glide.with(mContext.getApplicationContext()).load(data.getProfileImage())
                 .apply(new RequestOptions().circleCropTransform())
+                .transition(new DrawableTransitionOptions().crossFade())
                 .into(holder.mProfile);
+
+        Glide.with(mContext.getApplicationContext()).load(data.getPicture())
+                .apply(new RequestOptions().centerCrop())
+                .transition(new DrawableTransitionOptions().crossFade())
+                .into(holder.mPicture);
 
         switch (data.getPlatformType()) {
 

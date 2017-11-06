@@ -34,6 +34,10 @@ import taewon.navercorp.integratedsns.model.page.FacebookPageInfoData;
 import taewon.navercorp.integratedsns.model.page.FavoPageInfoData;
 import taewon.navercorp.integratedsns.model.page.YoutubeChannelInfoData;
 
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
+
 public class PageDetailActivity extends AppCompatActivity {
 
     private SharedPreferences mPref;
@@ -50,15 +54,9 @@ public class PageDetailActivity extends AppCompatActivity {
 
     private FavoPageInfoData mPageData = new FavoPageInfoData();
 
-    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
-
     // fragment index
     private static final int TAB_FEED = 0;
     private static final int TAB_VIDEO = 1;
-
-    private static final int PLATFORM_FACEBOOK = 1;
-    private static final int PLATFORM_YOUTUBE = 2;
-    private static final int PLATFORM_PINTEREST = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

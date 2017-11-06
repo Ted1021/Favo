@@ -23,8 +23,8 @@ public class AppController extends Application {
     public static final int PLATFORM_YOUTUBE = 2;
     public static final int PLATFORM_PINTEREST = 3;
 
-    private static final String GIPHY_BASE_URL = "api.giphy.com";
-    private static final String YOUTUBE_BASE_URL = "";
+    public static final String GIPHY_BASE_URL = "api.giphy.com";
+    public static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
 
     @Override
     public void onCreate() {

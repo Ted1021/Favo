@@ -40,16 +40,6 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_ITEM = 1;
 
-    // Contents Type
-    private static final int CONTENTS_IMAGE = 1;
-    private static final int CONTENTS_VIDEO = 2;
-    private static final int CONTENTS_MULTI = 3;
-
-    // Platform Type
-    private static final int PLATFORM_FACEBOOK = 1;
-    private static final int PLATFORM_YOUTUBE = 2;
-    private static final int PLATFORM_PINTEREST = 3;
-
     public FacebookCommentAdapter(Context context, FacebookCommentData feedDetail, ArrayList<FacebookCommentData.Comments.CommentData> dataset, int contentType) {
 
         mContext = context;

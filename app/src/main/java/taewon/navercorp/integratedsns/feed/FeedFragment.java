@@ -57,6 +57,12 @@ import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 /**
  * @author 김태원
@@ -82,31 +88,18 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private RecyclerView mFeedList;
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private FeedListAdapter mAdapter;
-
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
 
     private Realm mRealm;
-    private boolean isRefreshing;
+    private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
-    SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+    private int mAsyncCount = 0;
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
-
-    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
     private static final int MAX_COUNTS = 10;
-
-    private static final int CONTENTS_IMAGE = 1;
-    private static final int CONTENTS_VIDEO = 2;
-    private static final int CONTENTS_MULTI_IMAGE = 3;
-
-    private static final int PLATFORM_FACEBOOK = 1;
-    private static final int PLATFORM_YOUTUBE = 2;
-    private static final int PLATFORM_PINTEREST = 3;
-
-    private int mAsyncCount = 0;
 
     public FeedFragment() {
     }

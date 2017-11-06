@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
 
@@ -19,6 +20,10 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.FollowingInfoData;
 import taewon.navercorp.integratedsns.page.facebook.PageDetailActivity;
 import taewon.navercorp.integratedsns.page.youtube.ChannelDetailActivity;
+
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 /**
  * Created by USER on 2017-10-25.
@@ -29,10 +34,6 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
     private Context mContext;
     private ArrayList<FollowingInfoData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
-
-    private static final int PLATFORM_FACEBOOK = 1;
-    private static final int PLATFORM_YOUTUBE = 2;
-    private static final int PLATFORM_PINTEREST = 3;
 
     public FollowingListAdapter(Context context, ArrayList dataset) {
 
@@ -112,7 +113,9 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
         FollowingInfoData data = mDataset.get(position);
 
         holder.mUserName.setText(data.getUserName());
-        Glide.with(mContext).load(data.getProfile()).into(holder.mProfile);
+        Glide.with(mContext.getApplicationContext()).load(data.getProfile())
+                .transition(new DrawableTransitionOptions().crossFade())
+                .into(holder.mProfile);
     }
 
     @Override

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
@@ -29,6 +30,9 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
     private ArrayList<YoutubeCommentData.Item> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
+    SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+
     // ViewHolder Type
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_ITEM = 1;
@@ -38,6 +42,7 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
         mContext = context;
         mVideoData = videoData;
         mDataset = dataset;
+
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 

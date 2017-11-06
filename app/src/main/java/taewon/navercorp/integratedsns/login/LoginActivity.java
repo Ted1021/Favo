@@ -172,7 +172,7 @@ public class LoginActivity extends AppCompatActivity
                 break;
 
             case R.id.button_giphy_login:
-                getGiphyToken();
+
                 break;
         }
     }
@@ -260,10 +260,6 @@ public class LoginActivity extends AppCompatActivity
             }
         };
         mBandManager.login(LoginActivity.this, mBandLoginApiCallbacks);
-    }
-
-    private void getGiphyToken() {
-
     }
 
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {

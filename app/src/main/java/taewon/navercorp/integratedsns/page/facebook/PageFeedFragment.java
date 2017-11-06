@@ -36,6 +36,11 @@ import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
 
 import static android.content.Context.MODE_PRIVATE;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -56,20 +61,11 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
-    private static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
     private static final int MAX_COUNTS = 25;
 
     private static final String ARG_PARAM1 = "PAGE_ID";
     private static final String ARG_PARAM2 = "PLATFORM_TYPE";
     private static final String ARG_PARAM3 = "PROFILE_IMAGE";
-
-    private static final int CONTENTS_IMAGE = 1;
-    private static final int CONTENTS_VIDEO = 2;
-    private static final int CONTENTS_MULTI = 3;
-
-    private static final int PLATFORM_FACEBOOK = 1;
-    private static final int PLATFORM_YOUTUBE = 2;
-    private static final int PLATFORM_PINTEREST = 3;
 
     public static PageFeedFragment newInstance(String param1, int param2, String param3) {
 

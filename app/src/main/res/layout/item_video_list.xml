@@ -21,7 +21,8 @@
                 android:layout_width="160dp"
                 android:layout_height="100dp"
                 android:adjustViewBounds="true"
-                android:scaleType="fitXY"
+                android:cropToPadding="true"
+                android:scaleType="centerCrop"
                 app:srcCompat="@android:drawable/ic_menu_gallery" />
 
             <ImageView
@@ -61,7 +62,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="created time"
-                    android:textColor="@color/lightGray"
+                    android:textColor="@color/colorCremeWhite"
                     android:textSize="12sp" />
 
                 <TextView
@@ -71,7 +72,7 @@
                     android:layout_weight="1"
                     android:gravity="right"
                     android:text="0:00"
-                    android:textColor="@color/lightGray"
+                    android:textColor="@color/colorCremeWhite"
                     android:textSize="12sp" />
             </LinearLayout>
         </FrameLayout>
