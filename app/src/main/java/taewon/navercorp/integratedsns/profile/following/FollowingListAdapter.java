@@ -18,8 +18,7 @@ import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.FollowingInfoData;
-import taewon.navercorp.integratedsns.page.facebook.PageDetailActivity;
-import taewon.navercorp.integratedsns.page.youtube.ChannelDetailActivity;
+import taewon.navercorp.integratedsns.page.PageDetailActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -87,7 +86,7 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
 
                 case PLATFORM_YOUTUBE:
 
-                    intent = new Intent(mContext, ChannelDetailActivity.class);
+                    intent = new Intent(mContext, PageDetailActivity.class);
                     intent.putExtra("CHANNEL_ID", mDataset.get(position).get_id());
                     intent.putExtra("PROFILE_URL", mDataset.get(position).getProfile());
                     mContext.startActivity(intent);

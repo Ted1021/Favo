@@ -74,7 +74,7 @@
                             android:textSize="24sp" />
 
                         <Button
-                            android:id="@+id/button_following"
+                            android:id="@+id/button_subscribe"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="following" />

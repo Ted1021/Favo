@@ -41,7 +41,6 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
 public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
 
     private SharedPreferences mPref;
-    private SharedPreferences.Editor mEditor;
 
     private RecyclerView mCommentList;
     private RecyclerView.Adapter mAdapter;
@@ -78,10 +77,8 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
         // init preference
         mPref = CommentActivity.this.getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        mEditor = mPref.edit();
 
         Intent intent = getIntent();
-
         mContentType = intent.getIntExtra("CONTENT_TYPE", 0);
         mPlatformType = intent.getIntExtra("PLATFORM_TYPE", 0);
 

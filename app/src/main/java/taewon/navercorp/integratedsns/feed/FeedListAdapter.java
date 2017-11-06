@@ -31,7 +31,7 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
-import taewon.navercorp.integratedsns.page.facebook.PageDetailActivity;
+import taewon.navercorp.integratedsns.page.PageDetailActivity;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
 
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
@@ -294,7 +294,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 return new ViewHolder(itemView, viewType);
 
             case CONTENTS_VIDEO:
-//                itemView = mLayoutInflater.inflate(R.layout.item_video_article, parent, false);
                 itemView = mLayoutInflater.inflate(R.layout.item_image_article_test, parent, false);
                 return new ViewHolder(itemView, viewType);
 
@@ -313,7 +312,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mUploadTime.setText(data.getCreatedTime());
         holder.mUserName.setText(data.getUserName());
         holder.mDescription.setText(data.getDescription());
-//        holder.mLike.setText(data.getLikeCount() + "");
         holder.mComment.setText(data.getCommentCount() + "");
 
         Glide.with(mContext.getApplicationContext()).load(data.getProfileImage())
