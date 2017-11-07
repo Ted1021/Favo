@@ -228,8 +228,6 @@ public class LoginActivity extends AppCompatActivity
                 mEditor.putString(getString(R.string.google_token), credential.getToken());
                 mEditor.commit();
 
-                Toast.makeText(LoginActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
-
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("ERROR_LOGIN", "Login Activity >>>>> fail to get credential token");
@@ -245,6 +243,7 @@ public class LoginActivity extends AppCompatActivity
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            Toast.makeText(LoginActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
             startActivity(intent);
             LoginActivity.this.finish();

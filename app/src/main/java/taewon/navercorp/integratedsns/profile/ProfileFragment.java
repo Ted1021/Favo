@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +24,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.pinterest.android.pdk.PDKBoard;
-import com.pinterest.android.pdk.PDKCallback;
 import com.pinterest.android.pdk.PDKClient;
-import com.pinterest.android.pdk.PDKException;
-import com.pinterest.android.pdk.PDKResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,6 +61,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
 
+    private static boolean isInit;
+
     private static final int TAB_COUNT = 2;
     private static final int TAB_FOLLOWING = 0;
     private static final int TAB_MY_PIN = 1;
@@ -73,14 +70,25 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public ProfileFragment() {
     }
 
+    public static ProfileFragment newInstance() {
+        ProfileFragment fragment = new ProfileFragment();
+        isInit = true;
+        return fragment;
+    }
+
+    @Override
+    public void onDestroyView() {
+        mViewPager.setAdapter(null);
+        super.onDestroyView();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        initView(view);
         initData();
+        initView(view);
         setAction();
 
         return view;
@@ -121,7 +129,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mTabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
     }
 
-    private void setProfileInfo(){
+    private void setProfileInfo() {
 
         if (!mFacebookToken.equals("")) {
             getFacebookUserInfo();
@@ -138,69 +146,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mViewPager.setAdapter(new ViewPagerAdapter(getChildFragmentManager()));
         mViewPager.setCurrentItem(0);
         mViewPager.setOffscreenPageLimit(2);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-        // set tabLayout action
-        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                switch (tab.getPosition()) {
-
-                    case TAB_FOLLOWING:
-                        break;
-
-                    case TAB_MY_PIN:
-                        break;
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
 
         // set interaction between viewPager & tabLayout
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
-    }
-
-    private void getFollowingBoards() {
-
-        mPinterestClient.getMyFollowedBoards(BOARD_FIELDS, new PDKCallback() {
-            @Override
-            public void onSuccess(PDKResponse response) {
-                super.onSuccess(response);
-
-                for (PDKBoard board : response.getBoardList()) {
-                    Log.d("CHECK_BOARD", " >>>>> " + board.getName());
-                }
-            }
-
-            @Override
-            public void onFailure(PDKException exception) {
-                super.onFailure(exception);
-            }
-        });
     }
 
     private void getFacebookUserInfo() {
@@ -229,7 +178,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         request.setParameters(parameters);
         request.executeAsync();
     }
-
 
     @Override
     public void onClick(View v) {

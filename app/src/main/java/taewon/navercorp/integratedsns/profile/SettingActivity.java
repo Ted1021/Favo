@@ -203,12 +203,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         } else {
             mPinterestSwitch.setChecked(false);
         }
-
-        if (!mBandToken.equals("")) {
-            mBandSwitch.setChecked(true);
-        } else {
-            mBandSwitch.setChecked(false);
-        }
     }
 
     // request facebook token

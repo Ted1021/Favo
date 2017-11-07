@@ -40,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Vector;
 
 import io.realm.Realm;
@@ -80,20 +81,19 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     // for pinterest client
     private PDKClient mPinterestClient;
 
-    // BroadcastReceiver for updating status of tokens to "FeedFragment"
-    private BroadcastReceiver mTokenUpdateReceiver;
-    private BroadcastReceiver mAsyncFinishReceiver;
+    // BroadcastReceivers
+    private BroadcastReceiver mTokenUpdateReceiver, mAsyncFinishReceiver, mScrollToTopReceiver;
 
     // UI Components
     private RecyclerView mFeedList;
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private FeedListAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
 
     private Realm mRealm;
-    private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+    private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
 
     private int mAsyncCount = 0;
 
@@ -101,7 +101,30 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
     private static final int MAX_COUNTS = 10;
 
+    private static boolean isInit;
+
     public FeedFragment() {
+    }
+
+    public static FeedFragment newInstance(){
+
+        FeedFragment fragment = new FeedFragment();
+        isInit = true;
+        return fragment;
+    }
+
+    @Override
+    public void onDestroyView() {
+
+        // close Realm Instance
+        mRealm.close();
+
+        // destroy broadcast receiver along with fragment life cycle
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mTokenUpdateReceiver);
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mAsyncFinishReceiver);
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mScrollToTopReceiver);
+
+        super.onDestroyView();
     }
 
     @Override
@@ -112,20 +135,29 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         initData();
         initView(view);
-        checkToken();
 
+        if(isInit){
+            isInit = false;
+            checkToken();
+        }
         return view;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    private void initView(View view) {
 
-        // close Realm Instance
-        mRealm.close();
+        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
+        mRefreshLayout.setOnRefreshListener(this);
 
-        // destroy broadcast receiver along with fragment life cycle
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mTokenUpdateReceiver);
+        // view for disconnection
+        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
+
+        // set recyclerView
+        mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
+        mAdapter = new FeedListAdapter(getContext(), mDataset, mRealm);
+        mFeedList.setAdapter(mAdapter);
+
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mFeedList.setLayoutManager(mLayoutManager);
     }
 
     private void initData() {
@@ -158,22 +190,21 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             }
         };
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mAsyncFinishReceiver, new IntentFilter(getString(R.string.async_finish_status)));
-    }
 
-    private void initView(View view) {
+        mScrollToTopReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
 
-        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
-        mRefreshLayout.setOnRefreshListener(this);
+                int currentPosition = ((LinearLayoutManager)mLayoutManager).findFirstVisibleItemPosition();
+                if(currentPosition > 10){
+                    mLayoutManager.smoothScrollToPosition(mFeedList, null, 10);
+                    mLayoutManager.scrollToPosition(10);
+                }
+                mLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+            }
+        };
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mScrollToTopReceiver, new IntentFilter(getString(R.string.scroll_to_top_status)));
 
-        // view for disconnection
-        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
-
-        // set recyclerView
-        mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
-        mAdapter = new FeedListAdapter(getContext(), mDataset, mRealm);
-        mFeedList.setAdapter(mAdapter);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mFeedList.setLayoutManager(layoutManager);
     }
 
     private void checkToken() {
@@ -302,7 +333,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     data.setPicture(article.getFullPicture());
                                     data.setLink(article.getLink());
                                     data.setDescription(article.getMessage());
-                                    // TODO - subattachments
                                     data.setLikeCount(article.getLikes().getSummary().getTotalCount());
                                     data.setCommentCount(article.getComments().getSummary().getTotalCount());
 

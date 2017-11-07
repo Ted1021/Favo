@@ -1,14 +1,18 @@
 package taewon.navercorp.integratedsns.home;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.Auth;
@@ -30,9 +34,14 @@ import taewon.navercorp.integratedsns.search.SearchFragment;
  * @date 2017.09.27
  */
 
-public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, FragmentManager.OnBackStackChangedListener{
+public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
-    TabLayout mTabLayout;
+    private Fragment[] mFragmentList;
+    private TabLayout mTabLayout;
+    private FragmentManager mFragmentManager;
+    private LinearLayout mTabStrip;
+
+    private long mPressedTime = 0;
 
     // Auth for google (Youtube)
     public static GoogleApiClient mGoogleApiClient;
@@ -41,6 +50,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final int TAB_FEED = 0;
     private static final int TAB_SEARCH = 1;
     private static final int TAB_PROFILE = 2;
+    private static final int MAX_FRAGMENT = 3;
+    private static final int TIME_LENGTH = 2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +60,14 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
         initData();
         initView();
+        addFragmentOnTop();
         setAction();
-        addFragmentOnTop(new FeedFragment());
     }
 
     private void initData() {
+
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentList = new Fragment[MAX_FRAGMENT];
 
         // init google client
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -71,6 +85,17 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private void initView() {
 
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        mTabLayout.getTabAt(mTabLayout.getSelectedTabPosition()).getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, android.R.color.white), PorterDuff.Mode.SRC_IN);
+        mTabStrip = (LinearLayout) mTabLayout.getChildAt(0);
+    }
+
+    private void addFragmentOnTop() {
+
+        Fragment fragment = FeedFragment.newInstance();
+        mFragmentList[TAB_FEED] = fragment;
+        mFragmentManager.beginTransaction()
+                .add(R.id.layout_container, fragment)
+                .commit();
     }
 
     private void setAction() {
@@ -80,23 +105,31 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
 
-                Fragment fragment = new FeedFragment();
+                Fragment fragment;
                 switch (tab.getPosition()) {
 
                     case TAB_FEED:
-                        fragment = new FeedFragment();
+                        if (mFragmentList[TAB_FEED] == null) {
+                            fragment = FeedFragment.newInstance();
+                            mFragmentList[TAB_FEED] = fragment;
+                        }
                         break;
 
                     case TAB_SEARCH:
-                        fragment = new SearchFragment();
+                        if (mFragmentList[TAB_SEARCH] == null) {
+                            fragment = SearchFragment.newInstance();
+                            mFragmentList[TAB_SEARCH] = fragment;
+                        }
                         break;
 
                     case TAB_PROFILE:
-                        fragment = new ProfileFragment();
+                        if (mFragmentList[TAB_PROFILE] == null) {
+                            fragment = ProfileFragment.newInstance();
+                            mFragmentList[TAB_PROFILE] = fragment;
+                        }
                         break;
                 }
-
-                replaceFragment(fragment);
+                replaceFragment(mFragmentList[tab.getPosition()]);
                 tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, android.R.color.white), PorterDuff.Mode.SRC_IN);
             }
 
@@ -107,7 +140,23 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
 
+        mTabStrip.getChildAt(TAB_FEED).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (mPressedTime == 0) {
+                    mPressedTime = System.currentTimeMillis();
+                } else {
+
+                    int seconds = (int) (System.currentTimeMillis() - mPressedTime);
+                    if (seconds < TIME_LENGTH) {
+                        callScrollToTop();
+                        mPressedTime = 0;
+                    }
+                }
             }
         });
     }
@@ -117,25 +166,10 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     }
 
-    public void replaceFragment(Fragment fragment){
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.addOnBackStackChangedListener(this);
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.layout_container, fragment).addToBackStack(null).commit();
-    }
-
-    public void addFragmentOnTop(Fragment fragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
+    public void replaceFragment(Fragment fragment) {
+        mFragmentManager.beginTransaction()
                 .replace(R.id.layout_container, fragment)
-                .addToBackStack(null)
                 .commit();
-    }
-
-    @Override
-    public void onBackStackChanged() {
-
     }
 
     @Override
@@ -150,5 +184,40 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                 Glide.get(getApplicationContext()).clearDiskCache();
             }
         }).start();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (mTabLayout.getTabAt(TAB_FEED) != null) {
+            if (mTabLayout.getTabAt(TAB_FEED).isSelected()) {
+                alertClosingApp();
+            } else {
+                mTabLayout.getTabAt(TAB_FEED).select();
+            }
+        }
+    }
+
+    private void alertClosingApp() {
+
+        if (mPressedTime == 0) {
+            Toast.makeText(HomeActivity.this, getString(R.string.app_closing_alert), Toast.LENGTH_LONG).show();
+            mPressedTime = System.currentTimeMillis();
+        } else {
+            int seconds = (int) (System.currentTimeMillis() - mPressedTime);
+
+            if (seconds > TIME_LENGTH) {
+                Toast.makeText(HomeActivity.this, getString(R.string.app_closing_alert), Toast.LENGTH_LONG).show();
+                mPressedTime = 0;
+            } else {
+                super.onBackPressed();
+            }
+        }
+    }
+
+    private void callScrollToTop() {
+
+        Intent intent = new Intent(getString(R.string.scroll_to_top_status));
+        LocalBroadcastManager.getInstance(HomeActivity.this).sendBroadcast(intent);
     }
 }
