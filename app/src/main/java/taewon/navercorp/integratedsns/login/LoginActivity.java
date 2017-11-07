@@ -12,10 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.campmobile.android.bandsdk.BandManager;
-import com.campmobile.android.bandsdk.BandManagerFactory;
-import com.campmobile.android.bandsdk.api.LoginCallbacks;
-import com.campmobile.android.bandsdk.entity.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -77,10 +73,6 @@ public class LoginActivity extends AppCompatActivity
             PDKClient.PDKCLIENT_PERMISSION_WRITE_RELATIONSHIPS
     };
 
-    // Auth for Band
-    private BandManager mBandManager;
-    LoginCallbacks<AccessToken> mBandLoginApiCallbacks;
-
     // Auth Request Code
     private static final int REQ_FACEBOOK_SIGN_IN = FacebookSdk.getCallbackRequestCodeOffset() + 0;
     private static final int REQ_GOOGLE_SIGN_IN = 101;
@@ -127,9 +119,6 @@ public class LoginActivity extends AppCompatActivity
         // init pinterest client
         mPinterestClient = PDKClient.configureInstance(this, getString(R.string.pinterest_app_id));
         mPinterestClient.onConnect(LoginActivity.this);
-
-        // init band client
-        mBandManager = BandManagerFactory.getSingleton();
     }
 
     private void initView() {
@@ -165,10 +154,6 @@ public class LoginActivity extends AppCompatActivity
 
             case R.id.button_tumblr_login:
                 getPinterestToken();
-                break;
-
-            case R.id.button_band_login:
-                getBandToken();
                 break;
 
             case R.id.button_giphy_login:
@@ -237,29 +222,6 @@ public class LoginActivity extends AppCompatActivity
                 Log.e("ERROR_LOGIN", exception.getDetailMessage());
             }
         });
-    }
-
-    private void getBandToken() {
-
-        mBandLoginApiCallbacks = new LoginCallbacks<AccessToken>() {
-            @Override
-            public void onResponse(AccessToken response) {
-                mEditor.putString(getString(R.string.band_token), response.getAccessToken());
-                mEditor.commit();
-                Log.d("CHECK_TOKEN", mPref.getString(getString(R.string.band_token), ""));
-                Toast.makeText(LoginActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(intent);
-                LoginActivity.this.finish();
-            }
-
-            @Override
-            public void onCancel() {
-                Log.e("ERROR_LOGIN", "Error band login");
-            }
-        };
-        mBandManager.login(LoginActivity.this, mBandLoginApiCallbacks);
     }
 
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
@@ -338,11 +300,6 @@ public class LoginActivity extends AppCompatActivity
         // giphy login activity result
         else if (requestCode == REQ_GIPHY_SIGN_IN) {
 
-        }
-
-        // band login activity result
-        else {
-            mBandManager.onActivityResult(LoginActivity.this, requestCode, resultCode, data, mBandLoginApiCallbacks);
         }
     }
 }

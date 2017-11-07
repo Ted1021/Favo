@@ -1,6 +1,5 @@
 package taewon.navercorp.integratedsns.profile;
 
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

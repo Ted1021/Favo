@@ -13,12 +13,6 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.android.volley.VolleyError;
-import com.campmobile.android.bandsdk.BandManager;
-import com.campmobile.android.bandsdk.BandManagerFactory;
-import com.campmobile.android.bandsdk.api.ApiCallbacks;
-import com.campmobile.android.bandsdk.api.LoginCallbacks;
-import com.campmobile.android.bandsdk.entity.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -69,10 +63,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             PDKClient.PDKCLIENT_PERMISSION_READ_RELATIONSHIPS,
             PDKClient.PDKCLIENT_PERMISSION_WRITE_RELATIONSHIPS
     };
-
-    // Auth for Band
-    private BandManager mBandManager;
-    LoginCallbacks<AccessToken> mBandLoginApiCallbacks;
 
     // managing tokens
     private SharedPreferences mPref;
@@ -128,9 +118,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         // init pinterest client
         mPinterestClient = PDKClient.configureInstance(this, getString(R.string.pinterest_app_id));
         mPinterestClient.onConnect(SettingActivity.this);
-
-        // init band client
-        mBandManager = BandManagerFactory.getSingleton();
     }
 
     private void initView() {
@@ -185,21 +172,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
                 } else {
                     if (!mPinterestToken.equals("")) {
                         deletePinterestToken();
-                    }
-                }
-            }
-        });
-
-        mBandSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (mBandToken.equals("")) {
-                        getBandToken();
-                    }
-                } else {
-                    if (!mBandToken.equals("")) {
-                        deleteBandToken();
                     }
                 }
             }
@@ -337,39 +309,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mEditor.commit();
         Toast.makeText(SettingActivity.this, "disconnect pinterest successfully!!", Toast.LENGTH_SHORT).show();
         sendTokenStatus();
-    }
-
-    private void getBandToken() {
-
-        mBandLoginApiCallbacks = new LoginCallbacks<AccessToken>() {
-            @Override
-            public void onResponse(AccessToken response) {
-                mEditor.putString(getString(R.string.band_token), response.getAccessToken());
-                mEditor.commit();
-                Log.d("CHECK_TOKEN", mPref.getString(getString(R.string.band_token), ""));
-                Toast.makeText(SettingActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancel() {
-                Log.e("ERROR_LOGIN", "Error band login");
-            }
-        };
-        mBandManager.login(SettingActivity.this, mBandLoginApiCallbacks);
-    }
-
-    private void deleteBandToken() {
-        mBandManager.logout(new ApiCallbacks<Void>() {
-            @Override
-            public void onResponse(Void response) {
-                Toast.makeText(SettingActivity.this, "Logout succeeded.", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(VolleyError error) {
-                Log.e("ERROR_TOKEN", "Fail to band logout");
-            }
-        });
     }
 
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
