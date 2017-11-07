@@ -245,7 +245,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
 
-                    if (item.getTitle().equals("Save")) {
+                    if (item.getItemId() == 1) {
 
                         final FavoMyPinData myPin = RealmDataConvertingHelper.convertToRealmObject(mDataset.get(position));
                         mRealm.executeTransaction(new Realm.Transaction() {

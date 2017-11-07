@@ -131,12 +131,6 @@ public class LoginActivity extends AppCompatActivity
 
         mPinterestLogin = (Button) findViewById(R.id.button_tumblr_login);
         mPinterestLogin.setOnClickListener(this);
-
-        mBandLogin = (Button) findViewById(R.id.button_band_login);
-        mBandLogin.setOnClickListener(this);
-
-        mGiphyLogin = (Button) findViewById(R.id.button_giphy_login);
-        mGiphyLogin.setOnClickListener(this);
     }
 
     @Override
@@ -154,10 +148,6 @@ public class LoginActivity extends AppCompatActivity
 
             case R.id.button_tumblr_login:
                 getPinterestToken();
-                break;
-
-            case R.id.button_giphy_login:
-
                 break;
         }
     }

@@ -3,11 +3,8 @@ package taewon.navercorp.integratedsns.util;
 import android.app.Application;
 
 import com.bumptech.glide.Glide;
-import com.campmobile.android.bandsdk.BandManager;
-import com.campmobile.android.bandsdk.BandManagerFactory;
 
 import io.realm.Realm;
-import taewon.navercorp.integratedsns.R;
 
 /**
  * Created by USER on 2017-10-30.
@@ -32,10 +29,6 @@ public class AppController extends Application {
 
         // init Realm
         Realm.init(this);
-
-        // init Band sdk
-        BandManager bandManager = BandManagerFactory.getSingleton();
-        bandManager.init(AppController.this, getString(R.string.band_client_id), getString(R.string.band_client_secret), true);
     }
 
     @Override

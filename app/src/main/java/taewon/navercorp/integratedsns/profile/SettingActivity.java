@@ -125,7 +125,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mFacebookSwitch = (Switch) findViewById(R.id.switch_facebook);
         mYoutubeSwitch = (Switch) findViewById(R.id.switch_youtube);
         mPinterestSwitch = (Switch) findViewById(R.id.switch_pinterest);
-        mBandSwitch = (Switch) findViewById(R.id.switch_band);
 
         checkTokens();
     }
