@@ -146,17 +146,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         mTabStrip.getChildAt(TAB_FEED).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (mPressedTime == 0) {
-                    mPressedTime = System.currentTimeMillis();
-                } else {
-
-                    int seconds = (int) (System.currentTimeMillis() - mPressedTime);
-                    if (seconds < TIME_LENGTH) {
-                        callScrollToTop();
-                        mPressedTime = 0;
-                    }
-                }
+                callScrollToTop();
             }
         });
     }

@@ -96,6 +96,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
 
     private int mAsyncCount = 0;
+    private int mLastPosition = 0;
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
@@ -106,7 +107,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     public FeedFragment() {
     }
 
-    public static FeedFragment newInstance(){
+    public static FeedFragment newInstance() {
 
         FeedFragment fragment = new FeedFragment();
         isInit = true;
@@ -136,7 +137,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         initData();
         initView(view);
 
-        if(isInit){
+        if (isInit) {
             isInit = false;
             checkToken();
         }
@@ -195,16 +196,35 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                int currentPosition = ((LinearLayoutManager)mLayoutManager).findFirstVisibleItemPosition();
-                if(currentPosition > 10){
-                    mLayoutManager.smoothScrollToPosition(mFeedList, null, 10);
-                    mLayoutManager.scrollToPosition(10);
+                if (!mRefreshLayout.isRefreshing()) {
+                    int currentPosition = ((LinearLayoutManager) mLayoutManager).findFirstCompletelyVisibleItemPosition();
+                    if (currentPosition == 0) {
+                        scrollToLastPosition(mLastPosition);
+                        mLastPosition = 0;
+                    } else {
+                        mLastPosition = currentPosition;
+                        scrollToTopPosition(currentPosition);
+                    }
                 }
-                mLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
             }
         };
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mScrollToTopReceiver, new IntentFilter(getString(R.string.scroll_to_top_status)));
+    }
 
+    private void scrollToTopPosition(int position) {
+        if (position > 10) {
+            mLayoutManager.smoothScrollToPosition(mFeedList, null, 10);
+            mLayoutManager.scrollToPosition(10);
+        }
+        mLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+    }
+
+    private void scrollToLastPosition(int position) {
+        if (position >= 10) {
+            mLayoutManager.smoothScrollToPosition(mFeedList, null, position - 10);
+            mLayoutManager.scrollToPosition(position - 10);
+        }
+        mLayoutManager.smoothScrollToPosition(mFeedList, null, position);
     }
 
     private void checkToken() {
@@ -244,6 +264,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         });
 
         mAdapter.notifyDataSetChanged();
+        if (mLastPosition > mDataset.size() - 1) {
+            mLastPosition = mDataset.size() - 1;
+        }
         mRefreshLayout.setRefreshing(false);
     }
 

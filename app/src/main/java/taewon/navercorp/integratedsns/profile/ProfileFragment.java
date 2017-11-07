@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -162,14 +163,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                         try {
                             mUserName.setText(response.getJSONObject().getString("name"));
-                            Glide.with(getContext())
+                            Glide.with(getContext().getApplicationContext())
                                     .load(response.getJSONObject().getJSONObject("picture").getJSONObject("data").getString("url"))
+                                    .transition(new DrawableTransitionOptions().crossFade())
                                     .apply(new RequestOptions().circleCropTransform())
                                     .into(mProfile);
                         } catch (JSONException e) {
                             e.printStackTrace();
+                        } catch (NullPointerException e) {
+                            e.printStackTrace();
                         }
-
                     }
                 });
 
