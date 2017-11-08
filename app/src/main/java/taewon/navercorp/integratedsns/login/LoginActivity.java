@@ -33,11 +33,25 @@ import com.pinterest.android.pdk.PDKClient;
 import com.pinterest.android.pdk.PDKException;
 import com.pinterest.android.pdk.PDKResponse;
 
+import net.openid.appauth.AuthorizationRequest;
+import net.openid.appauth.AuthorizationResponse;
+
 import java.io.IOException;
 import java.util.Arrays;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
+import taewon.navercorp.integratedsns.interfaces.TwitchService;
+import taewon.navercorp.integratedsns.util.TwitchLoginActivity;
+
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_REDIRECT_URL;
 
 /**
  * @author 김태원
@@ -49,7 +63,11 @@ import taewon.navercorp.integratedsns.home.HomeActivity;
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
-    private Button mFacebookLogin, mGoogleLogin, mPinterestLogin, mBandLogin, mGiphyLogin;
+    private Button mFacebookLogin, mGoogleLogin, mPinterestLogin, mTwitchLogin;
+
+    // managing tokens
+    private SharedPreferences mPref;
+    private SharedPreferences.Editor mEditor;
 
     // Auth for facebook
     private CallbackManager mCallbackManager;
@@ -73,16 +91,14 @@ public class LoginActivity extends AppCompatActivity
             PDKClient.PDKCLIENT_PERMISSION_WRITE_RELATIONSHIPS
     };
 
+    private AuthorizationRequest mTwitchAuthRequest;
+
     // Auth Request Code
     private static final int REQ_FACEBOOK_SIGN_IN = FacebookSdk.getCallbackRequestCodeOffset() + 0;
     private static final int REQ_GOOGLE_SIGN_IN = 101;
     private static final int REQ_PINTEREST_SIGN_IN = 8772;
-    private static final int REQ_BAND_SIGN_IN = 102;
+    private static final int REQ_TWITCH_SIGN_IN = 102;
     private static final int REQ_GIPHY_SIGN_IN = 103;
-
-    // managing tokens
-    private SharedPreferences mPref;
-    private SharedPreferences.Editor mEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +135,22 @@ public class LoginActivity extends AppCompatActivity
         // init pinterest client
         mPinterestClient = PDKClient.configureInstance(this, getString(R.string.pinterest_app_id));
         mPinterestClient.onConnect(LoginActivity.this);
+
+//        AuthorizationServiceConfiguration serviceConfig =
+//                new AuthorizationServiceConfiguration(
+//                        Uri.parse("https://api.twitch.tv/kraken/oauth2/authorize"),
+//                        Uri.parse("https://api.twitch.tv/kraken/oauth2/token"));
+//
+//        AuthorizationRequest.Builder authRequestBuilder =
+//                new AuthorizationRequest.Builder(
+//                        serviceConfig,
+//                        getString(R.string.twitch_client_id),
+//                        ResponseTypeValues.CODE,
+//                        TWITCH_REDIRECT_URL);
+//
+//        mTwitchAuthRequest = authRequestBuilder
+//                .setScope("user:edit user:read:email")
+//                .build();
     }
 
     private void initView() {
@@ -131,6 +163,9 @@ public class LoginActivity extends AppCompatActivity
 
         mPinterestLogin = (Button) findViewById(R.id.button_tumblr_login);
         mPinterestLogin.setOnClickListener(this);
+
+        mTwitchLogin = (Button) findViewById(R.id.button_twitch_login);
+        mTwitchLogin.setOnClickListener(this);
     }
 
     @Override
@@ -148,6 +183,10 @@ public class LoginActivity extends AppCompatActivity
 
             case R.id.button_tumblr_login:
                 getPinterestToken();
+                break;
+
+            case R.id.button_twitch_login:
+                getTwitchToken();
                 break;
         }
     }
@@ -214,6 +253,40 @@ public class LoginActivity extends AppCompatActivity
         });
     }
 
+    private void getTwitchToken() {
+
+        // set retrofit
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TwitchService service = retrofit.create(TwitchService.class);
+        Call<ResponseBody> call = service.getTwitchAccessToken(getString(R.string.twitch_client_id), TWITCH_REDIRECT_URL, "token+id_token", "user:read:email");
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                String requestUrl = response.raw().request().url().toString();
+                Intent intent = new Intent(LoginActivity.this, TwitchLoginActivity.class);
+                intent.putExtra("REQ_URL", requestUrl);
+                startActivityForResult(intent, REQ_TWITCH_SIGN_IN);
+
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(requestUrl));
+//                LoginActivity.this.startActivityForResult(intent, REQ_TWITCH_SIGN_IN);
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d("CHECK_URL ", t.toString());
+            }
+        });
+
+//        AuthorizationService authService = new AuthorizationService(this);
+//        Intent authIntent = authService.getAuthorizationRequestIntent(mTwitchAuthRequest);
+//        startActivityForResult(authIntent, REQ_TWITCH_SIGN_IN);
+    }
+
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
 
         @Override
@@ -273,22 +346,32 @@ public class LoginActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // google login activity result
-        if (requestCode == REQ_GOOGLE_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            googleSignInResult(result);
-        }
-        // pinterest login activity result
-        else if (requestCode == REQ_PINTEREST_SIGN_IN) {
-            mPinterestClient.onOauthResponse(requestCode, resultCode, data);
-        }
-        // facebook login activity result
-        else if (requestCode == REQ_FACEBOOK_SIGN_IN) {
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
-        }
-        // giphy login activity result
-        else if (requestCode == REQ_GIPHY_SIGN_IN) {
+        if(resultCode == RESULT_OK) {
 
+            // google login activity result
+            if (requestCode == REQ_GOOGLE_SIGN_IN) {
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                googleSignInResult(result);
+            }
+            // pinterest login activity result
+            else if (requestCode == REQ_PINTEREST_SIGN_IN) {
+                mPinterestClient.onOauthResponse(requestCode, resultCode, data);
+            }
+            // facebook login activity result
+            else if (requestCode == REQ_FACEBOOK_SIGN_IN) {
+                mCallbackManager.onActivityResult(requestCode, resultCode, data);
+            }
+            // giphy login activity result
+            else if (requestCode == REQ_GIPHY_SIGN_IN) {
+
+            } else if (requestCode == REQ_TWITCH_SIGN_IN) {
+                AuthorizationResponse response = AuthorizationResponse.fromIntent(data);
+                if(response != null) {
+                    Log.d("CHECK_TWITCH", response.accessToken);
+                } else {
+
+                }
+            }
         }
     }
 }

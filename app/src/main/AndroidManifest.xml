@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="taewon.navercorp.integratedsns">
 
     <uses-sdk
@@ -15,13 +16,13 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".util.AppController"
         android:allowBackup="true"
         android:icon="@drawable/favo_icon"
         android:label="@string/app_name"
         android:roundIcon="@drawable/favo_icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name="taewon.navercorp.integratedsns.util.AppController">
+        android:theme="@style/AppTheme">
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -37,18 +38,19 @@
         </activity>
         <activity
             android:name=".login.LoginActivity"
-            android:configChanges="orientation|screenSize|keyboard">
+            android:configChanges="orientation|screenSize|keyboard"
+            tools:node="replace">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="pdk4928301781867311512" />
-                <data android:scheme="bandsdk219449230" />
+                <data android:scheme="pdk4928301781867311512"/>
+                <data android:scheme="bandsdk219449230"/>
+                <data android:scheme="http" android:host="174.138.18.90"/>
+
             </intent-filter>
         </activity>
-
         <activity
             android:name=".home.HomeActivity"
             android:configChanges="orientation|screenSize|keyboard" />
@@ -61,12 +63,15 @@
         <activity
             android:name=".feed.comment.CommentActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-
-        <activity android:name=".page.PageDetailActivity"
-            android:configChanges="orientation|screenSize|keyboard"/>
-
-        <activity android:name=".feed.VideoActivity"
-            android:configChanges="orientation|screenSize|keyboard"/>
+        <activity
+            android:name=".page.PageDetailActivity"
+            android:configChanges="orientation|screenSize|keyboard" />
+        <activity
+            android:name=".feed.VideoActivity"
+            android:configChanges="orientation|screenSize|keyboard" />
+        <activity
+            android:name=".util.TwitchLoginActivity"
+            android:configChanges="orientation|screenSize|keyboard" />
     </application>
 
 </manifest>
