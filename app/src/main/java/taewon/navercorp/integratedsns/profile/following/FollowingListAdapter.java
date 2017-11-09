@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.yayandroid.parallaxrecyclerview.ParallaxViewHolder;
 
 import java.util.ArrayList;
 
@@ -42,19 +43,23 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends ParallaxViewHolder implements View.OnClickListener {
 
         ImageView mProfile;
         TextView mUserName;
+
+        @Override
+        public int getParallaxImageId() {
+            return R.id.imageView_profile;
+        }
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
             mUserName.setOnClickListener(this);
-
-            mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
-            mProfile.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
+//            mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
+//            mProfile.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
         }
 
         @Override
@@ -112,9 +117,12 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
         FollowingInfoData data = mDataset.get(position);
 
         holder.mUserName.setText(data.getUserName());
+        holder.getBackgroundImage().setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
         Glide.with(mContext.getApplicationContext()).load(data.getProfile())
                 .transition(new DrawableTransitionOptions().crossFade())
-                .into(holder.mProfile);
+                .into(holder.getBackgroundImage());
+
+        holder.getBackgroundImage().reuse();
     }
 
     @Override

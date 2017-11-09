@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +29,7 @@ import com.pinterest.android.pdk.PDKCallback;
 import com.pinterest.android.pdk.PDKClient;
 import com.pinterest.android.pdk.PDKException;
 import com.pinterest.android.pdk.PDKResponse;
+import com.yayandroid.parallaxrecyclerview.ParallaxRecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,7 +65,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     private BroadcastReceiver mTokenUpdateReceiver;
 
     private Spinner mSpinner;
-    private RecyclerView mFollowingList;
+    private ParallaxRecyclerView mFollowingList;
     private FollowingListAdapter mAdapter;
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
@@ -147,10 +148,14 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         // view for disconnection
         mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
 
-        mFollowingList = (RecyclerView) view.findViewById(R.id.recyclerView_following);
+        mFollowingList = (ParallaxRecyclerView) view.findViewById(R.id.recyclerView_following);
+        mFollowingList.setHasFixedSize(true);
+
         mAdapter = new FollowingListAdapter(getContext(), mDataset);
         mFollowingList.setAdapter(mAdapter);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+
+//        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mFollowingList.setLayoutManager(layoutManager);
     }
 
