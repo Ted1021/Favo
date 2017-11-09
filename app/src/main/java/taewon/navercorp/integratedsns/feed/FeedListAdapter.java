@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,10 +21,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.text.SimpleDateFormat;
 import java.util.Vector;
 
 import io.realm.Realm;
@@ -33,6 +32,7 @@ import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
+import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_MULTI_IMAGE;
@@ -55,10 +55,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private LayoutInflater mLayoutInflater;
     private Realm mRealm;
-    private RequestListener mRequestListener;
-
-    private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
     public FeedListAdapter(Context context, Vector<FavoFeedData> dataset, Realm realm) {
 
@@ -92,31 +88,25 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
             mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
-
-//            mLike = (Button) itemView.findViewById(R.id.button_like);
-//            mLike.setOnClickListener(this);
-
+            mPicture.setOnClickListener(this);
             mComment = (TextView) itemView.findViewById(R.id.textView_comment);
             mComment.setOnClickListener(this);
-
             mMore = (Button) itemView.findViewById(R.id.button_more);
             mMore.setOnClickListener(this);
-
             mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
-
             mCommentDetail = (LinearLayout) itemView.findViewById(R.id.layout_comment);
             mCommentDetail.setOnClickListener(this);
 
-            if (viewType == CONTENTS_VIDEO) {
-
+//            if (viewType == CONTENTS_VIDEO) {
+//
 //                mPicture.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
 //                mPlay = (ImageButton) itemView.findViewById(R.id.button_play);
 //                mPlay.setOnClickListener(this);
-
-            } else {
-                mPicture.setOnClickListener(this);
-            }
+//
+//            } else {
+//
+//            }
         }
 
         @Override
@@ -129,7 +119,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             switch (v.getId()) {
 
                 case R.id.button_play:
-                    loadVideo(position, platformType);
+//                    loadVideo(position, platformType);
                     break;
 
                 case R.id.layout_comment:
@@ -141,7 +131,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     break;
 
                 case R.id.imageView_picture:
-                    loadLink(position);
+                    loadVideo(position, platformType);
                     break;
 
                 case R.id.button_more:
@@ -152,27 +142,38 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
         private void loadVideo(int position, int platformType) {
 
-            String videoUrl = null;
-            Intent intent = null;
-            if (platformType == PLATFORM_FACEBOOK) {
-
-                videoUrl = mDataset.get(position).getVideoUrl();
-                if (TextUtils.isEmpty(videoUrl)) {
-                    return;
-                }
-
-                Uri uri = Uri.parse(videoUrl);
-
-                intent = new Intent(Intent.ACTION_VIEW, uri);
-                intent.setDataAndType(uri, "video/*");
-                mContext.startActivity(intent);
-
-            } else {
-                videoUrl = mDataset.get(position).getVideoUrl();
-                intent = new Intent(mContext, VideoActivity.class);
-                intent.putExtra("VIDEO_ID", videoUrl);
-                mContext.startActivity(intent);
+            Log.d("CHECK_VIDEO", " 0 ");
+            if (TextUtils.isEmpty(mDataset.get(position).getVideoUrl())) {
+                loadLink(position);
+                Log.d("CHECK_VIDEO", " 1 ");
+                return;
             }
+
+            String videoUrl = mDataset.get(position).getVideoUrl();
+            Intent intent=null;
+            Log.d("CHECK_VIDEO", " 2 "+ videoUrl);
+            switch(platformType){
+
+                case PLATFORM_FACEBOOK:
+                    Uri uri = Uri.parse(videoUrl);
+                    intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.setDataAndType(uri, "video/*");
+                    break;
+
+                case PLATFORM_YOUTUBE:
+                    intent = new Intent(mContext, VideoActivity.class);
+                    intent.putExtra("VIDEO_ID", videoUrl);
+                    break;
+
+                case PLATFORM_TWITCH:
+                    Log.d("CHECK_URL", "-------------:" + mDataset.get(position).getVideoUrl());
+                    String twitchUrl = String.format(" http://player.twitch.tv?video=%s", mDataset.get(position).getVideoUrl());
+                    intent = new Intent(mContext, TwitchWebViewActivity.class);
+                    intent.putExtra("REQ_TYPE", "video");
+                    intent.putExtra("REQ_URL", twitchUrl);
+                    break;
+            }
+            mContext.startActivity(intent);
         }
 
         private void loadComments(int position, int platformType, int contentsType) {
@@ -188,19 +189,12 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     break;
 
                 case PLATFORM_YOUTUBE:
-
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position));
                     intent.putExtras(bundle);
-
                     intent.putExtra("VIDEO_ID", mDataset.get(position).getFeedId());
                     break;
-
-                case PLATFORM_PINTEREST:
-
-                    break;
             }
-
             mContext.startActivity(intent);
         }
 
@@ -220,8 +214,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
                     break;
 
-                case PLATFORM_PINTEREST:
-
+                case PLATFORM_TWITCH:
+                    intent.putExtra("USER_ID", mDataset.get(position).getPageId());
+                    intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
                     break;
             }
             mContext.startActivity(intent);
@@ -230,7 +225,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
         private void loadLink(int position) {
 
-            Intent intent = null;
+            Intent intent;
             String url = mDataset.get(position).getLink();
             if (url != null) {
                 intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -246,7 +241,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
 
-                    if (item.getItemId() == 1) {
+                    if (item.getTitle().equals("Save Pin")) {
 
                         final FavoMyPinData myPin = RealmDataConvertingHelper.convertToRealmObject(mDataset.get(position));
                         mRealm.executeTransaction(new Realm.Transaction() {
@@ -255,11 +250,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                                 realm.copyToRealmOrUpdate(myPin);
                             }
                         });
-
-                    } else {
-
                     }
-
                     return true;
                 }
             });
@@ -281,7 +272,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             case CONTENTS_MULTI_IMAGE:
                 return CONTENTS_MULTI_IMAGE;
         }
-
         return -1;
     }
 

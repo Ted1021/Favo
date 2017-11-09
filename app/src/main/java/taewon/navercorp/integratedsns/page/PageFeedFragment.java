@@ -30,16 +30,20 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedListAdapter;
+import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.feed.facebook.FacebookFeedData;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
+import taewon.navercorp.integratedsns.model.feed.facebook.FacebookFeedData;
+import taewon.navercorp.integratedsns.model.feed.twitch.TwitchVideoData;
 import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSearchVideoData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -125,6 +129,10 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
 
             case PLATFORM_YOUTUBE:
                 getYoutubeChannelFeed();
+                break;
+
+            case PLATFORM_TWITCH:
+                getTwitchVideoList();
                 break;
         }
     }
@@ -262,6 +270,59 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                 mRefreshLayout.setRefreshing(false);
                 t.printStackTrace();
                 Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
+            }
+        });
+    }
+
+    private void getTwitchVideoList() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
+
+        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), mPageId);
+        call.enqueue(new Callback<TwitchVideoData>() {
+            @Override
+            public void onResponse(Call<TwitchVideoData> call, Response<TwitchVideoData> response) {
+                if (response.isSuccessful()) {
+
+                    for (TwitchVideoData.VideoInfo result : response.body().getData()) {
+
+                        FavoFeedData data = new FavoFeedData();
+
+                        try {
+                            data.setPubDate(mDateConverter.parse(result.getPublishedAt()));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        data.setFeedId(result.getId());
+                        data.setPlatformType(PLATFORM_TWITCH);
+                        data.setContentsType(CONTENTS_VIDEO);
+                        data.setPageId(result.getUserId());
+                        data.setProfileImage(mProfileImage);
+                        data.setUserName("xodnjs");
+                        data.setCreatedTime(mFormat.format(data.getPubDate()));
+                        int position = result.getThumbnailUrl().indexOf("{width}");
+                        String thumbnail = result.getThumbnailUrl().substring(0, position - 1) + "1280x720.jpg";
+                        data.setPicture(thumbnail);
+                        data.setVideoUrl(result.getId());
+                        data.setDescription(result.getTitle());
+
+                        mDataset.add(data);
+                    }
+                } else {
+                    Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login // " + response.raw().toString());
+                }
+                mAdapter.notifyDataSetChanged();
+                mRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onFailure(Call<TwitchVideoData> call, Throwable t) {
+                Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login ");
+                t.printStackTrace();
+                mRefreshLayout.setRefreshing(false);
             }
         });
     }

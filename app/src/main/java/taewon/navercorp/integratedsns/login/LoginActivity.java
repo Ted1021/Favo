@@ -45,7 +45,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
-import taewon.navercorp.integratedsns.util.TwitchLoginActivity;
+import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_REDIRECT_URL;
@@ -243,7 +243,8 @@ public class LoginActivity extends AppCompatActivity
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 String requestUrl = response.raw().request().url().toString();
-                Intent intent = new Intent(LoginActivity.this, TwitchLoginActivity.class);
+                Intent intent = new Intent(LoginActivity.this, TwitchWebViewActivity.class);
+                intent.putExtra("REQ_TYPE", "login");
                 intent.putExtra("REQ_URL", requestUrl);
                 startActivityForResult(intent, REQ_TWITCH_SIGN_IN);
             }

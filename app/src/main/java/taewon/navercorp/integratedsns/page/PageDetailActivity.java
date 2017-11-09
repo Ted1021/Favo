@@ -23,6 +23,8 @@ import com.facebook.GraphResponse;
 import com.facebook.share.widget.LikeView;
 import com.google.gson.Gson;
 
+import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,13 +32,17 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
+import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
+import taewon.navercorp.integratedsns.model.TwitchUserData;
 import taewon.navercorp.integratedsns.model.page.FacebookPageInfoData;
 import taewon.navercorp.integratedsns.model.page.FavoPageInfoData;
 import taewon.navercorp.integratedsns.model.page.YoutubeChannelInfoData;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 public class PageDetailActivity extends AppCompatActivity {
@@ -89,6 +95,12 @@ public class PageDetailActivity extends AppCompatActivity {
                 mPageId = intent.getStringExtra("CHANNEL_ID");
                 mProfileImage = intent.getStringExtra("PROFILE_URL");
                 getYoutubeChannelInfo();
+                break;
+
+            case PLATFORM_TWITCH:
+                mPageId = intent.getStringExtra("USER_ID");
+                mProfileImage = intent.getStringExtra("PROFILE_URL");
+                getTwitchStreamerInfo();
                 break;
         }
     }
@@ -195,6 +207,43 @@ public class PageDetailActivity extends AppCompatActivity {
             public void onFailure(Call<YoutubeChannelInfoData> call, Throwable t) {
                 t.printStackTrace();
                 Log.e(getClass().getName(), "Error load youtube page ");
+            }
+        });
+    }
+
+    private void getTwitchStreamerInfo() {
+
+        String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), "");
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
+
+        Call<TwitchUserData> call = service.getTwitchUserInfo(getString(R.string.twitch_client_id), currentToken, mPageId);
+        call.enqueue(new Callback<TwitchUserData>() {
+            @Override
+            public void onResponse(Call<TwitchUserData> call, Response<TwitchUserData> response) {
+                if (response.isSuccessful()) {
+                    TwitchUserData.UserInfo result = response.body().getData().get(0);
+
+                    mPageData.setProfileImage(result.getProfileImageUrl());
+                    mPageData.setPageName(result.getDisplayName());
+                    mPageData.setCoverImage(result.getOfflineImageUrl());
+                    mPageData.setDescription(result.getDescription());
+                    mPageData.setSubscriptionCount(String.format(Locale.KOREA, "%d 명",result.getViewCount()));
+
+                    bindItem();
+
+                } else {
+                    Log.e("ERROR_TWITCH", "Feed Fragment >>>>> " + response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TwitchUserData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to get user ");
             }
         });
     }

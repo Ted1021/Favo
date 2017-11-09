@@ -614,10 +614,10 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onResponse(Call<TwitchFollowingData> call, Response<TwitchFollowingData> response) {
                 if (response.isSuccessful()) {
                     for (TwitchFollowingData.FollowingInfo result : response.body().getData()) {
-                        getTwitchUser(result.getToId());
+                        getTwitchStreamerInfo(result.getToId());
                     }
                 } else {
-                    Log.e("ERROR_TWTICH", "get following list error "+ response.raw().toString());
+                    Log.e("ERROR_TWTICH", "get following list error " + response.raw().toString());
                 }
             }
 
@@ -629,7 +629,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         });
     }
 
-    private void getTwitchUser(String userId) {
+    private void getTwitchStreamerInfo(String userId) {
 
         String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), "");
         Retrofit retrofit = new Retrofit.Builder()
@@ -688,7 +688,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setUserName(userName);
                         data.setCreatedTime(mStringFormat.format(data.getPubDate()));
                         int position = result.getThumbnailUrl().indexOf("{width}");
-                        String thumbnail = result.getThumbnailUrl().substring(0, position-1) + "1280x720.jpg";
+                        String thumbnail = result.getThumbnailUrl().substring(0, position - 1) + "1280x720.jpg";
                         data.setPicture(thumbnail);
                         data.setVideoUrl(result.getId());
                         data.setDescription(result.getTitle());
@@ -699,7 +699,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login // " + response.raw().toString());
                 }
 //                mAdapter.notifyDataSetChanged();
-                mAdapter.notifyItemInserted(mAdapter.getItemCount()+1);
+                mAdapter.notifyItemInserted(mAdapter.getItemCount() + 1);
             }
 
             @Override
@@ -742,7 +742,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setUserName(userName);
                         data.setCreatedTime(mStringFormat.format(data.getPubDate()));
                         int position = result.getThumbnailUrl().indexOf("{width}");
-                        String thumbnail = result.getThumbnailUrl().substring(0, position) + "1600x900.jpg";
+                        String thumbnail = result.getThumbnailUrl().substring(0, position) + "1280x720.jpg";
                         data.setPicture(thumbnail);
                         data.setVideoUrl(result.getId());
                         data.setDescription(result.getTitle());
