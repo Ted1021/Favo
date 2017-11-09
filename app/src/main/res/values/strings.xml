@@ -18,6 +18,7 @@
     <string name="band_client_id">219449230</string>
     <string name="band_client_secret">LRGkEU_Pm8ixZk7Y9348Z2X2ylve2L5M</string>
 
+    <string name="twitch_token">twitch_token</string>
     <string name="twitch_client_id">zwdk9ea1iu6y2o7lryazf8mq7zdx0k</string>
     <string name="twitch_client_secret">sq6f3h9b7ndpx87cj321u2k8lk7cej</string>
 

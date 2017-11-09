@@ -24,7 +24,7 @@ public class AppController extends Application {
     public static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
 
     public static final String TWITCH_BASE_URL = "https://api.twitch.tv/";
-    public static final String TWITCH_REDIRECT_URL = "http://174.138.18.90";
+    public static final String TWITCH_REDIRECT_URL = "http://174.138.18.90/message";
 
     @Override
     public void onCreate() {

@@ -47,7 +47,7 @@
 
                 <data android:scheme="pdk4928301781867311512"/>
                 <data android:scheme="bandsdk219449230"/>
-                <data android:scheme="http" android:host="174.138.18.90"/>
+                <data android:scheme="http" android:host="174.138.18.90" android:path="/message"/>
 
             </intent-filter>
         </activity>

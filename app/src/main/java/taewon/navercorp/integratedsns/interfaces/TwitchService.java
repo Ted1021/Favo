@@ -11,5 +11,6 @@ public interface TwitchService {
     Call<ResponseBody> getTwitchAccessToken(@Query("client_id") String clientId,
                                             @Query("redirect_uri") String redirectUrl,
                                             @Query("response_type") String responseType,
-                                            @Query("scope") String scope);
+                                            @Query("scope") String scope,
+                                            @Query("state") String state);
 }

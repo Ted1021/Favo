@@ -3,11 +3,14 @@ package taewon.navercorp.integratedsns.util;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import taewon.navercorp.integratedsns.R;
+
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_REDIRECT_URL;
 
 public class TwitchLoginActivity extends AppCompatActivity {
 
@@ -25,9 +28,15 @@ public class TwitchLoginActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                Log.d("CHECK_URL", " >>>> " + view.getUrl());
-                Log.d("CHECK_URL", " >>>> " + request.getUrl().toString());
+
+                webView.setVisibility(View.GONE);
                 webView.loadUrl(request.getUrl().toString());
+
+                if(request.getUrl().toString().startsWith(TWITCH_REDIRECT_URL)){
+                    Log.d("CHECK_TOKEN", request.getUrl().toString());
+                    setResult(RESULT_OK, getIntent().putExtra("CALLBACK", request.getUrl().toString()));
+                    TwitchLoginActivity.this.finish();
+                }
                 return true;
             }
         });
