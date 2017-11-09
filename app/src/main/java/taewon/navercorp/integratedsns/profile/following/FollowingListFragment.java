@@ -45,7 +45,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.FollowingInfoData;
-import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSubscriptionData;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;

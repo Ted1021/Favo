@@ -8,8 +8,8 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 import taewon.navercorp.integratedsns.model.comment.YoutubePostCommentData;
 import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
-import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
-import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSubscriptionData;
 import taewon.navercorp.integratedsns.model.page.YoutubeChannelInfoData;
 import taewon.navercorp.integratedsns.model.page.YoutubeChannelPlaylistData;
 

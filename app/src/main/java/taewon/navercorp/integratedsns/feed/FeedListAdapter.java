@@ -39,6 +39,7 @@ import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_MULTI_I
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 /**
@@ -336,6 +337,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             case PLATFORM_PINTEREST:
                 Glide.with(mContext).load(R.drawable.icon_pinterest_small).into(holder.mPlatformType);
+                break;
+
+            case PLATFORM_TWITCH:
+                Glide.with(mContext).load(R.drawable.twitch_icon_small).into(holder.mPlatformType);
                 break;
         }
     }

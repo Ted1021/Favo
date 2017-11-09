@@ -46,10 +46,11 @@ public class SplashActivity extends AppCompatActivity {
         String facebookToken = pref.getString(getString(R.string.facebook_token), "");
         String googleToken = pref.getString(getString(R.string.google_token), "");
         String pinterestToken = pref.getString(getString(R.string.pinterest_token), "");
+        String twitchToken = pref.getString(getString(R.string.twitch_token), "");
 
         Intent intent;
 
-        if (facebookToken.equals("") && googleToken.equals("") && pinterestToken.equals("")) {
+        if (facebookToken.equals("") && googleToken.equals("") && pinterestToken.equals("") && twitchToken.equals("")) {
             intent = new Intent(SplashActivity.this, LoginActivity.class);
             ActivityOptions options = ActivityOptions
                     .makeSceneTransitionAnimation(this, mLogo, "logo");

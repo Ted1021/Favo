@@ -1,10 +1,12 @@
-package taewon.navercorp.integratedsns.model.feed;
+package taewon.navercorp.integratedsns.model.feed.facebook;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 
 /**
  * @author 김태원
@@ -13,7 +15,7 @@ import java.util.List;
  * @date 2017.09.29
  */
 
-public class FacebookFeedData extends FavoFeedData{
+public class FacebookFeedData extends FavoFeedData {
 
     @SerializedName("data")
     private List<ArticleData> data = new ArrayList<>();

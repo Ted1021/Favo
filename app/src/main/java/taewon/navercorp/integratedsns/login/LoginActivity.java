@@ -276,14 +276,12 @@ public class LoginActivity extends AppCompatActivity
                 e.printStackTrace();
                 Log.e("ERROR_LOGIN", "Login Activity >>>>> fail to get credential token");
             }
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
             enterMainService();
         }
     }
@@ -309,7 +307,7 @@ public class LoginActivity extends AppCompatActivity
         String token = callbackResult.substring(startPoint, endPoint);
         Log.d("CHECK_TOKEN", token);
 
-        if (token == null || token.equals("")) {
+        if (!token.equals("")) {
 
             mEditor.putString(getString(R.string.twitch_token), token);
             mEditor.commit();
@@ -320,7 +318,7 @@ public class LoginActivity extends AppCompatActivity
 
     private void enterMainService() {
 
-        Toast.makeText(LoginActivity.this, "Login succeeded.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(LoginActivity.this, "Login succeed.", Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         startActivity(intent);

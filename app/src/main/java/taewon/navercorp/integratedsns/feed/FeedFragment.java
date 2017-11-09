@@ -50,11 +50,16 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.feed.FacebookFeedData;
+import taewon.navercorp.integratedsns.model.TwitchStreamingData;
+import taewon.navercorp.integratedsns.model.TwitchUserData;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
-import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
-import taewon.navercorp.integratedsns.model.feed.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.model.feed.facebook.FacebookFeedData;
+import taewon.navercorp.integratedsns.model.feed.twitch.TwitchFollowingData;
+import taewon.navercorp.integratedsns.model.feed.twitch.TwitchVideoData;
+import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSubscriptionData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
@@ -62,7 +67,9 @@ import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 /**
@@ -93,7 +100,10 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private RelativeLayout mLayoutDisconnection;
 
     private Realm mRealm;
-    private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
+    private SimpleDateFormat mStringFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
+    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+    private String tempUserId = "102859695";
 
     private int mAsyncCount = 0;
     private int mLastPosition = 0;
@@ -233,6 +243,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
         String googleToken = mPref.getString(getString(R.string.google_token), "");
         String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
+        String twitchToken = mPref.getString(getString(R.string.twitch_token), "");
 
         mDataset.clear();
         mAdapter.notifyDataSetChanged();
@@ -251,6 +262,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         if (!pinterestToken.equals("")) {
             mLayoutDisconnection.setVisibility(View.GONE);
             getPinterestFollowingBoards();
+        }
+
+        if (!twitchToken.equals("")) {
+            mLayoutDisconnection.setVisibility(View.GONE);
+            getTwitchFollowingList();
         }
     }
 
@@ -276,7 +292,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 
-    // TODO - 여기에서부터 리팩토링 필수!!!!
     // Facebook API Call
     private void getFacebookUserPages() {
 
@@ -352,7 +367,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     data.setFeedId(article.getId());
                                     data.setProfileImage(article.getFrom().getPicture().getProfileData().getUrl());
                                     data.setUserName(article.getFrom().getName());
-                                    data.setCreatedTime(mFormat.format(date));
+                                    data.setCreatedTime(mStringFormat.format(date));
                                     data.setPicture(article.getFullPicture());
                                     data.setLink(article.getLink());
                                     data.setDescription(article.getMessage());
@@ -426,7 +441,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setFeedId(pin.getUid());
                         data.setProfileImage(pin.getImageUrl());
                         data.setUserName(pin.getUid());
-                        data.setCreatedTime(mFormat.format(pin.getCreatedAt()));
+                        data.setCreatedTime(mStringFormat.format(pin.getCreatedAt()));
                         data.setPicture(pin.getImageUrl());
                         data.setLink(pin.getLink());
                         data.setDescription(pin.getNote());
@@ -454,7 +469,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     }
                 }
             });
-
             return null;
         }
 
@@ -537,9 +551,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                             data.setPlatformType(PLATFORM_YOUTUBE);
                             data.setContentsType(CONTENTS_VIDEO);
-                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
                             try {
-                                date = format.parse(item.getSnippet().getPublishedAt());
+                                date = mDateFormat.parse(item.getSnippet().getPublishedAt());
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
@@ -549,7 +563,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                             data.setFeedId(item.getId().getVideoId());
                             data.setProfileImage(profileUrl);
                             data.setUserName(item.getSnippet().getChannelTitle());
-                            data.setCreatedTime(mFormat.format(date));
+                            data.setCreatedTime(mStringFormat.format(date));
                             data.setPicture(item.getSnippet().getThumbnails().getHigh().getUrl());
                             data.setVideoUrl(item.getId().getVideoId());
                             data.setDescription(item.getSnippet().getTitle());
@@ -581,9 +595,173 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     }
                 }
             });
-
             return null;
         }
+    }
+
+    // call twitch api
+    private void getTwitchFollowingList() {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
+
+        Call<TwitchFollowingData> call = service.getTwitchFollowingInfo(getString(R.string.twitch_client_id), "102859695");
+        call.enqueue(new Callback<TwitchFollowingData>() {
+            @Override
+            public void onResponse(Call<TwitchFollowingData> call, Response<TwitchFollowingData> response) {
+                if (response.isSuccessful()) {
+                    for (TwitchFollowingData.FollowingInfo result : response.body().getData()) {
+                        getTwitchUser(result.getToId());
+                    }
+                } else {
+                    Log.e("ERROR_TWTICH", "get following list error "+ response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TwitchFollowingData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e("ERROR_TWTICH", "get following list error !!!!!!!!!!!!!!");
+            }
+        });
+    }
+
+    private void getTwitchUser(String userId) {
+
+        String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), "");
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
+
+        Call<TwitchUserData> call = service.getTwitchUserInfo(getString(R.string.twitch_client_id), currentToken, userId);
+        call.enqueue(new Callback<TwitchUserData>() {
+            @Override
+            public void onResponse(Call<TwitchUserData> call, Response<TwitchUserData> response) {
+                if (response.isSuccessful()) {
+                    TwitchUserData.UserInfo result = response.body().getData().get(0);
+                    getTwitchVideoList(result.getProfileImageUrl(), result.getDisplayName(), result.getId());
+                } else {
+                    Log.e("ERROR_TWITCH", "Feed Fragment >>>>> " + response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TwitchUserData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to get user ");
+            }
+        });
+    }
+
+    private void getTwitchVideoList(final String profileUrl, final String userName, String userId) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
+
+        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), userId);
+        call.enqueue(new Callback<TwitchVideoData>() {
+            @Override
+            public void onResponse(Call<TwitchVideoData> call, Response<TwitchVideoData> response) {
+                if (response.isSuccessful()) {
+
+                    for (TwitchVideoData.VideoInfo result : response.body().getData()) {
+
+                        FavoFeedData data = new FavoFeedData();
+
+                        try {
+                            data.setPubDate(mDateFormat.parse(result.getPublishedAt()));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        data.setFeedId(result.getId());
+                        data.setPlatformType(PLATFORM_TWITCH);
+                        data.setContentsType(CONTENTS_VIDEO);
+                        data.setPageId(result.getUserId());
+                        data.setProfileImage(profileUrl);
+                        data.setUserName(userName);
+                        data.setCreatedTime(mStringFormat.format(data.getPubDate()));
+                        int position = result.getThumbnailUrl().indexOf("{width}");
+                        String thumbnail = result.getThumbnailUrl().substring(0, position-1) + "1280x720.jpg";
+                        data.setPicture(thumbnail);
+                        data.setVideoUrl(result.getId());
+                        data.setDescription(result.getTitle());
+
+                        mDataset.add(data);
+                    }
+                } else {
+                    Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login // " + response.raw().toString());
+                }
+//                mAdapter.notifyDataSetChanged();
+                mAdapter.notifyItemInserted(mAdapter.getItemCount()+1);
+            }
+
+            @Override
+            public void onFailure(Call<TwitchVideoData> call, Throwable t) {
+                Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login ");
+                t.printStackTrace();
+            }
+        });
+    }
+
+    private void getTwitchStreams(final String profileUrl, final String userName) {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TwitchService service = retrofit.create(TwitchService.class);
+        Call<TwitchStreamingData> call = service.getTwitchStreams(getString(R.string.twitch_client_id), 20);
+        call.enqueue(new Callback<TwitchStreamingData>() {
+            @Override
+            public void onResponse(Call<TwitchStreamingData> call, Response<TwitchStreamingData> response) {
+                if (response.isSuccessful()) {
+
+                    for (TwitchStreamingData.StreamInfo result : response.body().getData()) {
+
+                        FavoFeedData data = new FavoFeedData();
+
+                        try {
+                            data.setPubDate(mDateFormat.parse(result.getStartedAt()));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        data.setFeedId(result.getId());
+                        data.setPlatformType(PLATFORM_TWITCH);
+                        data.setContentsType(CONTENTS_VIDEO);
+                        data.setPageId(result.getUserId());
+                        data.setProfileImage(profileUrl);
+                        data.setUserName(userName);
+                        data.setCreatedTime(mStringFormat.format(data.getPubDate()));
+                        int position = result.getThumbnailUrl().indexOf("{width}");
+                        String thumbnail = result.getThumbnailUrl().substring(0, position) + "1600x900.jpg";
+                        data.setPicture(thumbnail);
+                        data.setVideoUrl(result.getId());
+                        data.setDescription(result.getTitle());
+
+                        mDataset.add(data);
+                    }
+                    mAdapter.notifyDataSetChanged();
+
+                } else {
+                    Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login // " + response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TwitchStreamingData> call, Throwable t) {
+                Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login ");
+                t.printStackTrace();
+            }
+        });
     }
 
     @Override

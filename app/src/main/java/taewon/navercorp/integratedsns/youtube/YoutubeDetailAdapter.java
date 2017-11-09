@@ -16,7 +16,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSearchVideoData;
 
 /**
  * @author 김태원

@@ -16,7 +16,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.feed.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSearchVideoData;
 
 /**
  * @author 김태원

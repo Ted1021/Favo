@@ -19,6 +19,8 @@ public class AppController extends Application {
     public static final int PLATFORM_FACEBOOK = 1;
     public static final int PLATFORM_YOUTUBE = 2;
     public static final int PLATFORM_PINTEREST = 3;
+    public static final int PLATFORM_GIPHY = 4;
+    public static final int PLATFORM_TWITCH = 5;
 
     public static final String GIPHY_BASE_URL = "api.giphy.com";
     public static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
