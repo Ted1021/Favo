@@ -38,6 +38,7 @@
     <string name="update_token_status">update_token_status</string>
     <string name="async_finish_status">async_finish_status</string>
     <string name="scroll_to_top_status">scroll_to_top_status</string>
+    <string name="comment_request">comment_request</string>
 
     <string name="app_closing_alert">한번 더 누르시면 앱이 종료됩니다.</string>
 

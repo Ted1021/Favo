@@ -3,11 +3,10 @@ package taewon.navercorp.integratedsns.feed;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +26,6 @@ import java.util.Vector;
 
 import io.realm.Realm;
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
@@ -142,17 +140,14 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
         private void loadVideo(int position, int platformType) {
 
-            Log.d("CHECK_VIDEO", " 0 ");
             if (TextUtils.isEmpty(mDataset.get(position).getVideoUrl())) {
                 loadLink(position);
-                Log.d("CHECK_VIDEO", " 1 ");
                 return;
             }
 
             String videoUrl = mDataset.get(position).getVideoUrl();
-            Intent intent=null;
-            Log.d("CHECK_VIDEO", " 2 "+ videoUrl);
-            switch(platformType){
+            Intent intent = null;
+            switch (platformType) {
 
                 case PLATFORM_FACEBOOK:
                     Uri uri = Uri.parse(videoUrl);
@@ -166,8 +161,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     break;
 
                 case PLATFORM_TWITCH:
-                    Log.d("CHECK_URL", "-------------:" + mDataset.get(position).getVideoUrl());
-                    String twitchUrl = String.format(" http://player.twitch.tv?video=%s", mDataset.get(position).getVideoUrl());
+                    String twitchUrl = String.format("http://player.twitch.tv?video=%s", mDataset.get(position).getVideoUrl());
                     intent = new Intent(mContext, TwitchWebViewActivity.class);
                     intent.putExtra("REQ_TYPE", "video");
                     intent.putExtra("REQ_URL", twitchUrl);
@@ -178,24 +172,30 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
         private void loadComments(int position, int platformType, int contentsType) {
 
-            Intent intent = new Intent(mContext, CommentActivity.class);
+            // send status of asyncTasks
+            Intent intent = new Intent(mContext.getString(R.string.comment_request));
             intent.putExtra("PLATFORM_TYPE", platformType);
-            intent.putExtra("CONTENTS_TYPE", contentsType);
+            intent.putExtra("FEED_ID", mDataset.get(position).getFeedId());
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
 
-            switch (platformType) {
-
-                case PLATFORM_FACEBOOK:
-                    intent.putExtra("ARTICLE_ID", mDataset.get(position).getFeedId());
-                    break;
-
-                case PLATFORM_YOUTUBE:
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position));
-                    intent.putExtras(bundle);
-                    intent.putExtra("VIDEO_ID", mDataset.get(position).getFeedId());
-                    break;
-            }
-            mContext.startActivity(intent);
+//            Intent intent = new Intent(mContext, CommentActivity.class);
+//            intent.putExtra("PLATFORM_TYPE", platformType);
+//            intent.putExtra("CONTENTS_TYPE", contentsType);
+//
+//            switch (platformType) {
+//
+//                case PLATFORM_FACEBOOK:
+//                    intent.putExtra("ARTICLE_ID", mDataset.get(position).getFeedId());
+//                    break;
+//
+//                case PLATFORM_YOUTUBE:
+//                    Bundle bundle = new Bundle();
+//                    bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position));
+//                    intent.putExtras(bundle);
+//                    intent.putExtra("VIDEO_ID", mDataset.get(position).getFeedId());
+//                    break;
+//            }
+//            mContext.startActivity(intent);
         }
 
         private void loadPageDetail(int position, int platformType) {

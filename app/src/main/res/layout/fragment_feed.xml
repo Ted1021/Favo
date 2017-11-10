@@ -1,52 +1,23 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/slidingLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="bottom"
     android:orientation="vertical"
-    tools:context="taewon.navercorp.integratedsns.feed.FeedFragment">
-
-    <RelativeLayout
-        android:id="@+id/layout_disconnection"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_above="@+id/textView_pageName"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="11dp"
-            app:srcCompat="@drawable/ic_disconnection" />
-
-        <TextView
-            android:id="@+id/textView_pageName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="No data"
-            android:textColor="@color/lightGray"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView_pageName"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="12dp"
-            android:text="Please connect to SNS"
-            android:textColor="@color/unselected_color" />
-
-    </RelativeLayout>
+    sothree:umanoDragView="@+id/dragView"
+    sothree:umanoInitialState="hidden"
+    sothree:umanoOverlay="true"
+    sothree:umanoPanelHeight="0dp"
+    sothree:umanoScrollableView="@+id/recyclerView_commentList"
+    sothree:umanoShadowHeight="4dp">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="visible">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView_feed"
@@ -55,4 +26,43 @@
             android:overScrollMode="always" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
-</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dragView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:orientation="vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="32dp">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            app:cardCornerRadius="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="8dp"
+                    app:srcCompat="@drawable/shape_search_edit" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerView_commentList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>

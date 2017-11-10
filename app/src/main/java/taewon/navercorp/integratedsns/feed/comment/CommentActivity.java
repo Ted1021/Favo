@@ -97,7 +97,6 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
                 break;
 
             case PLATFORM_PINTEREST:
-
                 mPinId = intent.getStringExtra("PIN_ID");
                 break;
         }
@@ -118,7 +117,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         if (mPlatformType == PLATFORM_FACEBOOK) {
 
         } else if (mPlatformType == PLATFORM_YOUTUBE) {
-            mAdapter = new YoutubeCommentAdapter(CommentActivity.this, mYoutubeSearchVideoData, mYoutubeDataset);
+//            mAdapter = new YoutubeCommentAdapter(CommentActivity.this, mYoutubeSearchVideoData, mYoutubeDataset);
             mCommentList.setAdapter(mAdapter);
         }
 
@@ -161,7 +160,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
                             mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
                             mFacebookDataset.addAll(mFeedDetail.getComments().getData());
-                            mAdapter = new FacebookCommentAdapter(CommentActivity.this, mFeedDetail, mFacebookDataset, mContentType);
+//                            mAdapter = new FacebookCommentAdapter(CommentActivity.this, mFeedDetail, mFacebookDataset, mContentType);
                             mCommentList.setAdapter(mAdapter);
 
                         } else {

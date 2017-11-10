@@ -17,7 +17,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -30,6 +29,7 @@ import com.pinterest.android.pdk.PDKClient;
 import com.pinterest.android.pdk.PDKException;
 import com.pinterest.android.pdk.PDKPin;
 import com.pinterest.android.pdk.PDKResponse;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +37,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -50,10 +51,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.feed.comment.CommentListAdapter;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.TwitchStreamingData;
 import taewon.navercorp.integratedsns.model.TwitchUserData;
+import taewon.navercorp.integratedsns.model.comment.FacebookCommentData;
+import taewon.navercorp.integratedsns.model.comment.FavoCommentData;
+import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
 import taewon.navercorp.integratedsns.model.feed.facebook.FacebookFeedData;
 import taewon.navercorp.integratedsns.model.feed.twitch.TwitchFollowingData;
@@ -89,15 +94,21 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private PDKClient mPinterestClient;
 
     // BroadcastReceivers
-    private BroadcastReceiver mTokenUpdateReceiver, mAsyncFinishReceiver, mScrollToTopReceiver;
+    private BroadcastReceiver mTokenUpdateReceiver, mAsyncFinishReceiver, mScrollToTopReceiver, mCommentRequestReceiver;
 
-    // UI Components
+    // Feed list components
     private RecyclerView mFeedList;
-    private Vector<FavoFeedData> mDataset = new Vector<>();
-    private FeedListAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private Vector<FavoFeedData> mFeedDataset = new Vector<>();
+    private FeedListAdapter mFeedAdapter;
+    private RecyclerView.LayoutManager mFeedLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
-    private RelativeLayout mLayoutDisconnection;
+//    private RelativeLayout mLayoutDisconnection;
+
+    // Comment list components
+    private SlidingUpPanelLayout mCommentSlidingLayout;
+    private RecyclerView mCommentList;
+    private CommentListAdapter mCommentAdapter;
+    private ArrayList<FavoCommentData> mCommentDataset = new ArrayList<>();
 
     private Realm mRealm;
     private SimpleDateFormat mStringFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
@@ -160,54 +171,77 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mRefreshLayout.setOnRefreshListener(this);
 
         // view for disconnection
-        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
+//        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
 
-        // set recyclerView
+        // set feed recyclerView
         mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
-        mAdapter = new FeedListAdapter(getContext(), mDataset, mRealm);
-        mFeedList.setAdapter(mAdapter);
+        mFeedAdapter = new FeedListAdapter(getContext(), mFeedDataset, mRealm);
+        mFeedList.setAdapter(mFeedAdapter);
+        mFeedLayoutManager = new LinearLayoutManager(getContext());
+        mFeedList.setLayoutManager(mFeedLayoutManager);
 
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mFeedList.setLayoutManager(mLayoutManager);
+        // set comment recyclerView
+        mCommentList = (RecyclerView) view.findViewById(R.id.recyclerView_commentList);
+        mCommentAdapter = new CommentListAdapter(getContext(), mCommentDataset);
+        mCommentList.setAdapter(mCommentAdapter);
+        RecyclerView.LayoutManager commentLayoutManager = new LinearLayoutManager(getContext());
+        mCommentList.setLayoutManager(commentLayoutManager);
+
+        // set sliding panel for comment
+        mCommentSlidingLayout = (SlidingUpPanelLayout) view.findViewById(R.id.slidingLayout);
+        mCommentSlidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+            }
+        });
+        mCommentSlidingLayout.setFadeOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCommentSlidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+            }
+        });
     }
 
     private void initData() {
 
-        // init Realm Instance
+        // realm Instance
         mRealm = Realm.getDefaultInstance();
 
-        // init preference
+        // preference
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
         mEditor = mPref.edit();
 
-        // init pinterest client
+        // pinterest client
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
         mPinterestClient = PDKClient.getInstance();
 
-        // init update token status receiver
+        // update token status receiver
         mTokenUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 checkToken();
             }
         };
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
 
-        // init check async requests status receiver
+        // check async requests status receiver
         mAsyncFinishReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 refreshDataset();
             }
         };
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mAsyncFinishReceiver, new IntentFilter(getString(R.string.async_finish_status)));
 
+        // check scroll to top request status receiver
         mScrollToTopReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
 
                 if (!mRefreshLayout.isRefreshing()) {
-                    int currentPosition = ((LinearLayoutManager) mLayoutManager).findFirstCompletelyVisibleItemPosition();
+                    int currentPosition = ((LinearLayoutManager) mFeedLayoutManager).findFirstCompletelyVisibleItemPosition();
                     if (currentPosition == 0) {
                         scrollToLastPosition(mLastPosition);
                         mLastPosition = 0;
@@ -218,23 +252,23 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 }
             }
         };
+
+        // comment request receiver
+        mCommentRequestReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                int platformType = intent.getIntExtra("PLATFORM_TYPE", 0);
+                String feedId = intent.getStringExtra("FEED_ID");
+
+                loadComments(platformType, feedId);
+            }
+        };
+
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mAsyncFinishReceiver, new IntentFilter(getString(R.string.async_finish_status)));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mScrollToTopReceiver, new IntentFilter(getString(R.string.scroll_to_top_status)));
-    }
-
-    private void scrollToTopPosition(int position) {
-        if (position > 10) {
-            mLayoutManager.smoothScrollToPosition(mFeedList, null, 10);
-            mLayoutManager.scrollToPosition(10);
-        }
-        mLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
-    }
-
-    private void scrollToLastPosition(int position) {
-        if (position >= 10) {
-            mLayoutManager.smoothScrollToPosition(mFeedList, null, position - 10);
-            mLayoutManager.scrollToPosition(position - 10);
-        }
-        mLayoutManager.smoothScrollToPosition(mFeedList, null, position);
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mCommentRequestReceiver, new IntentFilter(getString(R.string.comment_request)));
     }
 
     private void checkToken() {
@@ -245,45 +279,73 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
         String twitchToken = mPref.getString(getString(R.string.twitch_token), "");
 
-        mDataset.clear();
-        mAdapter.notifyDataSetChanged();
+        mFeedDataset.clear();
+        mFeedAdapter.notifyDataSetChanged();
 
-        mLayoutDisconnection.setVisibility(View.VISIBLE);
         if (!facebookToken.equals("")) {
-            mLayoutDisconnection.setVisibility(View.GONE);
             getFacebookUserPages();
         }
 
         if (!googleToken.equals("")) {
-            mLayoutDisconnection.setVisibility(View.GONE);
             getYoutubeSubscriptionList();
         }
 
         if (!pinterestToken.equals("")) {
-            mLayoutDisconnection.setVisibility(View.GONE);
             getPinterestFollowingBoards();
         }
 
         if (!twitchToken.equals("")) {
-            mLayoutDisconnection.setVisibility(View.GONE);
             getTwitchFollowingList();
         }
     }
 
     private void refreshDataset() {
 
-        Collections.sort(mDataset, new Comparator<FavoFeedData>() {
+        Collections.sort(mFeedDataset, new Comparator<FavoFeedData>() {
             @Override
             public int compare(FavoFeedData o1, FavoFeedData o2) {
                 return o2.getPubDate().compareTo(o1.getPubDate());
             }
         });
 
-        mAdapter.notifyDataSetChanged();
-        if (mLastPosition > mDataset.size() - 1) {
-            mLastPosition = mDataset.size() - 1;
+        mFeedAdapter.notifyDataSetChanged();
+        if (mLastPosition > mFeedDataset.size() - 1) {
+            mLastPosition = mFeedDataset.size() - 1;
         }
         mRefreshLayout.setRefreshing(false);
+    }
+
+    private void scrollToTopPosition(int position) {
+        if (position > 10) {
+            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 10);
+            mFeedLayoutManager.scrollToPosition(10);
+        }
+        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+    }
+
+    private void scrollToLastPosition(int position) {
+        if (position >= 10) {
+            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position - 10);
+            mFeedLayoutManager.scrollToPosition(position - 10);
+        }
+        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
+    }
+
+    private void loadComments(int platformType, String feedId) {
+
+        mCommentDataset.clear();
+        mCommentAdapter.notifyDataSetChanged();
+
+        mCommentSlidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        switch (platformType) {
+            case PLATFORM_FACEBOOK:
+                getFacebookComment(feedId);
+                break;
+
+            case PLATFORM_YOUTUBE:
+                getYoutubeComment(feedId);
+                break;
+        }
     }
 
     // send status of asyncTasks
@@ -374,7 +436,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     data.setLikeCount(article.getLikes().getSummary().getTotalCount());
                                     data.setCommentCount(article.getComments().getSummary().getTotalCount());
 
-                                    mDataset.add(data);
+                                    mFeedDataset.add(data);
                                 }
                             } catch (ParseException e) {
                                 e.printStackTrace();
@@ -446,7 +508,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setLink(pin.getLink());
                         data.setDescription(pin.getNote());
 
-                        mDataset.add(data);
+                        mFeedDataset.add(data);
                     }
 
                     synchronized ((Integer) mAsyncCount) {
@@ -568,7 +630,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                             data.setVideoUrl(item.getId().getVideoId());
                             data.setDescription(item.getSnippet().getTitle());
 
-                            mDataset.add(data);
+                            mFeedDataset.add(data);
                         }
                     } else {
                         Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
@@ -693,13 +755,13 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setVideoUrl(result.getId());
                         data.setDescription(result.getTitle());
 
-                        mDataset.add(data);
+                        mFeedDataset.add(data);
                     }
                 } else {
                     Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login // " + response.raw().toString());
                 }
-//                mAdapter.notifyDataSetChanged();
-                mAdapter.notifyItemInserted(mAdapter.getItemCount() + 1);
+//                mFeedAdapter.notifyDataSetChanged();
+                mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
             }
 
             @Override
@@ -747,9 +809,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setVideoUrl(result.getId());
                         data.setDescription(result.getTitle());
 
-                        mDataset.add(data);
+                        mFeedDataset.add(data);
                     }
-                    mAdapter.notifyDataSetChanged();
+                    mFeedAdapter.notifyDataSetChanged();
 
                 } else {
                     Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login // " + response.raw().toString());
@@ -764,11 +826,98 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         });
     }
 
+    private void getFacebookComment(String feedId) {
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        GraphRequest request = GraphRequest.newGraphPathRequest(
+                accessToken,
+                feedId,
+                new GraphRequest.Callback() {
+                    @Override
+                    public void onCompleted(GraphResponse response) {
+
+                        if (response.getError() == null) {
+
+                            FacebookCommentData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
+                            for (FacebookCommentData.Comments.CommentData comment : result.getComments().getData()) {
+
+                                FavoCommentData data = new FavoCommentData();
+
+                                data.setProfileImage(comment.getFrom().getPicture().getData().getUrl());
+                                data.setCreatedTime(comment.getUploadTime());
+                                data.setMessage(comment.getMessage());
+                                data.setUserName(comment.getFrom().getName());
+
+                                mCommentDataset.add(data);
+                            }
+                            mCommentAdapter.notifyDataSetChanged();
+
+                        } else {
+                            Log.e("CHECK_COMMENT", response.getError().toString());
+                        }
+                    }
+                });
+
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(1024){url}},attachments{subattachments},source,likes.limit(0).summary(true),comments.summary(true){from{name, picture.height(1024){url}},message,created_time}");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
+    private void getYoutubeComment(String feedId) {
+
+        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeCommentData> call = service.getCommentListNext(accessToken, "snippet", null, MAX_COUNTS, feedId);
+        call.enqueue(new Callback<YoutubeCommentData>() {
+            @Override
+            public void onResponse(Call<YoutubeCommentData> call, Response<YoutubeCommentData> response) {
+
+                if (response.isSuccessful()) {
+
+//                    if (response.body().getNextPageToken() == null) {
+//                        return;
+//                    }
+
+//                    mNextPage = response.body().getNextPageToken();
+
+                    for (YoutubeCommentData.Item result : response.body().getItems()) {
+
+                        YoutubeCommentData.Item.TopLevelComment.Author comment = result.getSnippet().getTopLevelComment().getSnippet();
+                        FavoCommentData data = new FavoCommentData();
+
+                        data.setProfileImage(comment.getAuthorProfileImageUrl());
+                        data.setCreatedTime(comment.getPublishedAt());
+                        data.setMessage(comment.getTextOriginal());
+                        data.setUserName(comment.getAuthorDisplayName());
+
+                        mCommentDataset.add(data);
+                    }
+                    mCommentAdapter.notifyDataSetChanged();
+
+                } else {
+                    Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to get json for video " + response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<YoutubeCommentData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to access youtube api server");
+            }
+        });
+    }
+
     @Override
     public void onRefresh() {
 
-        mDataset.clear();
-        mAdapter.notifyDataSetChanged();
+        mFeedDataset.clear();
+        mFeedAdapter.notifyDataSetChanged();
         checkToken();
     }
 }
