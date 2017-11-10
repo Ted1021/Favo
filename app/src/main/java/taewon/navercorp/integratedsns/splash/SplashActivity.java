@@ -49,7 +49,6 @@ public class SplashActivity extends AppCompatActivity {
         String twitchToken = pref.getString(getString(R.string.twitch_token), "");
 
         Intent intent;
-
         if (facebookToken.equals("") && googleToken.equals("") && pinterestToken.equals("") && twitchToken.equals("")) {
             intent = new Intent(SplashActivity.this, LoginActivity.class);
             ActivityOptions options = ActivityOptions

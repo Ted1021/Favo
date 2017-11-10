@@ -222,6 +222,7 @@ public class LoginActivity extends AppCompatActivity
         });
     }
 
+    // request twitch token
     private void getTwitchToken() {
 
         // set retrofit
@@ -300,6 +301,7 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
+    // twitch auth callback method
     private void twitchSignInResult(String callbackResult) {
 
         int startPoint = callbackResult.indexOf("=") + 1;
@@ -317,6 +319,7 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
+    // jump to HomeActivity
     private void enterMainService() {
 
         Toast.makeText(LoginActivity.this, "Login succeed.", Toast.LENGTH_SHORT).show();

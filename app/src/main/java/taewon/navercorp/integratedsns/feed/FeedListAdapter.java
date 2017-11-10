@@ -121,15 +121,15 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     break;
 
                 case R.id.layout_comment:
-                    loadComments(position, platformType, contentsType);
+                    loadComments(position);
                     break;
 
                 case R.id.layout_page_detail:
-                    loadPageDetail(position, platformType);
+                    loadPageDetail(position);
                     break;
 
                 case R.id.imageView_picture:
-                    loadVideo(position, platformType);
+                    loadVideo(position);
                     break;
 
                 case R.id.button_more:
@@ -138,7 +138,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             }
         }
 
-        private void loadVideo(int position, int platformType) {
+        private void loadVideo(int position) {
 
             if (TextUtils.isEmpty(mDataset.get(position).getVideoUrl())) {
                 loadLink(position);
@@ -146,6 +146,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             }
 
             String videoUrl = mDataset.get(position).getVideoUrl();
+            int platformType = mDataset.get(position).getPlatformType();
             Intent intent = null;
             switch (platformType) {
 
@@ -170,9 +171,11 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             mContext.startActivity(intent);
         }
 
-        private void loadComments(int position, int platformType, int contentsType) {
+        private void loadComments(int position) {
 
-            // send status of asyncTasks
+            int platformType = mDataset.get(position).getPlatformType();
+
+            // send call 'load comment'
             Intent intent = new Intent(mContext.getString(R.string.comment_request));
             intent.putExtra("PLATFORM_TYPE", platformType);
             intent.putExtra("FEED_ID", mDataset.get(position).getFeedId());
@@ -198,9 +201,10 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 //            mContext.startActivity(intent);
         }
 
-        private void loadPageDetail(int position, int platformType) {
+        private void loadPageDetail(int position) {
 
             Intent intent = new Intent(mContext, PageDetailActivity.class);
+            int platformType = mDataset.get(position).getPlatformType();
             intent.putExtra("PLATFORM_TYPE", platformType);
 
             switch (platformType) {

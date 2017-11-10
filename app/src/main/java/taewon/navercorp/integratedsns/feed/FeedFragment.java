@@ -388,7 +388,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("limit", "25");
+        parameters.putString("limit", "10");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -455,7 +455,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         Bundle parameters = new Bundle();
         parameters.putString("fields", "link,created_time,message,full_picture,likes.limit(0).summary(true),comments.limit(0).summary(true),from{name, picture.height(2048){url}},attachments{subattachments},source");
-        parameters.putString("limit", "5");
+        parameters.putString("limit", "10");
         request.setParameters(parameters);
         request.executeAsync();
     }

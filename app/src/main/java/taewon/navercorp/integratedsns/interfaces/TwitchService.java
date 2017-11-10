@@ -35,5 +35,4 @@ public interface TwitchService {
     @GET("helix/streams")
     Call<TwitchStreamingData> getTwitchStreams(@Header("Client-ID") String clinetId,
                                                @Query("first") int count);
-
 }
