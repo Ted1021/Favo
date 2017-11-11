@@ -26,6 +26,7 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.profile.ProfileFragment;
 import taewon.navercorp.integratedsns.search.SearchFragment;
+import taewon.navercorp.integratedsns.today.TodayFragment;
 
 /**
  * @author 김태원
@@ -36,7 +37,7 @@ import taewon.navercorp.integratedsns.search.SearchFragment;
 
 public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
-    private Fragment[] mFragmentList;
+    private Fragment[] mFragmentList = new Fragment[MAX_FRAGMENT];
     private TabLayout mTabLayout;
     private FragmentManager mFragmentManager;
     private LinearLayout mTabStrip;
@@ -47,10 +48,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     public static GoogleApiClient mGoogleApiClient;
 
     // fragment index
-    private static final int TAB_FEED = 0;
-    private static final int TAB_SEARCH = 1;
-    private static final int TAB_PROFILE = 2;
-    private static final int MAX_FRAGMENT = 3;
+    private static final int TAB_TODAY = 0;
+    private static final int TAB_FEED = 1;
+    private static final int TAB_SEARCH = 2;
+    private static final int TAB_PROFILE = 3;
+    private static final int MAX_FRAGMENT = 4;
     private static final int TIME_LENGTH = 2000;
 
     @Override
@@ -91,8 +93,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void addFragmentOnTop() {
 
-        Fragment fragment = FeedFragment.newInstance();
-        mFragmentList[TAB_FEED] = fragment;
+        Fragment fragment = new TodayFragment();
+        mFragmentList[TAB_TODAY] = fragment;
         mFragmentManager.beginTransaction()
                 .add(R.id.layout_container, fragment)
                 .commit();
@@ -107,6 +109,13 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
                 Fragment fragment;
                 switch (tab.getPosition()) {
+
+                    case TAB_TODAY:
+                        if (mFragmentList[TAB_TODAY] == null) {
+                            fragment = new TodayFragment();
+                            mFragmentList[TAB_TODAY] = fragment;
+                        }
+                        break;
 
                     case TAB_FEED:
                         if (mFragmentList[TAB_FEED] == null) {
