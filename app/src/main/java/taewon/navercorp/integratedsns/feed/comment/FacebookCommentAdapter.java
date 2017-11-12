@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.comment.FacebookCommentData;
+import taewon.navercorp.integratedsns.model.facebook.FacebookCommentData;
 
 /**
  * Created by USER on 2017-10-18.
@@ -87,7 +87,6 @@ public class FacebookCommentAdapter extends RecyclerView.Adapter<FacebookComment
 
             mLike = (Button) itemView.findViewById(R.id.button_like);
             mComment = (Button) itemView.findViewById(R.id.button_comment);
-            mShare = (Button) itemView.findViewById(R.id.button_share);
         }
 
         private void initBodyView(View itemView) {

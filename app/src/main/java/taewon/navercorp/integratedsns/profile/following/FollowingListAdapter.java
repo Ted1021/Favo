@@ -18,7 +18,7 @@ import com.yayandroid.parallaxrecyclerview.ParallaxViewHolder;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.FollowingInfoData;
+import taewon.navercorp.integratedsns.model.favo.FavoFollowingInfoData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
@@ -32,7 +32,7 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE
 public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<FollowingInfoData> mDataset = new ArrayList<>();
+    private ArrayList<FavoFollowingInfoData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
     public FollowingListAdapter(Context context, ArrayList dataset) {
@@ -114,7 +114,7 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        FollowingInfoData data = mDataset.get(position);
+        FavoFollowingInfoData data = mDataset.get(position);
 
         holder.mUserName.setText(data.getUserName());
         holder.getBackgroundImage().setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);

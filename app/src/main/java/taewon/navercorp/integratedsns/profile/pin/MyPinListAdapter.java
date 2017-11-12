@@ -20,7 +20,7 @@ import com.bumptech.glide.request.RequestOptions;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
+import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_MULTI_IMAGE;

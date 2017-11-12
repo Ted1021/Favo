@@ -34,10 +34,10 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.TwitchUserData;
-import taewon.navercorp.integratedsns.model.page.FacebookPageInfoData;
-import taewon.navercorp.integratedsns.model.page.FavoPageInfoData;
-import taewon.navercorp.integratedsns.model.page.YoutubeChannelInfoData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
+import taewon.navercorp.integratedsns.model.facebook.FacebookPageInfoData;
+import taewon.navercorp.integratedsns.model.favo.FavoPageInfoData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelInfoData;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;

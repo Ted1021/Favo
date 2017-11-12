@@ -15,7 +15,7 @@ import com.bumptech.glide.request.RequestOptions;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.comment.FavoCommentData;
+import taewon.navercorp.integratedsns.model.favo.FavoCommentData;
 
 /**
  * Created by USER on 2017-11-10.

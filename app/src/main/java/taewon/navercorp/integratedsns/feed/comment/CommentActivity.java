@@ -27,10 +27,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.comment.FacebookCommentData;
-import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
-import taewon.navercorp.integratedsns.model.comment.YoutubePostCommentData;
-import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
+import taewon.navercorp.integratedsns.model.facebook.FacebookCommentData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubePostCommentData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;

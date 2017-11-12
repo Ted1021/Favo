@@ -26,9 +26,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.page.FacebookPageVideoData;
-import taewon.navercorp.integratedsns.model.page.FavoPageVideoData;
-import taewon.navercorp.integratedsns.model.page.YoutubeChannelPlaylistData;
+import taewon.navercorp.integratedsns.model.facebook.FacebookPageVideoData;
+import taewon.navercorp.integratedsns.model.favo.FavoPageVideoData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelPlaylistData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;

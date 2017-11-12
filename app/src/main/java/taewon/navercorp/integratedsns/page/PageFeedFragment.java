@@ -32,10 +32,10 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedListAdapter;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
-import taewon.navercorp.integratedsns.model.feed.facebook.FacebookFeedData;
-import taewon.navercorp.integratedsns.model.feed.twitch.TwitchVideoData;
-import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
+import taewon.navercorp.integratedsns.model.facebook.FacebookFeedData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;

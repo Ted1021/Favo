@@ -16,8 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.comment.YoutubeCommentData;
-import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 
 /**
  * Created by USER on 2017-10-20.
@@ -82,7 +82,6 @@ public class YoutubeCommentAdapter extends RecyclerView.Adapter<YoutubeCommentAd
 
             mLike = (Button) itemView.findViewById(R.id.button_like);
             mComment = (Button) itemView.findViewById(R.id.button_comment);
-            mShare = (Button) itemView.findViewById(R.id.button_share);
         }
 
         private void initBodyView(View itemView) {

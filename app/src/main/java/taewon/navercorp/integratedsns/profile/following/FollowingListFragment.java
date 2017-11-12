@@ -44,8 +44,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.FollowingInfoData;
-import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.model.favo.FavoFollowingInfoData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -70,7 +70,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
 
-    private ArrayList<FollowingInfoData> mDataset = new ArrayList<>();
+    private ArrayList<FavoFollowingInfoData> mDataset = new ArrayList<>();
 
     private String mFacebookToken;
     private String mGoogleToken;
@@ -211,7 +211,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
                                 for (int i = 0; i < results.length(); i++) {
                                     pageInfo = results.getJSONObject(i);
-                                    FollowingInfoData data = new FollowingInfoData();
+                                    FavoFollowingInfoData data = new FavoFollowingInfoData();
 
                                     data.setUserName(pageInfo.getString("name"));
                                     data.setProfile(pageInfo.getJSONObject("picture").getJSONObject("data").getString("url"));
@@ -261,7 +261,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
                 if (response.isSuccessful()) {
 
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
-                        FollowingInfoData data = new FollowingInfoData();
+                        FavoFollowingInfoData data = new FavoFollowingInfoData();
 
                         data.setUserName(item.getSnippet().getTitle());
                         data.setProfile(item.getSnippet().getThumbnails().getHigh().getUrl());
@@ -300,7 +300,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
                 for (PDKBoard board : response.getBoardList()) {
 
-                    FollowingInfoData data = new FollowingInfoData();
+                    FavoFollowingInfoData data = new FavoFollowingInfoData();
 
                     data.setUserName(board.getName());
                     data.setProfile(board.getImageUrl());

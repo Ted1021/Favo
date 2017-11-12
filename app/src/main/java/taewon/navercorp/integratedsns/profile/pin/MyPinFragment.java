@@ -14,7 +14,7 @@ import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
+import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 
 /**
  * A simple {@link Fragment} subclass.
