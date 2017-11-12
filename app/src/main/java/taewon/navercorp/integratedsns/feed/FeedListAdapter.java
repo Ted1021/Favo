@@ -315,7 +315,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 .into(holder.mProfile);
 
         Glide.with(mContext.getApplicationContext()).load(data.getPicture())
+                .apply(new RequestOptions().override(864, 486))
                 .apply(new RequestOptions().centerCrop())
+//                .thumbnail(0.5f)
                 .transition(new DrawableTransitionOptions().crossFade())
                 .into(holder.mPicture);
 

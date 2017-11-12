@@ -22,9 +22,8 @@ public class AppController extends Application {
     public static final int PLATFORM_GIPHY = 4;
     public static final int PLATFORM_TWITCH = 5;
 
-    public static final String GIPHY_BASE_URL = "api.giphy.com";
+    public static final String GIPHY_BASE_URL = "https://api.giphy.com/";
     public static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
-
     public static final String TWITCH_BASE_URL = "https://api.twitch.tv/";
     public static final String TWITCH_REDIRECT_URL = "http://174.138.18.90/message";
 

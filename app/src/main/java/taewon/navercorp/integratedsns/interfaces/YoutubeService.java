@@ -34,7 +34,9 @@ public interface YoutubeService {
                                               @Query("maxResults") int maxResults,
                                               @Query("channelId") String channelId,
                                               @Query("order") String order,
-                                              @Query("type") String type);
+                                              @Query("type") String type,
+                                              @Query("chart") String chart,
+                                              @Query("regionCode") String regionCode);
 
     @GET("youtube/v3/commentThreads")
     Call<YoutubeCommentData> getCommentList(@Header("Authorization") String auth,

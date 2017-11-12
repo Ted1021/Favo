@@ -188,11 +188,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     public void onBackPressed() {
 
-        if (mTabLayout.getTabAt(TAB_FEED) != null) {
-            if (mTabLayout.getTabAt(TAB_FEED).isSelected()) {
+        if (mTabLayout.getTabAt(TAB_TODAY) != null) {
+            if (mTabLayout.getTabAt(TAB_TODAY).isSelected()) {
                 alertClosingApp();
             } else {
-                mTabLayout.getTabAt(TAB_FEED).select();
+                mTabLayout.getTabAt(TAB_TODAY).select();
             }
         }
     }
