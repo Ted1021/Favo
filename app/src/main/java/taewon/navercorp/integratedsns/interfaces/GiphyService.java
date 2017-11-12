@@ -3,7 +3,7 @@ package taewon.navercorp.integratedsns.interfaces;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import taewon.navercorp.integratedsns.model.GiphyImageData;
+import taewon.navercorp.integratedsns.model.giphy.GiphyImageData;
 
 /**
  * Created by USER on 2017-11-01.

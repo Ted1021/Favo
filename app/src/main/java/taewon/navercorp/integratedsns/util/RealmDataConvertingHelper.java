@@ -2,8 +2,8 @@ package taewon.navercorp.integratedsns.util;
 
 import com.google.gson.Gson;
 
-import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
-import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
+import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 
 /**
  * Created by USER on 2017-10-30.

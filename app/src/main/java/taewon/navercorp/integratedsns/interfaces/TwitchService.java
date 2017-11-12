@@ -5,10 +5,10 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Query;
-import taewon.navercorp.integratedsns.model.TwitchStreamingData;
-import taewon.navercorp.integratedsns.model.TwitchUserData;
-import taewon.navercorp.integratedsns.model.feed.twitch.TwitchFollowingData;
-import taewon.navercorp.integratedsns.model.feed.twitch.TwitchVideoData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
 
 public interface TwitchService {
 
