@@ -27,17 +27,16 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.GiphyService;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.GiphyImageData;
-import taewon.navercorp.integratedsns.model.TwitchStreamingData;
-import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
-import taewon.navercorp.integratedsns.model.feed.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
+import taewon.navercorp.integratedsns.model.giphy.GiphyImageData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.R.id.viewPager;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.GIPHY_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
-import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_GIPHY;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
@@ -91,8 +90,12 @@ public class PlatformFragment extends Fragment {
         if (getArguments() != null) {
             mPlatformType = getArguments().getInt(ARG_PARAM1);
         }
+
         initView(view);
-        initData(mPlatformType);
+        if (isInit) {
+            initData(mPlatformType);
+        }
+
 
         return view;
     }
@@ -127,10 +130,6 @@ public class PlatformFragment extends Fragment {
             case PLATFORM_TWITCH:
                 getTwitchTopStreaming();
                 mPlatformName.setText("TWITCH");
-
-                break;
-
-            case PLATFORM_GIPHY:
 
                 break;
         }
@@ -208,7 +207,7 @@ public class PlatformFragment extends Fragment {
             @Override
             public void onResponse(Call<GiphyImageData> call, Response<GiphyImageData> response) {
 
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     for (GiphyImageData.Info result : response.body().getData()) {
 
                         Date date = null;
@@ -317,7 +316,7 @@ public class PlatformFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 5;
+            return MAX_COUNTS;
         }
     }
 }

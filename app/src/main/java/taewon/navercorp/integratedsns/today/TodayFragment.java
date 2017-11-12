@@ -18,7 +18,6 @@ import taewon.navercorp.integratedsns.R;
 
 import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
-import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
@@ -59,7 +58,7 @@ public class TodayFragment extends Fragment {
 
         String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
         String googleToken = mPref.getString(getString(R.string.google_token), "");
-        String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
+//        String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
         String twitchToken = mPref.getString(getString(R.string.twitch_token), "");
 
         if (!facebookToken.equals("")) {
@@ -70,9 +69,9 @@ public class TodayFragment extends Fragment {
             mPlatformList.add(PLATFORM_YOUTUBE);
         }
 
-        if (!pinterestToken.equals("")) {
-            mPlatformList.add(PLATFORM_PINTEREST);
-        }
+//        if (!pinterestToken.equals("")) {
+//            mPlatformList.add(PLATFORM_PINTEREST);
+//        }
 
         if (!twitchToken.equals("")) {
             mPlatformList.add(PLATFORM_TWITCH);

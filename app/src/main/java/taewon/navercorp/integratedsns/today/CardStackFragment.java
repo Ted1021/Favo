@@ -17,7 +17,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -78,7 +78,7 @@ public class CardStackFragment extends Fragment implements View.OnClickListener{
         mProfile = (ImageView) view.findViewById(R.id.imageView_profile);
         mPlatformType = (ImageView) view.findViewById(R.id.imageView_platformType);
         mPicture = (ImageView) view.findViewById(R.id.imageView_picture);
-        mPicture.setOnClickListener(this);
+//        mPicture.setOnClickListener(this);
         mComment = (TextView) view.findViewById(R.id.textView_comment);
         mComment.setOnClickListener(this);
         mPageDetail = (FrameLayout) view.findViewById(R.id.layout_page_detail);
