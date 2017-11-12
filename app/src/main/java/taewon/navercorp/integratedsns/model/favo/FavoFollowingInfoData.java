@@ -1,10 +1,10 @@
-package taewon.navercorp.integratedsns.model;
+package taewon.navercorp.integratedsns.model.favo;
 
 /**
  * Created by USER on 2017-10-25.
  */
 
-public class FollowingInfoData {
+public class FavoFollowingInfoData {
 
     private String _id;
     private String userName;

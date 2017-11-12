@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.model.feed.facebook;
+package taewon.navercorp.integratedsns.model.facebook;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 
 /**
  * @author 김태원

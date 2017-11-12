@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.model.page;
+package taewon.navercorp.integratedsns.model.favo;
 
 /**
  * Created by tedkim on 2017. 10. 29..

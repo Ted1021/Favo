@@ -1,27 +1,35 @@
-package taewon.navercorp.integratedsns.model.page;
+package taewon.navercorp.integratedsns.model.youtube;
 
+import com.google.api.services.youtube.model.ResourceId;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by tedkim on 2017. 10. 22..
+ * @author 김태원
+ * @file YoutubeFeedData.java
+ * @brief model class for youtube
+ * @date 2017.10.07
  */
 
-public class YoutubeChannelPlaylistData {
+public class YoutubeSubscriptionData {
 
     @SerializedName("kind")
+    @Expose
     private String kind;
     @SerializedName("etag")
+    @Expose
     private String etag;
     @SerializedName("nextPageToken")
+    @Expose
     private String nextPageToken;
     @SerializedName("pageInfo")
+    @Expose
     private PageInfo pageInfo;
     @SerializedName("items")
-    private List<Item> items = new ArrayList<Item>();
+    @Expose
+    private List<Item> items = null;
 
     public String getKind() {
         return kind;
@@ -66,14 +74,19 @@ public class YoutubeChannelPlaylistData {
     public class Item {
 
         @SerializedName("kind")
+        @Expose
         private String kind;
         @SerializedName("etag")
+        @Expose
         private String etag;
         @SerializedName("id")
+        @Expose
         private String id;
         @SerializedName("snippet")
+        @Expose
         private Snippet snippet;
         @SerializedName("contentDetails")
+        @Expose
         private ContentDetails contentDetails;
 
         public String getKind() {
@@ -116,41 +129,26 @@ public class YoutubeChannelPlaylistData {
             this.contentDetails = contentDetails;
         }
 
-        public class ContentDetails {
-
-            @SerializedName("itemCount")
-            private Integer itemCount;
-
-            public Integer getItemCount() {
-                return itemCount;
-            }
-
-            public void setItemCount(Integer itemCount) {
-                this.itemCount = itemCount;
-            }
-
-        }
-
         public class Snippet {
 
             @SerializedName("publishedAt")
             @Expose
             private String publishedAt;
-            @SerializedName("channelId")
-            @Expose
-            private String channelId;
             @SerializedName("title")
             @Expose
             private String title;
             @SerializedName("description")
             @Expose
             private String description;
+            @SerializedName("resourceId")
+            @Expose
+            private ResourceId resourceId;
+            @SerializedName("channelId")
+            @Expose
+            private String channelId;
             @SerializedName("thumbnails")
             @Expose
             private Thumbnails thumbnails;
-            @SerializedName("channelTitle")
-            @Expose
-            private String channelTitle;
 
             public String getPublishedAt() {
                 return publishedAt;
@@ -158,14 +156,6 @@ public class YoutubeChannelPlaylistData {
 
             public void setPublishedAt(String publishedAt) {
                 this.publishedAt = publishedAt;
-            }
-
-            public String getChannelId() {
-                return channelId;
-            }
-
-            public void setChannelId(String channelId) {
-                this.channelId = channelId;
             }
 
             public String getTitle() {
@@ -184,6 +174,22 @@ public class YoutubeChannelPlaylistData {
                 this.description = description;
             }
 
+            public ResourceId getResourceId() {
+                return resourceId;
+            }
+
+            public void setResourceId(ResourceId resourceId) {
+                this.resourceId = resourceId;
+            }
+
+            public String getChannelId() {
+                return channelId;
+            }
+
+            public void setChannelId(String channelId) {
+                this.channelId = channelId;
+            }
+
             public Thumbnails getThumbnails() {
                 return thumbnails;
             }
@@ -192,20 +198,33 @@ public class YoutubeChannelPlaylistData {
                 this.thumbnails = thumbnails;
             }
 
-            public String getChannelTitle() {
-                return channelTitle;
-            }
-
-            public void setChannelTitle(String channelTitle) {
-                this.channelTitle = channelTitle;
-            }
-
             public class Thumbnails {
 
+                @SerializedName("default")
+                @Expose
+                private Default _default;
+                @SerializedName("medium")
+                @Expose
+                private Medium medium;
                 @SerializedName("high")
+                @Expose
                 private High high;
-                @SerializedName("standard")
-                private Standard standard;
+
+                public Default getDefault() {
+                    return _default;
+                }
+
+                public void setDefault(Default _default) {
+                    this._default = _default;
+                }
+
+                public Medium getMedium() {
+                    return medium;
+                }
+
+                public void setMedium(Medium medium) {
+                    this.medium = medium;
+                }
 
                 public High getHigh() {
                     return high;
@@ -215,22 +234,11 @@ public class YoutubeChannelPlaylistData {
                     this.high = high;
                 }
 
-                public Standard getStandard() {
-                    return standard;
-                }
-
-                public void setStandard(Standard standard) {
-                    this.standard = standard;
-                }
-
-                public class Standard {
+                public class Default {
 
                     @SerializedName("url")
+                    @Expose
                     private String url;
-                    @SerializedName("width")
-                    private Integer width;
-                    @SerializedName("height")
-                    private Integer height;
 
                     public String getUrl() {
                         return url;
@@ -238,22 +246,6 @@ public class YoutubeChannelPlaylistData {
 
                     public void setUrl(String url) {
                         this.url = url;
-                    }
-
-                    public Integer getWidth() {
-                        return width;
-                    }
-
-                    public void setWidth(Integer width) {
-                        this.width = width;
-                    }
-
-                    public Integer getHeight() {
-                        return height;
-                    }
-
-                    public void setHeight(Integer height) {
-                        this.height = height;
                     }
 
                 }
@@ -261,11 +253,8 @@ public class YoutubeChannelPlaylistData {
                 public class High {
 
                     @SerializedName("url")
+                    @Expose
                     private String url;
-                    @SerializedName("width")
-                    private Integer width;
-                    @SerializedName("height")
-                    private Integer height;
 
                     public String getUrl() {
                         return url;
@@ -275,35 +264,70 @@ public class YoutubeChannelPlaylistData {
                         this.url = url;
                     }
 
-                    public Integer getWidth() {
-                        return width;
-                    }
-
-                    public void setWidth(Integer width) {
-                        this.width = width;
-                    }
-
-                    public Integer getHeight() {
-                        return height;
-                    }
-
-                    public void setHeight(Integer height) {
-                        this.height = height;
-                    }
-
                 }
 
-            }
+                public class Medium {
 
+                    @SerializedName("url")
+                    @Expose
+                    private String url;
+
+                    public String getUrl() {
+                        return url;
+                    }
+
+                    public void setUrl(String url) {
+                        this.url = url;
+                    }
+                }
+            }
         }
 
+        public class ContentDetails {
+
+            @SerializedName("totalItemCount")
+            @Expose
+            private Integer totalItemCount;
+            @SerializedName("newItemCount")
+            @Expose
+            private Integer newItemCount;
+            @SerializedName("activityType")
+            @Expose
+            private String activityType;
+
+            public Integer getTotalItemCount() {
+                return totalItemCount;
+            }
+
+            public void setTotalItemCount(Integer totalItemCount) {
+                this.totalItemCount = totalItemCount;
+            }
+
+            public Integer getNewItemCount() {
+                return newItemCount;
+            }
+
+            public void setNewItemCount(Integer newItemCount) {
+                this.newItemCount = newItemCount;
+            }
+
+            public String getActivityType() {
+                return activityType;
+            }
+
+            public void setActivityType(String activityType) {
+                this.activityType = activityType;
+            }
+        }
     }
 
     public class PageInfo {
 
         @SerializedName("totalResults")
+        @Expose
         private Integer totalResults;
         @SerializedName("resultsPerPage")
+        @Expose
         private Integer resultsPerPage;
 
         public Integer getTotalResults() {
@@ -321,8 +345,5 @@ public class YoutubeChannelPlaylistData {
         public void setResultsPerPage(Integer resultsPerPage) {
             this.resultsPerPage = resultsPerPage;
         }
-
     }
-
-
 }

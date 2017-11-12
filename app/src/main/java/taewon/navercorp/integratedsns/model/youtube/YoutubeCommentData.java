@@ -1,9 +1,11 @@
-package taewon.navercorp.integratedsns.model.comment;
+package taewon.navercorp.integratedsns.model.youtube;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+
+import taewon.navercorp.integratedsns.model.favo.FavoCommentData;
 
 /**
  * Created by USER on 2017-10-19.

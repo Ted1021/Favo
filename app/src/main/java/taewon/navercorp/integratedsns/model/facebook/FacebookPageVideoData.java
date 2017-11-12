@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.model.page;
+package taewon.navercorp.integratedsns.model.facebook;
 
 import com.google.gson.annotations.SerializedName;
 

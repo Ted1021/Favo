@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.model.feed.twitch;
+package taewon.navercorp.integratedsns.model.twitch;
 
 import com.google.gson.annotations.SerializedName;
 

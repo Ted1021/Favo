@@ -26,8 +26,8 @@ import java.util.Vector;
 
 import io.realm.Realm;
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.feed.FavoFeedData;
-import taewon.navercorp.integratedsns.model.feed.FavoMyPinData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
+import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
 import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;

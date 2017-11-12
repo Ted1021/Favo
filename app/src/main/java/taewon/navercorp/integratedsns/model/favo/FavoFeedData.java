@@ -1,18 +1,15 @@
-package taewon.navercorp.integratedsns.model.feed;
+package taewon.navercorp.integratedsns.model.favo;
 
+import java.io.Serializable;
 import java.util.Date;
 
-import io.realm.RealmObject;
-import io.realm.annotations.Ignore;
-import io.realm.annotations.PrimaryKey;
-
 /**
- * Created by USER on 2017-10-30.
+ * Created by tedkim on 2017. 10. 15..
  */
 
-public class FavoMyPinData extends RealmObject {
+@SuppressWarnings("serial")
+public class FavoFeedData implements Serializable{
 
-    @PrimaryKey
     private String feedId;
     private int platformType;
     private int contentsType;
@@ -25,10 +22,10 @@ public class FavoMyPinData extends RealmObject {
     private String link;
     private String videoUrl;
     private String description;
-    @Ignore
     private String[] subattachments;
     private int likeCount;
     private int commentCount;
+    private String nextCursor, beforeCursor;
 
     public int getPlatformType() {
         return platformType;
@@ -156,5 +153,21 @@ public class FavoMyPinData extends RealmObject {
 
     public void setSubattachments(String[] subattachments) {
         this.subattachments = subattachments;
+    }
+
+    public String getNextCursor() {
+        return nextCursor;
+    }
+
+    public void setNextCursor(String nextCursor) {
+        this.nextCursor = nextCursor;
+    }
+
+    public String getBeforeCursor() {
+        return beforeCursor;
+    }
+
+    public void setBeforeCursor(String beforeCursor) {
+        this.beforeCursor = beforeCursor;
     }
 }
