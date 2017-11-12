@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:background="@color/darkGray"
     android:orientation="vertical"
-    android:padding="24dp"
     tools:context="taewon.navercorp.integratedsns.search.SearchFragment">
 
 
@@ -12,16 +11,21 @@
         android:id="@+id/textView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginTop="24dp"
         android:text="Search"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@android:color/white"
-        android:textSize="40sp"
+        android:textSize="48sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
         android:text="Search everything here"
         android:textColor="@color/lightGray" />
 
@@ -29,7 +33,7 @@
         android:id="@+id/editText_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_margin="24dp"
         android:background="@drawable/shape_search_edit"
         android:ems="10"
         android:inputType="textPersonName"
@@ -37,8 +41,9 @@
         android:paddingRight="16dp"
         android:textColor="@android:color/white" />
 
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/searchList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"></LinearLayout>
+        android:layout_height="match_parent" />
+
 </LinearLayout>
