@@ -1,3 +1,4 @@
+
 <resources>
     <string name="app_name">Favo</string>
 
@@ -19,8 +20,8 @@
     <string name="band_client_secret">LRGkEU_Pm8ixZk7Y9348Z2X2ylve2L5M</string>
 
     <string name="twitch_token">twitch_token</string>
-    <string name="twitch_client_id">zwdk9ea1iu6y2o7lryazf8mq7zdx0k</string>
-    <string name="twitch_client_secret">sq6f3h9b7ndpx87cj321u2k8lk7cej</string>
+    <string name="twitch_client_id">4n0mf4u10svjmioh7us0yxcw1wng56</string>
+    <string name="twitch_client_secret">9wqgigujqzys0cnxpjdere8yk099rz</string>
 
     <string name="giphy_api_key">yfEUjOH0kmWK01krPXrhn2dgrs3n6CYB</string>
 

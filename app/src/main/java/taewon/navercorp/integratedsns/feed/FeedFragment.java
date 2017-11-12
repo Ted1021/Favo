@@ -38,8 +38,6 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
@@ -54,7 +52,6 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.comment.CommentListAdapter;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.TwitchStreamingData;
 import taewon.navercorp.integratedsns.model.TwitchUserData;
 import taewon.navercorp.integratedsns.model.comment.FacebookCommentData;
 import taewon.navercorp.integratedsns.model.comment.FavoCommentData;
@@ -136,7 +133,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     @Override
-    public void onDestroyView() {
+    public void onDestroy() {
 
         // close Realm Instance
         mRealm.close();
@@ -146,7 +143,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mAsyncFinishReceiver);
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mScrollToTopReceiver);
 
-        super.onDestroyView();
+        super.onDestroy();
     }
 
     @Override
@@ -295,18 +292,18 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }
 
         if (!twitchToken.equals("")) {
-            getTwitchFollowingList();
+            getTwitchUserInfo();
         }
     }
 
     private void refreshDataset() {
 
-        Collections.sort(mFeedDataset, new Comparator<FavoFeedData>() {
-            @Override
-            public int compare(FavoFeedData o1, FavoFeedData o2) {
-                return o2.getPubDate().compareTo(o1.getPubDate());
-            }
-        });
+//        Collections.sort(mFeedDataset, new Comparator<FavoFeedData>() {
+//            @Override
+//            public int compare(FavoFeedData o1, FavoFeedData o2) {
+//                return o2.getPubDate().compareTo(o1.getPubDate());
+//            }
+//        });
 
         mFeedAdapter.notifyDataSetChanged();
         if (mLastPosition > mFeedDataset.size() - 1) {
@@ -455,7 +452,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         Bundle parameters = new Bundle();
         parameters.putString("fields", "link,created_time,message,full_picture,likes.limit(0).summary(true),comments.limit(0).summary(true),from{name, picture.height(2048){url}},attachments{subattachments},source");
-        parameters.putString("limit", "10");
+        parameters.putString("limit", "1");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -492,24 +489,41 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 public void onSuccess(PDKResponse response) {
                     super.onSuccess(response);
 
-                    for (PDKPin pin : response.getPinList()) {
+                    PDKPin pin = response.getPinList().get(0);
 
-                        FavoFeedData data = new FavoFeedData();
+                    FavoFeedData data = new FavoFeedData();
 
-                        data.setPlatformType(PLATFORM_PINTEREST);
-                        data.setContentsType(CONTENTS_IMAGE);
-                        data.setPubDate(pin.getCreatedAt());
+                    data.setPlatformType(PLATFORM_PINTEREST);
+                    data.setContentsType(CONTENTS_IMAGE);
+                    data.setPubDate(pin.getCreatedAt());
 
-                        data.setFeedId(pin.getUid());
-                        data.setProfileImage(pin.getImageUrl());
-                        data.setUserName(pin.getUid());
-                        data.setCreatedTime(mStringFormat.format(pin.getCreatedAt()));
-                        data.setPicture(pin.getImageUrl());
-                        data.setLink(pin.getLink());
-                        data.setDescription(pin.getNote());
+                    data.setFeedId(pin.getUid());
+                    data.setProfileImage(pin.getImageUrl());
+                    data.setUserName(pin.getUid());
+                    data.setCreatedTime(mStringFormat.format(pin.getCreatedAt()));
+                    data.setPicture(pin.getImageUrl());
+                    data.setLink(pin.getLink());
+                    data.setDescription(pin.getNote());
 
-                        mFeedDataset.add(data);
-                    }
+                    mFeedDataset.add(data);
+//                    for (PDKPin pin : response.getPinList()) {
+//
+//                        FavoFeedData data = new FavoFeedData();
+//
+//                        data.setPlatformType(PLATFORM_PINTEREST);
+//                        data.setContentsType(CONTENTS_IMAGE);
+//                        data.setPubDate(pin.getCreatedAt());
+//
+//                        data.setFeedId(pin.getUid());
+//                        data.setProfileImage(pin.getImageUrl());
+//                        data.setUserName(pin.getUid());
+//                        data.setCreatedTime(mStringFormat.format(pin.getCreatedAt()));
+//                        data.setPicture(pin.getImageUrl());
+//                        data.setLink(pin.getLink());
+//                        data.setDescription(pin.getNote());
+//
+//                        mFeedDataset.add(data);
+//                    }
 
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
@@ -600,7 +614,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     .build();
 
             YoutubeService service = retrofit.create(YoutubeService.class);
-            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, params[0], "date", "video", null, null);
+            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 1, params[0], "date", "video", null, null);
             call.enqueue(new Callback<YoutubeSearchVideoData>() {
                 @Override
                 public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
@@ -661,8 +675,36 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }
     }
 
+    private void getTwitchUserInfo() {
+
+        String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), "");
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
+
+        Call<TwitchUserData> call = service.getTwitchUserInfo(getString(R.string.twitch_client_id), currentToken, null);
+        call.enqueue(new Callback<TwitchUserData>() {
+            @Override
+            public void onResponse(Call<TwitchUserData> call, Response<TwitchUserData> response) {
+                if (response.isSuccessful()) {
+                    getTwitchFollowingList(response.body().getData().get(0).getId());
+                } else {
+                    Log.e("ERROR_TWITCH", "Feed Fragment >>>>> " + response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TwitchUserData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to get user ");
+            }
+        });
+    }
+
     // call twitch api
-    private void getTwitchFollowingList() {
+    private void getTwitchFollowingList(String userId) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
@@ -670,7 +712,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
 
-        Call<TwitchFollowingData> call = service.getTwitchFollowingInfo(getString(R.string.twitch_client_id), "102859695");
+        Call<TwitchFollowingData> call = service.getTwitchFollowingInfo(getString(R.string.twitch_client_id), userId, MAX_COUNTS);
         call.enqueue(new Callback<TwitchFollowingData>() {
             @Override
             public void onResponse(Call<TwitchFollowingData> call, Response<TwitchFollowingData> response) {
@@ -693,7 +735,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void getTwitchStreamerInfo(String userId) {
 
-        String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), "");
+        String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), userId);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -727,7 +769,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
 
-        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), userId);
+        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), userId, 1);
         call.enqueue(new Callback<TwitchVideoData>() {
             @Override
             public void onResponse(Call<TwitchVideoData> call, Response<TwitchVideoData> response) {
@@ -766,60 +808,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
             @Override
             public void onFailure(Call<TwitchVideoData> call, Throwable t) {
-                Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login ");
-                t.printStackTrace();
-            }
-        });
-    }
-
-    private void getTwitchStreams(final String profileUrl, final String userName) {
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(TWITCH_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        TwitchService service = retrofit.create(TwitchService.class);
-        Call<TwitchStreamingData> call = service.getTwitchStreams(getString(R.string.twitch_client_id), 20);
-        call.enqueue(new Callback<TwitchStreamingData>() {
-            @Override
-            public void onResponse(Call<TwitchStreamingData> call, Response<TwitchStreamingData> response) {
-                if (response.isSuccessful()) {
-
-                    for (TwitchStreamingData.StreamInfo result : response.body().getData()) {
-
-                        FavoFeedData data = new FavoFeedData();
-
-                        try {
-                            data.setPubDate(mDateFormat.parse(result.getStartedAt()));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-
-                        data.setFeedId(result.getId());
-                        data.setPlatformType(PLATFORM_TWITCH);
-                        data.setContentsType(CONTENTS_VIDEO);
-                        data.setPageId(result.getUserId());
-                        data.setProfileImage(profileUrl);
-                        data.setUserName(userName);
-                        data.setCreatedTime(mStringFormat.format(data.getPubDate()));
-                        int position = result.getThumbnailUrl().indexOf("{width}");
-                        String thumbnail = result.getThumbnailUrl().substring(0, position) + "1280x720.jpg";
-                        data.setPicture(thumbnail);
-                        data.setVideoUrl(result.getId());
-                        data.setDescription(result.getTitle());
-
-                        mFeedDataset.add(data);
-                    }
-                    mFeedAdapter.notifyDataSetChanged();
-
-                } else {
-                    Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login // " + response.raw().toString());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<TwitchStreamingData> call, Throwable t) {
                 Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login ");
                 t.printStackTrace();
             }

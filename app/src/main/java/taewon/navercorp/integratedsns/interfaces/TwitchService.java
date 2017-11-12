@@ -26,11 +26,13 @@ public interface TwitchService {
 
     @GET("helix/users/follows")
     Call<TwitchFollowingData> getTwitchFollowingInfo(@Header("Client-ID") String clientId,
-                                                     @Query("from_id") String id);
+                                                     @Query("from_id") String id,
+                                                     @Query("first") int limit);
 
     @GET("helix/videos")
     Call<TwitchVideoData> getTwitchVideoInfo(@Header("Client-ID") String clientId,
-                                             @Query("user_id") String userId);
+                                             @Query("user_id") String userId,
+                                             @Query("first") int limit);
 
     @GET("helix/streams")
     Call<TwitchStreamingData> getTwitchStreams(@Header("Client-ID") String clinetId,

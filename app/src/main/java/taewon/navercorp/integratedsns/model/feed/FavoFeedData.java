@@ -25,6 +25,7 @@ public class FavoFeedData implements Serializable{
     private String[] subattachments;
     private int likeCount;
     private int commentCount;
+    private String nextCursor, beforeCursor;
 
     public int getPlatformType() {
         return platformType;
@@ -152,5 +153,21 @@ public class FavoFeedData implements Serializable{
 
     public void setSubattachments(String[] subattachments) {
         this.subattachments = subattachments;
+    }
+
+    public String getNextCursor() {
+        return nextCursor;
+    }
+
+    public void setNextCursor(String nextCursor) {
+        this.nextCursor = nextCursor;
+    }
+
+    public String getBeforeCursor() {
+        return beforeCursor;
+    }
+
+    public void setBeforeCursor(String beforeCursor) {
+        this.beforeCursor = beforeCursor;
     }
 }

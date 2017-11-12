@@ -281,7 +281,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
 
-        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), mPageId);
+        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), mPageId, 1);
         call.enqueue(new Callback<TwitchVideoData>() {
             @Override
             public void onResponse(Call<TwitchVideoData> call, Response<TwitchVideoData> response) {
