@@ -10,10 +10,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
+
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
+
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 /**
  * Created by tedkim on 2017. 11. 12..
@@ -35,7 +44,7 @@ public class SearchPageListAdapter extends RecyclerView.Adapter<SearchPageListAd
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         // common components
-        private TextView mUserName, mUploadTime, mComment;
+        private TextView mUserName, mAbout, mComment;
         private ImageView mProfile, mPlatformType;
         private FrameLayout mPageDetail;
         private LinearLayout mCommentDetail;
@@ -45,7 +54,7 @@ public class SearchPageListAdapter extends RecyclerView.Adapter<SearchPageListAd
             super(itemView);
 
             mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
-            mUploadTime = (TextView) itemView.findViewById(R.id.textView_uploadTime);
+            mAbout = (TextView) itemView.findViewById(R.id.textView_about);
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
             mComment = (TextView) itemView.findViewById(R.id.textView_comment);
@@ -65,7 +74,33 @@ public class SearchPageListAdapter extends RecyclerView.Adapter<SearchPageListAd
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
+        FavoSearchResultData data = mDataset.get(position);
 
+        holder.mUserName.setText(data.getUserName());
+        holder.mAbout.setText(data.getDescription());
+        Glide.with(mContext.getApplicationContext()).load(data.getProfileImage())
+                .apply(new RequestOptions().circleCropTransform())
+                .transition(new DrawableTransitionOptions().crossFade())
+                .into(holder.mProfile);
+
+        switch (data.getPlatformType()) {
+
+            case PLATFORM_FACEBOOK:
+                Glide.with(mContext).load(R.drawable.icon_facebook_small).into(holder.mPlatformType);
+                break;
+
+            case PLATFORM_YOUTUBE:
+                Glide.with(mContext).load(R.drawable.icon_youtube_small).into(holder.mPlatformType);
+                break;
+
+            case PLATFORM_PINTEREST:
+                Glide.with(mContext).load(R.drawable.icon_pinterest_small).into(holder.mPlatformType);
+                break;
+
+            case PLATFORM_TWITCH:
+                Glide.with(mContext).load(R.drawable.twitch_icon_small).into(holder.mPlatformType);
+                break;
+        }
     }
 
     @Override

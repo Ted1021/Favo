@@ -69,7 +69,7 @@ public class SearchResultLayout extends LinearLayout {
             case RESULT_PAGE:
                 mTitle.setText("Page & Channel");
                 mAdapter = new SearchPageListAdapter(context, dataset);
-                mLayoutManager = new GridLayoutManager(context, 3, GridLayoutManager.HORIZONTAL, false);
+                mLayoutManager = new GridLayoutManager(context, 3, GridLayoutManager.HORIZONTAL, true);
                 mLayoutManager.scrollToPosition(dataset.size()-1);
                 break;
 
@@ -82,7 +82,7 @@ public class SearchResultLayout extends LinearLayout {
             case RESULT_PHOTO:
                 mTitle.setText("Photo");
                 mAdapter = new SearchPhotoListAdapter(context, dataset);
-                mLayoutManager = new GridLayoutManager(context, 2, GridLayoutManager.HORIZONTAL, false);
+                mLayoutManager = new GridLayoutManager(context, 2, GridLayoutManager.HORIZONTAL, true);
                 break;
         }
 
@@ -95,5 +95,8 @@ public class SearchResultLayout extends LinearLayout {
 
     public RecyclerView.Adapter getAdapter(){
         return mAdapter;
+    }
+    public RecyclerView.LayoutManager getLayoutManager(){
+        return mLayoutManager;
     }
 }

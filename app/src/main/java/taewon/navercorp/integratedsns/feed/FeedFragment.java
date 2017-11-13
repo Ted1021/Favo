@@ -721,14 +721,14 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         getTwitchStreamerInfo(result.getToId());
                     }
                 } else {
-                    Log.e("ERROR_TWTICH", "get following list error " + response.raw().toString());
+                    Log.e("ERROR_TWITCH", "get following list error " + response.raw().toString());
                 }
             }
 
             @Override
             public void onFailure(Call<TwitchFollowingData> call, Throwable t) {
                 t.printStackTrace();
-                Log.e("ERROR_TWTICH", "get following list error !!!!!!!!!!!!!!");
+                Log.e("ERROR_TWITCH", "get following list error !!!!!!!!!!!!!!");
             }
         });
     }
