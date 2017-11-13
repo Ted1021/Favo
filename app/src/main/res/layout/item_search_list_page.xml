@@ -10,7 +10,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textView_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -25,7 +25,6 @@
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_gravity="right|center_vertical"
-            android:gravity="right|center_vertical"
             android:text="see all" />
     </FrameLayout>
 

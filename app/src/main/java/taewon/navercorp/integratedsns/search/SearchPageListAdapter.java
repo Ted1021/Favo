@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.search.pagenchannel;
+package taewon.navercorp.integratedsns.search;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.favo.FavoPageSearchResultData;
+import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
 
 /**
  * Created by tedkim on 2017. 11. 12..
@@ -22,10 +22,10 @@ import taewon.navercorp.integratedsns.model.favo.FavoPageSearchResultData;
 public class SearchPageListAdapter extends RecyclerView.Adapter<SearchPageListAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<FavoPageSearchResultData> mDataset = new ArrayList<>();
+    private ArrayList<FavoSearchResultData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
-    public SearchPageListAdapter(Context context, ArrayList<FavoPageSearchResultData> dataset) {
+    public SearchPageListAdapter(Context context, ArrayList<FavoSearchResultData> dataset) {
 
         mContext = context;
         mDataset = dataset;
@@ -52,7 +52,6 @@ public class SearchPageListAdapter extends RecyclerView.Adapter<SearchPageListAd
             mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
             mCommentDetail = (LinearLayout) itemView.findViewById(R.id.layout_comment);
             mLine = itemView.findViewById(R.id.line);
-
         }
     }
 

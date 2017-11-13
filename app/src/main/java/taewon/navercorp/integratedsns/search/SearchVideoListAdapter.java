@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.search.video;
+package taewon.navercorp.integratedsns.search;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.favo.FavoVideoSearchResultData;
+import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
 
 /**
  * Created by tedkim on 2017. 11. 12..
@@ -22,10 +22,10 @@ import taewon.navercorp.integratedsns.model.favo.FavoVideoSearchResultData;
 public class SearchVideoListAdapter extends RecyclerView.Adapter<SearchVideoListAdapter.ViewHolder>{
 
     private Context mContext;
-    private ArrayList<FavoVideoSearchResultData> mDataset = new ArrayList<>();
+    private ArrayList<FavoSearchResultData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
-    public SearchVideoListAdapter(Context context, ArrayList<FavoVideoSearchResultData> dataset) {
+    public SearchVideoListAdapter(Context context, ArrayList<FavoSearchResultData> dataset) {
 
         mContext = context;
         mDataset = dataset;

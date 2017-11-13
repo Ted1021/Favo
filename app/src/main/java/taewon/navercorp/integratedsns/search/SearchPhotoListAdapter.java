@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.search.photo;
+package taewon.navercorp.integratedsns.search;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.model.favo.FavoPhotoSearchResultData;
+import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
 
 /**
  * Created by tedkim on 2017. 11. 12..
@@ -20,10 +20,10 @@ import taewon.navercorp.integratedsns.model.favo.FavoPhotoSearchResultData;
 public class SearchPhotoListAdapter extends RecyclerView.Adapter<SearchPhotoListAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<FavoPhotoSearchResultData> mDataset = new ArrayList<>();
+    private ArrayList<FavoSearchResultData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
-    public SearchPhotoListAdapter(Context context, ArrayList<FavoPhotoSearchResultData> dataset) {
+    public SearchPhotoListAdapter(Context context, ArrayList<FavoSearchResultData> dataset) {
 
         mContext = context;
         mDataset = dataset;
@@ -57,7 +57,6 @@ public class SearchPhotoListAdapter extends RecyclerView.Adapter<SearchPhotoList
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mDataset.size();
     }
-
 }
