@@ -6,13 +6,13 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-import taewon.navercorp.integratedsns.model.youtube.YoutubePostCommentData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelInfoData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelPlaylistData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubePostCommentData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
-import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelInfoData;
-import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelPlaylistData;
 
 /**
  * @author 김태원
@@ -34,10 +34,19 @@ public interface YoutubeService {
                                               @Query("part") String part,
                                               @Query("maxResults") int maxResults,
                                               @Query("channelId") String channelId,
+                                              @Query("q") String query,
                                               @Query("order") String order,
                                               @Query("type") String type,
                                               @Query("chart") String chart,
                                               @Query("regionCode") String regionCode);
+
+    @GET("youtube/v3/search")
+    Call<YoutubeSearchChannelData> searchChannelList (@Header("Authorization") String auth,
+                                                      @Query("part") String part,
+                                                      @Query("maxResults") int maxResults,
+                                                      @Query("order") String order,
+                                                      @Query("type") String type,
+                                                      @Query("q") String query);
 
     @GET("youtube/v3/commentThreads")
     Call<YoutubeCommentData> getCommentList(@Header("Authorization") String auth,
@@ -62,14 +71,6 @@ public interface YoutubeService {
                                                          @Query("part") String part,
                                                          @Query("maxResults") int maxResults,
                                                          @Query("channelId") String channelId);
-
-    @GET("youtube/v3/search")
-    Call<YoutubeSearchChannelData> searchChannelList (@Header("Authorization") String auth,
-                                                      @Query("part") String part,
-                                                      @Query("maxResults") int maxResults,
-                                                      @Query("order") String order,
-                                                      @Query("type") String type,
-                                                      @Query("q") String query);
 
     @POST("youtube/v3/commentThreads")
     Call<Void> setComment(@Header("Authorization") String auth,

@@ -40,28 +40,12 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <FrameLayout
-                        android:id="@+id/layout_page_detail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <ImageView
-                            android:id="@+id/imageView_profile"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:scaleType="fitXY"
-                            app:srcCompat="@drawable/com_facebook_profile_picture_blank_portrait" />
-
-                        <ImageView
-                            android:id="@+id/imageView_platformType"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:layout_gravity="bottom|right"
-                            android:adjustViewBounds="true"
-                            android:background="@android:color/transparent"
-                            android:scaleType="fitXY" />
-
-                    </FrameLayout>
+                    <ImageView
+                        android:id="@+id/imageView_profile"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@drawable/com_facebook_profile_picture_blank_portrait" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -72,7 +56,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/textView_userName"
+                            android:id="@+id/textView_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="4dp"
@@ -83,11 +67,11 @@
                             android:textStyle="bold" />
 
                         <TextView
-                            android:id="@+id/textView_uploadTime"
+                            android:id="@+id/textView_userName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="upload time"
-                            android:textColor="@color/unselected_color"
+                            android:textColor="@color/colorCremeWhite"
                             android:textSize="14sp" />
 
                     </LinearLayout>

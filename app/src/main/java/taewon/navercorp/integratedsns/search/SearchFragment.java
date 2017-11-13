@@ -36,6 +36,7 @@ import taewon.navercorp.integratedsns.model.facebook.FacebookPageInfoData;
 import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
@@ -268,9 +269,9 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
         call.enqueue(new Callback<TwitchSearchChannelData>() {
             @Override
             public void onResponse(Call<TwitchSearchChannelData> call, Response<TwitchSearchChannelData> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     TwitchSearchChannelData result = response.body();
-                    for(TwitchSearchChannelData.Channel item : result.getChannels()){
+                    for (TwitchSearchChannelData.Channel item : result.getChannels()) {
 
                         FavoSearchResultData data = new FavoSearchResultData();
 
@@ -299,7 +300,47 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
     private void getYoutubeVideo() {
 
+        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNT, null, mQuery, "viewCount", "video", null, "KR");
+        call.enqueue(new Callback<YoutubeSearchVideoData>() {
+            @Override
+            public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
+                if (response.isSuccessful()) {
+                    YoutubeSearchVideoData result = response.body();
+                    for (YoutubeSearchVideoData.Item item : result.getItems()) {
+
+                        FavoSearchResultData data = new FavoSearchResultData();
+
+                        data.setPlatformType(PLATFORM_YOUTUBE);
+                        data.setUserName(item.getSnippet().getChannelTitle());
+                        data.setDescription(item.getSnippet().getTitle());
+                        data.setPicture(item.getSnippet().getThumbnails().getHigh().getUrl());
+
+                        data.setFeedId(item.getId().getVideoId());
+                        data.setPageId(item.getSnippet().getChannelId());
+                        data.setVideoUrl(item.getId().getVideoId());
+
+                        mVideoDataset.add(data);
+                    }
+                    mVideoResult.getAdapter().notifyDataSetChanged();
+
+                } else {
+                    Log.e("ERROR_SEARCH", response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     private void getTwitchVideo() {
