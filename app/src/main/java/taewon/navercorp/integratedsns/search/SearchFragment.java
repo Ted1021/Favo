@@ -30,14 +30,19 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.facebook.FacebookPageInfoData;
 import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 
 import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_ACCEPT_CODE;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 /**
@@ -81,6 +86,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
         initView(view);
         initData();
 
+        Log.d("CHECK_TOKEN", mPref.getString(getString(R.string.twitch_token), ""));
         if (isInit) {
         }
         return view;
@@ -142,6 +148,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
         searchFacebookPage();
         getYoutubeChannel();
+        getTwitchChannel();
     }
 
     private void loadVideoSearchResult() {
@@ -244,6 +251,47 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
             @Override
             public void onFailure(Call<YoutubeSearchChannelData> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+    }
+
+    private void getTwitchChannel() {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TwitchService service = retrofit.create(TwitchService.class);
+        Call<TwitchSearchChannelData> call = service.searchTwitchChannel(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mQuery, MAX_COUNT);
+        call.enqueue(new Callback<TwitchSearchChannelData>() {
+            @Override
+            public void onResponse(Call<TwitchSearchChannelData> call, Response<TwitchSearchChannelData> response) {
+                if(response.isSuccessful()){
+                    TwitchSearchChannelData result = response.body();
+                    for(TwitchSearchChannelData.Channel item : result.getChannels()){
+
+                        FavoSearchResultData data = new FavoSearchResultData();
+
+                        data.setPlatformType(PLATFORM_TWITCH);
+                        data.setPageId(item.getId().toString());
+                        data.setProfileImage(item.getLogo());
+                        data.setUserName(item.getName());
+                        data.setDescription(item.getDescription());
+
+                        mPageDataset.add(data);
+                    }
+                    mPageResult.getAdapter().notifyDataSetChanged();
+                    mPageResult.getLayoutManager().scrollToPosition(mPageDataset.size() - 1);
+
+                } else {
+                    Log.e("ERROR_SEARCH", response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TwitchSearchChannelData> call, Throwable t) {
                 t.printStackTrace();
             }
         });

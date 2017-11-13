@@ -5,6 +5,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Query;
+import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
@@ -18,6 +19,11 @@ public interface TwitchService {
                                             @Query("response_type") String responseType,
                                             @Query("scope") String scope,
                                             @Query("state") String state);
+    @GET("kraken/search/channels")
+    Call<TwitchSearchChannelData> searchTwitchChannel(@Header("Accept") String accept,
+                                                      @Header("Client-ID") String clientId,
+                                                      @Query("query") String query,
+                                                      @Query("limit") int limit);
 
     @GET("helix/users")
     Call<TwitchUserData> getTwitchUserInfo(@Header("Client-ID") String clientId,
