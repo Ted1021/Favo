@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.search;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
@@ -23,16 +24,28 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.facebook.FacebookPageInfoData;
 import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 
+import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SearchFragment extends Fragment implements EditText.OnEditorActionListener {
+
+    private SharedPreferences mPref;
 
     private EditText mSearch;
     private RecyclerView mSearchList;
@@ -48,6 +61,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
     private static final int RESULT_PAGE = 0;
     private static final int RESULT_VIDEO = 1;
     private static final int RESULT_PHOTO = 2;
+    private static final int MAX_COUNT = 6;
 
     public SearchFragment() {
     }
@@ -65,10 +79,9 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         initView(view);
+        initData();
 
         if (isInit) {
-//            initData();
-            isInit = false;
         }
         return view;
     }
@@ -88,13 +101,8 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
     private void initData() {
 
-        mPageResult.getAdapter().notifyDataSetChanged();
-        mPageResult.getLayoutManager().scrollToPosition(mPageDataset.size() - 1);
-
-        mVideoResult.getAdapter().notifyDataSetChanged();
-
-        mPhotoResult.getAdapter().notifyDataSetChanged();
-        mPhotoResult.getLayoutManager().scrollToPosition(mPhotoDataset.size() - 1);
+        // init preference
+        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
     }
 
     @Override
@@ -114,7 +122,6 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
                 case EditorInfo.IME_ACTION_GO:
                 case EditorInfo.IME_ACTION_NEXT:
 
-                    Log.d("CHECK_SEARCH", " >>>>> keyboard");
                     mQuery = mSearch.getText().toString();
 
                     loadPageSearchResult();
@@ -127,6 +134,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
         return false;
     }
 
+    // TODO - have to implement checking token logic
     private void loadPageSearchResult() {
 
         mPageDataset.clear();
@@ -163,7 +171,6 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
                         if (response.getError() == null) {
                             try {
-                                Log.d("CHECK_SEARCH", " >>>>> search");
                                 JSONArray result = response.getJSONObject().getJSONArray("data");
                                 for (int i = 0; i < result.length(); i++) {
 
@@ -194,7 +201,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
         Bundle parameters = new Bundle();
         parameters.putString("q", mQuery);
         parameters.putString("type", "page");
-        parameters.putString("limit", "6");
+        parameters.putString("limit", MAX_COUNT + "");
         parameters.putString("fields", "name,about,picture.height(1024){url},cover.height(1024){source},fan_count,description");
         request.setParameters(parameters);
         request.executeAsync();
@@ -202,6 +209,44 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
     private void getYoutubeChannel() {
 
+        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeSearchChannelData> call = service.searchChannelList(accessToken, "Snippet", MAX_COUNT, "viewCount", "channel", mQuery);
+        call.enqueue(new Callback<YoutubeSearchChannelData>() {
+            @Override
+            public void onResponse(Call<YoutubeSearchChannelData> call, Response<YoutubeSearchChannelData> response) {
+                if (response.isSuccessful()) {
+                    YoutubeSearchChannelData result = response.body();
+                    for (YoutubeSearchChannelData.Item item : result.getItems()) {
+                        FavoSearchResultData data = new FavoSearchResultData();
+
+                        data.setPlatformType(PLATFORM_YOUTUBE);
+                        data.setPageId(item.getSnippet().getChannelId());
+                        data.setProfileImage(item.getSnippet().getThumbnails().getHigh().getUrl());
+                        data.setUserName(item.getSnippet().getChannelTitle());
+                        data.setDescription(item.getSnippet().getDescription());
+
+                        mPageDataset.add(data);
+                    }
+
+                    mPageResult.getAdapter().notifyDataSetChanged();
+                    mPageResult.getLayoutManager().scrollToPosition(mPageDataset.size() - 1);
+                } else {
+                    Log.e("ERROR_SEARCH", response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<YoutubeSearchChannelData> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     private void getYoutubeVideo() {
