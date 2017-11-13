@@ -63,7 +63,7 @@ public class PlatformFragment extends Fragment {
     private static boolean isInit;
 
     private static String ARG_PARAM1 = "PLATFORM_TYPE";
-    private static int MAX_COUNTS = 5;
+    private static int MAX_COUNTS = 10;
 
     public static PlatformFragment newInstance(int platformType) {
 
@@ -103,7 +103,7 @@ public class PlatformFragment extends Fragment {
     private void initView(View view) {
 
         mViewPager = (VerticalCardStackViewPager) view.findViewById(viewPager);
-        mViewPager.setOffscreenPageLimit(5);
+        mViewPager.setOffscreenPageLimit(MAX_COUNTS);
         mViewPager.setClipToPadding(false);
 
         mPlatformName = (TextView) view.findViewById(R.id.textView_platform);
@@ -145,7 +145,7 @@ public class PlatformFragment extends Fragment {
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, null, "date", "video", "mostPopular", "KR");
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, null, null, "date", "video", "mostPopular", "KR");
         call.enqueue(new Callback<YoutubeSearchVideoData>() {
             @Override
             public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
@@ -202,7 +202,7 @@ public class PlatformFragment extends Fragment {
                 .build();
 
         GiphyService service = retrofit.create(GiphyService.class);
-        Call<GiphyImageData> call = service.getGiphyTrendImage(getString(R.string.giphy_api_key), 5);
+        Call<GiphyImageData> call = service.getGiphyTrendImage(getString(R.string.giphy_api_key), MAX_COUNTS);
         call.enqueue(new Callback<GiphyImageData>() {
             @Override
             public void onResponse(Call<GiphyImageData> call, Response<GiphyImageData> response) {

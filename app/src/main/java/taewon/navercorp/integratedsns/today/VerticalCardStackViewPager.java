@@ -27,7 +27,7 @@ public class VerticalCardStackViewPager extends ViewPager {
         initTransformer();
     }
 
-    private void initTransformer(){
+    private void initTransformer() {
         setPageTransformer(true, new CardStackTransformer());
         setOverScrollMode(OVER_SCROLL_NEVER);
 
@@ -40,10 +40,8 @@ public class VerticalCardStackViewPager extends ViewPager {
         public void transformPage(View page, float position) {
 
             if (position < -1) {
-//                page.setAlpha(1 + position * 0.2f);
 
             } else {
-//                page.setAlpha(1);
                 float yPosition = position * page.getHeight();
                 page.setTranslationX(page.getWidth() * -position);
                 page.setTranslationY(yPosition);
@@ -53,8 +51,12 @@ public class VerticalCardStackViewPager extends ViewPager {
                 page.setScaleX(0.8f - 0.04f * position);
                 page.setScaleY(0.8f - 0.04f * position);
                 page.setTranslationX(-page.getWidth() * position);
-                page.setTranslationY(80 * position);
 
+                if (position <= 1) {
+                    page.setTranslationY(80 * (float) Math.sqrt(position));
+                } else {
+                    page.setTranslationY(80 * (float) Math.sqrt(position - 1) + 80);
+                }
             }
 
             if (position < -1) { // [-Infinity,-1)
@@ -69,20 +71,12 @@ public class VerticalCardStackViewPager extends ViewPager {
 
             } else { // (1,+Infinity]
                 // This page is way off-screen to the right.
-
             }
-
-
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-
-        if(ev.getAction()==MotionEvent.ACTION_MOVE){
-
-        }
-
         return super.onTouchEvent(swapXY(ev));
     }
 
@@ -90,7 +84,7 @@ public class VerticalCardStackViewPager extends ViewPager {
 
         float width = getWidth();
         float height = getHeight();
-        float newX = (ev.getY() / height) * width;
+        float newX = (ev.getY() / height) * width * 1.5f;
         float newY = (ev.getX() / width) * height;
         ev.setLocation(newX, newY);
         return ev;
