@@ -23,7 +23,7 @@
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:scaleType="fitXY"
-                app:srcCompat="@drawable/com_facebook_profile_picture_blank_portrait" />
+                app:srcCompat="@drawable/icon_profile" />
 
             <ImageView
                 android:id="@+id/imageView_platformType"

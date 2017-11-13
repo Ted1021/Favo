@@ -7,6 +7,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Query;
 import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
@@ -24,6 +25,12 @@ public interface TwitchService {
                                                       @Header("Client-ID") String clientId,
                                                       @Query("query") String query,
                                                       @Query("limit") int limit);
+
+    @GET("kraken/search/streams")
+    Call<TwitchStreamingDataV5> searchTwitchStreams(@Header("Accept") String accept,
+                                                    @Header("Client-ID") String clientId,
+                                                    @Query("query") String query,
+                                                    @Query("limit") int limit);
 
     @GET("helix/users")
     Call<TwitchUserData> getTwitchUserInfo(@Header("Client-ID") String clientId,

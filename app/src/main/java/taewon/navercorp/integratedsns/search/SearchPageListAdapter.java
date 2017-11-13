@@ -78,10 +78,13 @@ public class SearchPageListAdapter extends RecyclerView.Adapter<SearchPageListAd
 
         holder.mUserName.setText(data.getUserName());
         holder.mAbout.setText(data.getDescription());
-        Glide.with(mContext.getApplicationContext()).load(data.getProfileImage())
-                .apply(new RequestOptions().circleCropTransform())
-                .transition(new DrawableTransitionOptions().crossFade())
-                .into(holder.mProfile);
+
+        if(data.getProfileImage() != null){
+            Glide.with(mContext.getApplicationContext()).load(data.getProfileImage())
+                    .apply(new RequestOptions().circleCropTransform())
+                    .transition(new DrawableTransitionOptions().crossFade())
+                    .into(holder.mProfile);
+        }
 
         switch (data.getPlatformType()) {
 
