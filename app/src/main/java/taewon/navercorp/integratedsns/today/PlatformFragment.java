@@ -52,7 +52,7 @@ public class PlatformFragment extends Fragment {
 
     private VerticalCardStackViewPager mViewPager;
     private CardStackAdapter mAdapter;
-    private int mPlatformType;
+    private String mPlatformType;
     private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
 
     private TextView mPlatformName;
@@ -65,11 +65,11 @@ public class PlatformFragment extends Fragment {
     private static String ARG_PARAM1 = "PLATFORM_TYPE";
     private static int MAX_COUNTS = 10;
 
-    public static PlatformFragment newInstance(int platformType) {
+    public static PlatformFragment newInstance(String platformType) {
 
         PlatformFragment fragment = new PlatformFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, platformType);
+        args.putString(ARG_PARAM1, platformType);
         fragment.setArguments(args);
         isInit = true;
         return fragment;
@@ -88,7 +88,7 @@ public class PlatformFragment extends Fragment {
 
 
         if (getArguments() != null) {
-            mPlatformType = getArguments().getInt(ARG_PARAM1);
+            mPlatformType = getArguments().getString(ARG_PARAM1);
         }
 
         initView(view);
@@ -109,7 +109,7 @@ public class PlatformFragment extends Fragment {
         mPlatformName = (TextView) view.findViewById(R.id.textView_platform);
     }
 
-    private void initData(int platformType) {
+    private void initData(String platformType) {
 
         // preference
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);

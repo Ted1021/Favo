@@ -2,7 +2,6 @@ package taewon.navercorp.integratedsns.login;
 
 import android.accounts.Account;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -45,6 +44,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
@@ -63,8 +63,7 @@ public class LoginActivity extends AppCompatActivity
     private Button mFacebookLogin, mGoogleLogin, mPinterestLogin, mTwitchLogin;
 
     // managing tokens
-    private SharedPreferences mPref;
-    private SharedPreferences.Editor mEditor;
+    private FavoTokenManager mFavoTokenManager;
 
     // Auth for facebook
     private CallbackManager mCallbackManager;
@@ -105,10 +104,8 @@ public class LoginActivity extends AppCompatActivity
     }
 
     private void initData() {
-
-        // init Preference
-        mPref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        mEditor = mPref.edit();
+        // init token manager
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         // init pinterest client
         mPinterestClient = PDKClient.configureInstance(this, getString(R.string.pinterest_app_id));
@@ -178,9 +175,7 @@ public class LoginActivity extends AppCompatActivity
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                // set facebook preference
-                mEditor.putString(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
-                mEditor.commit();
+                mFavoTokenManager.createToken(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
                 enterMainService();
             }
 
@@ -209,9 +204,7 @@ public class LoginActivity extends AppCompatActivity
         mPinterestClient.login(this, Arrays.asList(PINTEREST_SCOPE), new PDKCallback() {
             @Override
             public void onSuccess(PDKResponse response) {
-
-                mEditor.putString(getString(R.string.pinterest_token), response.getUser().getUid());
-                mEditor.commit();
+                mFavoTokenManager.createToken(getString(R.string.pinterest_token), response.getUser().getUid());
                 enterMainService();
             }
 
@@ -268,9 +261,7 @@ public class LoginActivity extends AppCompatActivity
 
             // set google preference
             try {
-                mEditor.putString(getString(R.string.google_token), credential.getToken());
-                mEditor.commit();
-
+                mFavoTokenManager.createToken(getString(R.string.google_token), credential.getToken());
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("ERROR_LOGIN", "Login Activity >>>>> fail to get credential token");
@@ -311,10 +302,7 @@ public class LoginActivity extends AppCompatActivity
         Log.d("CHECK_TOKEN", token);
 
         if (!token.equals("")) {
-
-            mEditor.putString(getString(R.string.twitch_token), token);
-            mEditor.commit();
-
+            mFavoTokenManager.createToken(getString(R.string.twitch_token), token);
             enterMainService();
         }
     }
@@ -342,12 +330,13 @@ public class LoginActivity extends AppCompatActivity
 
             // facebook login activity result
             if (requestCode == REQ_FACEBOOK_SIGN_IN) {
-                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-                googleSignInResult(result);
+                mCallbackManager.onActivityResult(requestCode, resultCode, data);
             }
             // google login activity result
             else if (requestCode == REQ_GOOGLE_SIGN_IN) {
-                mCallbackManager.onActivityResult(requestCode, resultCode, data);
+
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                googleSignInResult(result);
             }
             // pinterest login activity result
             else if (requestCode == REQ_PINTEREST_SIGN_IN) {

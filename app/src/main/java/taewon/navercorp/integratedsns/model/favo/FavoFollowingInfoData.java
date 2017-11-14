@@ -9,7 +9,7 @@ public class FavoFollowingInfoData {
     private String _id;
     private String userName;
     private String profile;
-    private int platformType;
+    private String platformType;
 
     public String get_id() {
         return _id;
@@ -35,11 +35,11 @@ public class FavoFollowingInfoData {
         this.profile = profile;
     }
 
-    public int getPlatformType() {
+    public String getPlatformType() {
         return platformType;
     }
 
-    public void setPlatformType(int platformType) {
+    public void setPlatformType(String platformType) {
         this.platformType = platformType;
     }
 }

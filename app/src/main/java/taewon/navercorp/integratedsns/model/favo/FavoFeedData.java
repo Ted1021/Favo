@@ -11,7 +11,7 @@ import java.util.Date;
 public class FavoFeedData implements Serializable{
 
     private String feedId;
-    private int platformType;
+    private String platformType;
     private int contentsType;
     private Date pubDate;
     private String pageId;
@@ -27,11 +27,11 @@ public class FavoFeedData implements Serializable{
     private int commentCount;
     private String nextCursor, beforeCursor;
 
-    public int getPlatformType() {
+    public String getPlatformType() {
         return platformType;
     }
 
-    public void setPlatformType(int platformType) {
+    public void setPlatformType(String platformType) {
         this.platformType = platformType;
     }
 

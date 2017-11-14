@@ -14,7 +14,7 @@ public class FavoMyPinData extends RealmObject {
 
     @PrimaryKey
     private String feedId;
-    private int platformType;
+    private String platformType;
     private int contentsType;
     private Date pubDate;
     private String pageId;
@@ -30,11 +30,11 @@ public class FavoMyPinData extends RealmObject {
     private int likeCount;
     private int commentCount;
 
-    public int getPlatformType() {
+    public String getPlatformType() {
         return platformType;
     }
 
-    public void setPlatformType(int platformType) {
+    public void setPlatformType(String platformType) {
         this.platformType = platformType;
     }
 

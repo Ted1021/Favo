@@ -51,7 +51,8 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
     private ArrayList<YoutubeCommentData.Item> mYoutubeDataset = new ArrayList<>();
     private FavoFeedData mYoutubeSearchVideoData;
 
-    private int mContentType, mPlatformType;
+    private int mContentType;
+    private String mPlatformType;
     private String mArticleId, mVideoId, mPinId;
     private EditText mUserComment;
     private ImageButton mCamera, mSend;
@@ -80,7 +81,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
         Intent intent = getIntent();
         mContentType = intent.getIntExtra("CONTENT_TYPE", 0);
-        mPlatformType = intent.getIntExtra("PLATFORM_TYPE", 0);
+        mPlatformType = intent.getStringExtra("PLATFORM_TYPE");
 
         switch (mPlatformType) {
 

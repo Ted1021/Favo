@@ -46,7 +46,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
     // platform & video data
     private SharedPreferences mPref;
-    private int mPlatformType;
+    private String mPlatformType;
     private String mPageId;
 
     private static final String ARG_PARAM1 = "PAGE_ID";
@@ -57,13 +57,13 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
 
-    public static PageVideoFragment newInstance(String param1, int param2) {
+    public static PageVideoFragment newInstance(String param1, String param2) {
 
         PageVideoFragment fragment = new PageVideoFragment();
 
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
-        args.putInt(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
 
         return fragment;
@@ -74,7 +74,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mPageId = getArguments().getString(ARG_PARAM1);
-            mPlatformType = getArguments().getInt(ARG_PARAM2);
+            mPlatformType = getArguments().getString(ARG_PARAM2);
         }
     }
 

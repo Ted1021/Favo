@@ -255,7 +255,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                int platformType = intent.getIntExtra("PLATFORM_TYPE", 0);
+                String platformType = intent.getStringExtra("PLATFORM_TYPE");
                 String feedId = intent.getStringExtra("FEED_ID");
 
                 loadComments(platformType, feedId);
@@ -298,13 +298,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void refreshDataset() {
 
-//        Collections.sort(mFeedDataset, new Comparator<FavoFeedData>() {
-//            @Override
-//            public int compare(FavoFeedData o1, FavoFeedData o2) {
-//                return o2.getPubDate().compareTo(o1.getPubDate());
-//            }
-//        });
-
         mFeedAdapter.notifyDataSetChanged();
         if (mLastPosition > mFeedDataset.size() - 1) {
             mLastPosition = mFeedDataset.size() - 1;
@@ -328,7 +321,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
     }
 
-    private void loadComments(int platformType, String feedId) {
+    private void loadComments(String platformType, String feedId) {
 
         mCommentDataset.clear();
         mCommentAdapter.notifyDataSetChanged();
@@ -506,24 +499,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     data.setDescription(pin.getNote());
 
                     mFeedDataset.add(data);
-//                    for (PDKPin pin : response.getPinList()) {
-//
-//                        FavoFeedData data = new FavoFeedData();
-//
-//                        data.setPlatformType(PLATFORM_PINTEREST);
-//                        data.setContentsType(CONTENTS_IMAGE);
-//                        data.setPubDate(pin.getCreatedAt());
-//
-//                        data.setFeedId(pin.getUid());
-//                        data.setProfileImage(pin.getImageUrl());
-//                        data.setUserName(pin.getUid());
-//                        data.setCreatedTime(mStringFormat.format(pin.getCreatedAt()));
-//                        data.setPicture(pin.getImageUrl());
-//                        data.setLink(pin.getLink());
-//                        data.setDescription(pin.getNote());
-//
-//                        mFeedDataset.add(data);
-//                    }
 
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
@@ -867,12 +842,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onResponse(Call<YoutubeCommentData> call, Response<YoutubeCommentData> response) {
 
                 if (response.isSuccessful()) {
-
-//                    if (response.body().getNextPageToken() == null) {
-//                        return;
-//                    }
-
-//                    mNextPage = response.body().getNextPageToken();
 
                     for (YoutubeCommentData.Item result : response.body().getItems()) {
 

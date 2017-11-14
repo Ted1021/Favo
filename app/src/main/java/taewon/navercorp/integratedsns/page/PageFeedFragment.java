@@ -54,7 +54,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     private RecyclerView mPageFeedList;
 
     private String mPageId;
-    private int mPlatformType;
+    private String mPlatformType;
     private String mProfileImage;
 
     private Vector<FavoFeedData> mDataset = new Vector<>();
@@ -71,13 +71,13 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     private static final String ARG_PARAM2 = "PLATFORM_TYPE";
     private static final String ARG_PARAM3 = "PROFILE_IMAGE";
 
-    public static PageFeedFragment newInstance(String param1, int param2, String param3) {
+    public static PageFeedFragment newInstance(String param1, String param2, String param3) {
 
         PageFeedFragment fragment = new PageFeedFragment();
 
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
-        args.putInt(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM2, param2);
         args.putString(ARG_PARAM3, param3);
         fragment.setArguments(args);
 
@@ -90,7 +90,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         if (getArguments() != null) {
             mPageId = getArguments().getString(ARG_PARAM1);
-            mPlatformType = getArguments().getInt(ARG_PARAM2);
+            mPlatformType = getArguments().getString(ARG_PARAM2);
             mProfileImage = getArguments().getString(ARG_PARAM3);
         }
     }

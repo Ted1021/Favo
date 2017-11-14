@@ -32,7 +32,7 @@ public class TodayFragment extends Fragment {
     private ParallaxViewPager mViewPager;
     private PlatformAdapter mAdapter;
 
-    private List<Integer> mPlatformList = new ArrayList<>();
+    private List<String> mPlatformList = new ArrayList<>();
 
     public TodayFragment() {
         // Required empty public constructor

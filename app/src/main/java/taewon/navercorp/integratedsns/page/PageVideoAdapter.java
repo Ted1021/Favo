@@ -26,6 +26,7 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.favo.FavoPageVideoData;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 /**
@@ -38,8 +39,13 @@ public class PageVideoAdapter extends RecyclerView.Adapter<PageVideoAdapter.View
     private ArrayList<FavoPageVideoData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
 
-    SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+    private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+
+    private static final int TYPE_FACEBOOK = 0;
+    private static final int TYPE_YOUTUBE = 1;
+    private static final int TYPE_TWITCH = 2;
+
 
     public PageVideoAdapter(Context context, ArrayList<FavoPageVideoData> dataset) {
 
@@ -73,10 +79,10 @@ public class PageVideoAdapter extends RecyclerView.Adapter<PageVideoAdapter.View
             mVideoItem = (LinearLayout) itemView.findViewById(R.id.linearLayout_item);
             mVideoItem.setOnClickListener(this);
 
-            if (viewType == PLATFORM_FACEBOOK) {
+            if (viewType == TYPE_FACEBOOK) {
                 mPlay = (ImageView) itemView.findViewById(R.id.imageView_play);
                 mRunTime = (TextView) itemView.findViewById(R.id.textView_runTime);
-            } else if (viewType == PLATFORM_YOUTUBE) {
+            } else if (viewType == TYPE_YOUTUBE) {
                 mVideoCount = (TextView) itemView.findViewById(R.id.textView_itemCount);
             }
         }
@@ -116,10 +122,13 @@ public class PageVideoAdapter extends RecyclerView.Adapter<PageVideoAdapter.View
         switch (mDataset.get(position).getPlatformType()) {
 
             case PLATFORM_FACEBOOK:
-                return PLATFORM_FACEBOOK;
+                return TYPE_FACEBOOK;
 
             case PLATFORM_YOUTUBE:
-                return PLATFORM_YOUTUBE;
+                return TYPE_YOUTUBE;
+
+            case PLATFORM_TWITCH:
+                return TYPE_TWITCH;
         }
         return -1;
     }
@@ -129,11 +138,11 @@ public class PageVideoAdapter extends RecyclerView.Adapter<PageVideoAdapter.View
 
         View itemView = null;
         switch (viewType) {
-            case PLATFORM_FACEBOOK:
+            case TYPE_FACEBOOK:
                 itemView = mLayoutInflater.inflate(R.layout.item_video_list, parent, false);
                 break;
 
-            case PLATFORM_YOUTUBE:
+            case TYPE_YOUTUBE:
                 itemView = mLayoutInflater.inflate(R.layout.item_channel_playlist, parent, false);
                 break;
         }

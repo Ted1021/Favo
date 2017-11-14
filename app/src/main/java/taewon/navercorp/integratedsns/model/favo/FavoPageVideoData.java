@@ -6,7 +6,7 @@ package taewon.navercorp.integratedsns.model.favo;
 
 public class FavoPageVideoData {
 
-    private int platformType;
+    private String platformType;
     private String picture;
     private String title;
     private String pubDate;
@@ -14,11 +14,11 @@ public class FavoPageVideoData {
     private int videoCount;
     private String videoUrl;
 
-    public int getPlatformType() {
+    public String getPlatformType() {
         return platformType;
     }
 
-    public void setPlatformType(int platformType) {
+    public void setPlatformType(String platformType) {
         this.platformType = platformType;
     }
 

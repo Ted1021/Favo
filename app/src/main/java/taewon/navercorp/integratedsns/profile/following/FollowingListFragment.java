@@ -76,7 +76,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     private String mGoogleToken;
     private String mPinterestToken;
 
-    private int mCurrentPlatform = 1;
+    private String mCurrentPlatform = PLATFORM_FACEBOOK;
 
     private static final String BOARD_FIELDS = "id,name, created_at, creator, image, url";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
@@ -135,7 +135,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mCurrentPlatform = position + 1;
+                mCurrentPlatform = parent.getSelectedItem().toString();
                 setFollowingList(mCurrentPlatform);
             }
 
@@ -159,14 +159,14 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         mFollowingList.setLayoutManager(layoutManager);
     }
 
-    private void setFollowingList(int position) {
+    private void setFollowingList(String platformType) {
 
         mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
         mGoogleToken = mPref.getString(getString(R.string.google_token), "");
         mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
 
         mLayoutDisconnection.setVisibility(View.VISIBLE);
-        switch (position) {
+        switch (platformType) {
 
             case PLATFORM_FACEBOOK:
                 if (!mFacebookToken.equals("")) {

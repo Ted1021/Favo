@@ -58,7 +58,7 @@ public class PageDetailActivity extends AppCompatActivity {
     // page data
     private SharedPreferences mPref;
     private String mPageId;
-    private int mPlatformType;
+    private String mPlatformType;
     private String mProfileImage;
     private FavoPageInfoData mPageData = new FavoPageInfoData();
 
@@ -83,7 +83,7 @@ public class PageDetailActivity extends AppCompatActivity {
 
         // init platform type & page ID
         Intent intent = getIntent();
-        mPlatformType = intent.getIntExtra("PLATFORM_TYPE", 1);
+        mPlatformType = intent.getStringExtra("PLATFORM_TYPE");
         switch (mPlatformType) {
 
             case PLATFORM_FACEBOOK:

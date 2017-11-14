@@ -77,7 +77,7 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
         private void loadPageDetail(int position){
 
             Intent intent;
-            int platformType = mDataset.get(position).getPlatformType();
+            String platformType = mDataset.get(position).getPlatformType();
             switch (platformType) {
 
                 case PLATFORM_FACEBOOK:

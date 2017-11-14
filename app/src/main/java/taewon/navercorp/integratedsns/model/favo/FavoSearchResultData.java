@@ -9,7 +9,7 @@ import java.util.Date;
 public class FavoSearchResultData {
 
     private String feedId;
-    private int platformType;
+    private String platformType;
     private int contentsType;
     private Date pubDate;
     private String pageId;
@@ -29,11 +29,11 @@ public class FavoSearchResultData {
         this.feedId = feedId;
     }
 
-    public int getPlatformType() {
+    public String getPlatformType() {
         return platformType;
     }
 
-    public void setPlatformType(int platformType) {
+    public void setPlatformType(String platformType) {
         this.platformType = platformType;
     }
 

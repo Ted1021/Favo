@@ -111,7 +111,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         public void onClick(View v) {
 
             int position = getLayoutPosition();
-            int platformType = mDataset.get(position).getPlatformType();
+            String platformType = mDataset.get(position).getPlatformType();
             int contentsType = mDataset.get(position).getContentsType();
 
             switch (v.getId()) {
@@ -146,7 +146,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             }
 
             String videoUrl = mDataset.get(position).getVideoUrl();
-            int platformType = mDataset.get(position).getPlatformType();
+            String platformType = mDataset.get(position).getPlatformType();
             Intent intent = null;
             switch (platformType) {
 
@@ -173,7 +173,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
         private void loadComments(int position) {
 
-            int platformType = mDataset.get(position).getPlatformType();
+            String platformType = mDataset.get(position).getPlatformType();
 
             // send call 'load comment'
             Intent intent = new Intent(mContext.getString(R.string.comment_request));
@@ -204,7 +204,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         private void loadPageDetail(int position) {
 
             Intent intent = new Intent(mContext, PageDetailActivity.class);
-            int platformType = mDataset.get(position).getPlatformType();
+            String platformType = mDataset.get(position).getPlatformType();
             intent.putExtra("PLATFORM_TYPE", platformType);
 
             switch (platformType) {
