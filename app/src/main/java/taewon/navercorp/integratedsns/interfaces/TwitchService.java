@@ -26,7 +26,13 @@ public interface TwitchService {
                                                       @Query("query") String query,
                                                       @Query("limit") int limit);
 
-    @GET("kraken/search/streams")
+    @GET("kraken/streams/followed")
+    Call<TwitchStreamingDataV5> getTwitchFollowingStreams(@Header("Accept") String accept,
+                                                          @Header("Client-ID") String clientId,
+                                                          @Header("Authorization") String auth,
+                                                          @Query("limit") int limit);
+
+    @GET("kraken/search/channels")
     Call<TwitchStreamingDataV5> searchTwitchStreams(@Header("Accept") String accept,
                                                     @Header("Client-ID") String clientId,
                                                     @Query("query") String query,

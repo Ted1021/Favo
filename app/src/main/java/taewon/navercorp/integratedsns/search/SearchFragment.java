@@ -378,6 +378,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
                 .baseUrl(TWITCH_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
         TwitchService service = retrofit.create(TwitchService.class);
         Call<TwitchStreamingDataV5> call = service.searchTwitchStreams(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mQuery, MAX_VIDEO_COUNT);
         call.enqueue(new Callback<TwitchStreamingDataV5>() {
@@ -386,7 +387,6 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
                 Log.d("CHECK_SEARCH", " >>>>>>>>>>>> in");
                 if (response.isSuccessful()) {
                     TwitchStreamingDataV5 result = response.body();
-
                     for (TwitchStreamingDataV5.Stream item : result.getStreams()) {
 
                         FavoSearchResultData data = new FavoSearchResultData();
@@ -412,6 +412,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
             @Override
             public void onFailure(Call<TwitchStreamingDataV5> call, Throwable t) {
                 t.printStackTrace();
+                Log.e("ERROR_SEARCH", call.toString());
             }
         });
     }

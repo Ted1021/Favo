@@ -8,11 +8,13 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 
@@ -23,6 +25,7 @@ import taewon.navercorp.integratedsns.page.PageDetailActivity;
 import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
@@ -45,36 +48,36 @@ public class LiveStreamingListAdapter extends RecyclerView.Adapter<LiveStreaming
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         // common components
-        private TextView mUserName, mUploadTime, mDescription, mComment;
+        private TextView mUserName, mTitle;
         private ImageView mProfile, mPicture, mPlatformType;
-        private Button mShare, mMore;
         private FrameLayout mPageDetail;
-        private LinearLayout mCommentDetail;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
+            mTitle = (TextView) itemView.findViewById(R.id.textView_title);
             mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
-            mUploadTime = (TextView) itemView.findViewById(R.id.textView_uploadTime);
-            mDescription = (TextView) itemView.findViewById(R.id.textView_description);
-
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
             mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
             mPicture.setOnClickListener(this);
-            mComment = (TextView) itemView.findViewById(R.id.textView_comment);
-            mComment.setOnClickListener(this);
-            mMore = (Button) itemView.findViewById(R.id.button_more);
-            mMore.setOnClickListener(this);
             mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
-            mCommentDetail = (LinearLayout) itemView.findViewById(R.id.layout_comment);
-            mCommentDetail.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
+            int position = getLayoutPosition();
+            switch(v.getId()){
 
+                case R.id.imageView_picture:
+                    loadVideo(position);
+                    break;
+
+                case R.id.layout_page_detail:
+                    loadPageDetail(position);
+                    break;
+            }
         }
 
         private void loadVideo(int position) {
@@ -138,13 +141,48 @@ public class LiveStreamingListAdapter extends RecyclerView.Adapter<LiveStreaming
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-
-        return null;
+        View itemView = mLayoutInflater.inflate(R.layout.item_live_streaming, parent, false);
+        return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
+        FavoFeedData data = mDataset.get(position);
+
+        holder.mUserName.setText(data.getUserName());
+        holder.mTitle.setText(data.getDescription());
+
+        Glide.with(mContext.getApplicationContext()).load(data.getProfileImage())
+                .apply(new RequestOptions().circleCropTransform())
+                .transition(new DrawableTransitionOptions().crossFade())
+                .into(holder.mProfile);
+
+        Glide.with(mContext.getApplicationContext()).load(data.getPicture())
+                .apply(new RequestOptions().override(864, 486))
+                .apply(new RequestOptions().centerCrop())
+//                .thumbnail(0.5f)
+                .transition(new DrawableTransitionOptions().crossFade())
+                .into(holder.mPicture);
+
+        switch (data.getPlatformType()) {
+
+            case PLATFORM_FACEBOOK:
+                Glide.with(mContext).load(R.drawable.icon_facebook_small).into(holder.mPlatformType);
+                break;
+
+            case PLATFORM_YOUTUBE:
+                Glide.with(mContext).load(R.drawable.icon_youtube_small).into(holder.mPlatformType);
+                break;
+
+            case PLATFORM_PINTEREST:
+                Glide.with(mContext).load(R.drawable.icon_pinterest_small).into(holder.mPlatformType);
+                break;
+
+            case PLATFORM_TWITCH:
+                Glide.with(mContext).load(R.drawable.twitch_icon_small).into(holder.mPlatformType);
+                break;
+        }
     }
 
     @Override
