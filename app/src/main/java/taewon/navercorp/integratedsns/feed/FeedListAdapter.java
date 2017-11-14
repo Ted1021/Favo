@@ -224,7 +224,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     break;
             }
             mContext.startActivity(intent);
-
         }
 
         private void loadLink(int position) {

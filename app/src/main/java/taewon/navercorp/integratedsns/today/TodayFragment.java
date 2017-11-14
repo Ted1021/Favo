@@ -31,9 +31,16 @@ public class TodayFragment extends Fragment {
 
     private ParallaxViewPager mViewPager;
     private PlatformAdapter mAdapter;
-
     private List<String> mPlatformList = new ArrayList<>();
 
+    private static boolean isInit;
+
+    public static TodayFragment newInstance() {
+
+        TodayFragment fragment = new TodayFragment();
+        isInit = true;
+        return fragment;
+    }
     public TodayFragment() {
         // Required empty public constructor
     }
@@ -45,9 +52,11 @@ public class TodayFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_today, container, false);
 
-        checkToken();
+        if(isInit){
+            checkToken();
+            isInit = false;
+        }
         initView(view);
-
         return view;
     }
 

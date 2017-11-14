@@ -165,6 +165,8 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         mGoogleToken = mPref.getString(getString(R.string.google_token), "");
         mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
 
+        mDataset.clear();
+        mAdapter.notifyDataSetChanged();
         mLayoutDisconnection.setVisibility(View.VISIBLE);
         switch (platformType) {
 

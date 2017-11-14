@@ -42,20 +42,20 @@
             tools:node="replace">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="pdk4928301781867311512"/>
-                <data android:scheme="bandsdk219449230"/>
-                <data android:scheme="http" android:host="174.138.18.90" android:path="/message"/>
-
+                <data android:scheme="pdk4928301781867311512" />
+                <data android:scheme="bandsdk219449230" />
+                <data
+                    android:host="174.138.18.90"
+                    android:path="/message"
+                    android:scheme="http" />
             </intent-filter>
         </activity>
         <activity
             android:name=".home.HomeActivity"
-            android:configChanges="orientation|screenSize|keyboard" />
-        <activity
-            android:name=".youtube.YoutubeDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
             android:name=".profile.SettingActivity"
@@ -72,6 +72,7 @@
         <activity
             android:name=".util.TwitchWebViewActivity"
             android:configChanges="orientation|screenSize|keyboard" />
+        <activity android:name=".search.SearchDetailActivity"></activity>
     </application>
 
 </manifest>

@@ -75,32 +75,27 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
         }
 
         private void loadPageDetail(int position){
-
-            Intent intent;
             String platformType = mDataset.get(position).getPlatformType();
+
+            Intent intent = new Intent(mContext, PageDetailActivity.class);
+            intent.putExtra("PLATFORM_TYPE", platformType);
+
             switch (platformType) {
 
                 case PLATFORM_FACEBOOK:
-
-                    intent = new Intent(mContext, PageDetailActivity.class);
-//                intent.putExtra("CONTENT_TYPE", mDataset.get(position).getContentsType());
                     intent.putExtra("PAGE_ID", mDataset.get(position).get_id());
-                    mContext.startActivity(intent);
-
                     break;
 
                 case PLATFORM_YOUTUBE:
-
-                    intent = new Intent(mContext, PageDetailActivity.class);
                     intent.putExtra("CHANNEL_ID", mDataset.get(position).get_id());
                     intent.putExtra("PROFILE_URL", mDataset.get(position).getProfile());
-                    mContext.startActivity(intent);
                     break;
 
                 case PLATFORM_PINTEREST:
 
                     break;
             }
+            mContext.startActivity(intent);
         }
     }
 

@@ -93,7 +93,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     private void addFragmentOnTop() {
 
-        Fragment fragment = new TodayFragment();
+        Fragment fragment = TodayFragment.newInstance();
         mFragmentList[TAB_TODAY] = fragment;
         mFragmentManager.beginTransaction()
                 .add(R.id.layout_container, fragment)
@@ -112,7 +112,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
                     case TAB_TODAY:
                         if (mFragmentList[TAB_TODAY] == null) {
-                            fragment = new TodayFragment();
+                            fragment = TodayFragment.newInstance();
                             mFragmentList[TAB_TODAY] = fragment;
                         }
                         break;

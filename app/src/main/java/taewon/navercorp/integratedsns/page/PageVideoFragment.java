@@ -110,7 +110,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
         mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
 
         // call video lists along with platform
-        switch(mPlatformType){
+        switch (mPlatformType) {
             case PLATFORM_FACEBOOK:
                 getFacebookVideoList();
                 break;
@@ -131,10 +131,10 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
                     @Override
                     public void onCompleted(GraphResponse response) {
 
-                        if(response.getError() == null){
+                        if (response.getError() == null) {
 
                             FacebookPageVideoData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookPageVideoData.class);
-                            for(FacebookPageVideoData.Video video : result.getData()){
+                            for (FacebookPageVideoData.Video video : result.getData()) {
 
                                 FavoPageVideoData data = new FavoPageVideoData();
 
@@ -177,12 +177,14 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
                 if (response.isSuccessful()) {
 
-                    for(YoutubeChannelPlaylistData.Item video : response.body().getItems()) {
+                    for (YoutubeChannelPlaylistData.Item video : response.body().getItems()) {
 
                         FavoPageVideoData data = new FavoPageVideoData();
 
                         data.setPlatformType(PLATFORM_YOUTUBE);
-                        data.setPicture(video.getSnippet().getThumbnails().getHigh().getUrl());
+                        if (video.getSnippet().getThumbnails() != null) {
+                            data.setPicture(video.getSnippet().getThumbnails().getHigh().getUrl());
+                        }
                         data.setTitle(video.getSnippet().getTitle());
                         data.setPubDate(video.getSnippet().getPublishedAt());
                         data.setVideoCount(video.getContentDetails().getItemCount());
