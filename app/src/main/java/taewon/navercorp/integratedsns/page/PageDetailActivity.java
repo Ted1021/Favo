@@ -154,7 +154,9 @@ public class PageDetailActivity extends AppCompatActivity {
                             FacebookPageInfoData pageInfo = new Gson().fromJson(response.getJSONObject().toString(), FacebookPageInfoData.class);
 
                             mPageData.setProfileImage(pageInfo.getPicture().getData().getUrl());
-                            mPageData.setCoverImage(pageInfo.getCover().getSource());
+                            if (pageInfo.getCover() != null) {
+                                mPageData.setCoverImage(pageInfo.getCover().getSource());
+                            }
                             mPageData.setPageName(pageInfo.getName());
                             mPageData.setDescription(pageInfo.getDescription());
                             mPageData.setSubscriptionCount(pageInfo.getFan_count());
@@ -231,7 +233,7 @@ public class PageDetailActivity extends AppCompatActivity {
                     mPageData.setPageName(result.getDisplayName());
                     mPageData.setCoverImage(result.getOfflineImageUrl());
                     mPageData.setDescription(result.getDescription());
-                    mPageData.setSubscriptionCount(String.format(Locale.KOREA, "%d 명",result.getViewCount()));
+                    mPageData.setSubscriptionCount(String.format(Locale.KOREA, "%d 명", result.getViewCount()));
 
                     bindItem();
 

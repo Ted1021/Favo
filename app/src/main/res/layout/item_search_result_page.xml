@@ -6,6 +6,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/layout_pageDetail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -14,7 +15,6 @@
         android:orientation="horizontal">
 
         <FrameLayout
-            android:id="@+id/layout_page_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 

@@ -1,11 +1,11 @@
 package taewon.navercorp.integratedsns.search;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
+import taewon.navercorp.integratedsns.page.PageDetailActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -41,14 +42,12 @@ public class SearchPageListAdapter extends RecyclerView.Adapter<SearchPageListAd
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // common components
-        private TextView mUserName, mAbout, mComment;
+        private TextView mUserName, mAbout;
         private ImageView mProfile, mPlatformType;
-        private FrameLayout mPageDetail;
-        private LinearLayout mCommentDetail;
-        private View mLine;
+        private LinearLayout mPageDetail;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -57,10 +56,43 @@ public class SearchPageListAdapter extends RecyclerView.Adapter<SearchPageListAd
             mAbout = (TextView) itemView.findViewById(R.id.textView_about);
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
-            mComment = (TextView) itemView.findViewById(R.id.textView_comment);
-            mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
-            mCommentDetail = (LinearLayout) itemView.findViewById(R.id.layout_comment);
-            mLine = itemView.findViewById(R.id.line);
+            mPageDetail = (LinearLayout) itemView.findViewById(R.id.layout_pageDetail);
+            mPageDetail.setOnClickListener(this);
+        }
+
+        private void loadPageDetail(int position) {
+
+            Intent intent = new Intent(mContext, PageDetailActivity.class);
+            String platformType = mDataset.get(position).getPlatformType();
+            intent.putExtra("PLATFORM_TYPE", platformType);
+
+            switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    intent.putExtra("PAGE_ID", mDataset.get(position).getPageId());
+                    break;
+
+                case PLATFORM_YOUTUBE:
+                    intent.putExtra("CHANNEL_ID", mDataset.get(position).getPageId());
+                    intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
+                    break;
+
+                case PLATFORM_TWITCH:
+                    intent.putExtra("USER_ID", mDataset.get(position).getPageId());
+                    intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
+                    break;
+            }
+            mContext.startActivity(intent);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getLayoutPosition();
+            switch (v.getId()) {
+                case R.id.layout_pageDetail:
+                    loadPageDetail(position);
+                    break;
+            }
         }
     }
 
@@ -79,7 +111,7 @@ public class SearchPageListAdapter extends RecyclerView.Adapter<SearchPageListAd
         holder.mUserName.setText(data.getUserName());
         holder.mAbout.setText(data.getDescription());
 
-        if(data.getProfileImage() != null){
+        if (data.getProfileImage() != null) {
             Glide.with(mContext.getApplicationContext()).load(data.getProfileImage())
                     .apply(new RequestOptions().circleCropTransform())
                     .transition(new DrawableTransitionOptions().crossFade())

@@ -8,7 +8,7 @@ public class FavoPageInfoData {
 
     private String profileImage;
     private String PageName;
-    private String coverImage;
+    private String coverImage=null;
     private String description;
     private String subscriptionCount;
 
