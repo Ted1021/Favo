@@ -72,7 +72,9 @@
         <activity
             android:name=".util.TwitchWebViewActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-        <activity android:name=".search.SearchDetailActivity"></activity>
+
+        <activity android:name=".search.SearchDetailActivity"
+            android:configChanges="orientation|screenSize|keyboard"/>
     </application>
 
 </manifest>

@@ -1,7 +1,9 @@
 package taewon.navercorp.integratedsns.search;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
@@ -21,13 +23,15 @@ import taewon.navercorp.integratedsns.R;
  * Created by USER on 2017-11-13.
  */
 
-public class SearchResultLayout extends LinearLayout {
+public class SearchResultLayout extends LinearLayout implements View.OnClickListener {
 
     private TextView mTitle;
     private Button mMore;
     private RecyclerView mResultList;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private int mResultType;
 
     private static final int RESULT_PAGE = 0;
     private static final int RESULT_VIDEO = 1;
@@ -60,12 +64,15 @@ public class SearchResultLayout extends LinearLayout {
 
         mTitle = (TextView) view.findViewById(R.id.textView_title);
         mMore = (Button) view.findViewById(R.id.button_more);
+        mMore.setOnClickListener(this);
         mResultList = (RecyclerView) view.findViewById(R.id.recyclerView_searchResult);
     }
 
     public void setView(int resultType, Context context, ArrayList dataset){
 
-        switch(resultType){
+        mResultType = resultType;
+
+        switch(mResultType){
             case RESULT_PAGE:
                 mTitle.setText("Page & Channel");
                 mAdapter = new SearchPageListAdapter(context, dataset);
@@ -98,5 +105,17 @@ public class SearchResultLayout extends LinearLayout {
     }
     public RecyclerView.LayoutManager getLayoutManager(){
         return mLayoutManager;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+
+            case R.id.button_more:
+                Intent intent = new Intent(this.getContext().getString(R.string.search_detail_request));
+                intent.putExtra("RESULT_TYPE",mResultType);
+                LocalBroadcastManager.getInstance(this.getContext()).sendBroadcast(intent);
+                break;
+        }
     }
 }
