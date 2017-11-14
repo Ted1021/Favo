@@ -653,6 +653,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private void getTwitchUserInfo() {
 
         String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), "");
+        Log.d("CHECK_TWITCH", currentToken);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())

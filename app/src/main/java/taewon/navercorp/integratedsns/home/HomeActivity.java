@@ -24,6 +24,7 @@ import com.google.api.services.youtube.YouTubeScopes;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
+import taewon.navercorp.integratedsns.live.LiveStreamingFragment;
 import taewon.navercorp.integratedsns.profile.ProfileFragment;
 import taewon.navercorp.integratedsns.search.SearchFragment;
 import taewon.navercorp.integratedsns.today.TodayFragment;
@@ -51,8 +52,10 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final int TAB_TODAY = 0;
     private static final int TAB_FEED = 1;
     private static final int TAB_SEARCH = 2;
-    private static final int TAB_PROFILE = 3;
-    private static final int MAX_FRAGMENT = 4;
+    private static final int TAB_LIVE = 3;
+    private static final int TAB_PROFILE = 4;
+    private static final int MAX_FRAGMENT = 5;
+
     private static final int TIME_LENGTH = 2000;
 
     @Override
@@ -64,6 +67,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         initView();
         addFragmentOnTop();
         setAction();
+
     }
 
     private void initData() {
@@ -128,6 +132,13 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                         if (mFragmentList[TAB_SEARCH] == null) {
                             fragment = SearchFragment.newInstance();
                             mFragmentList[TAB_SEARCH] = fragment;
+                        }
+                        break;
+
+                    case TAB_LIVE:
+                        if (mFragmentList[TAB_LIVE] == null) {
+                            fragment = LiveStreamingFragment.newInstance();
+                            mFragmentList[TAB_LIVE] = fragment;
                         }
                         break;
 
