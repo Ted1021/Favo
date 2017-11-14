@@ -1,7 +1,10 @@
 package taewon.navercorp.integratedsns.search;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +18,9 @@ import com.bumptech.glide.request.RequestOptions;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.feed.VideoActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
+import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -39,7 +44,7 @@ public class SearchVideoListAdapter extends RecyclerView.Adapter<SearchVideoList
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         // common components
         private TextView mUserName, mTitle;
@@ -52,6 +57,51 @@ public class SearchVideoListAdapter extends RecyclerView.Adapter<SearchVideoList
             mTitle = (TextView) itemView.findViewById(R.id.textView_title);
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
+            mPicture.setOnClickListener(this);
+        }
+
+        private void loadVideo(int position) {
+
+            if (TextUtils.isEmpty(mDataset.get(position).getVideoUrl())) {
+
+                return;
+            }
+
+            String videoUrl = mDataset.get(position).getVideoUrl();
+            String platformType = mDataset.get(position).getPlatformType();
+            Intent intent = null;
+            switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    Uri uri = Uri.parse(videoUrl);
+                    intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.setDataAndType(uri, "video/*");
+                    break;
+
+                case PLATFORM_YOUTUBE:
+                    intent = new Intent(mContext, VideoActivity.class);
+                    intent.putExtra("VIDEO_ID", videoUrl);
+                    break;
+
+                case PLATFORM_TWITCH:
+                    String twitchUrl = String.format("http://player.twitch.tv?video=%s", mDataset.get(position).getVideoUrl());
+                    intent = new Intent(mContext, TwitchWebViewActivity.class);
+                    intent.putExtra("REQ_TYPE", "video");
+                    intent.putExtra("REQ_URL", twitchUrl);
+                    break;
+            }
+            mContext.startActivity(intent);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getLayoutPosition();
+            switch(v.getId()){
+
+                case R.id.imageView_picture:
+                    loadVideo(position);
+                    break;
+            }
         }
     }
 
