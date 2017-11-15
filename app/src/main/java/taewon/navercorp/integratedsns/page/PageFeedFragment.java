@@ -1,7 +1,6 @@
 package taewon.navercorp.integratedsns.page;
 
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -32,12 +31,12 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedListAdapter;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.facebook.FacebookFeedData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
-import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
@@ -48,7 +47,7 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
 
 public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    private SharedPreferences mPref;
+    private FavoTokenManager mFavoTokenManager;
 
     private SwipeRefreshLayout mRefreshLayout;
     private RecyclerView mPageFeedList;
@@ -119,7 +118,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
         mRealm = Realm.getDefaultInstance();
 
         // init preference
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         switch (mPlatformType) {
 
@@ -216,7 +215,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private void getYoutubeChannelFeed() {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)

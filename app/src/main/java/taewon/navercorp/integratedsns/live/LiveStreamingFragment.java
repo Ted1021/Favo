@@ -1,10 +1,10 @@
 package taewon.navercorp.integratedsns.live;
 
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -34,10 +34,11 @@ import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
-import static android.content.Context.MODE_PRIVATE;
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_ACCEPT_CODE;
@@ -45,15 +46,15 @@ import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 
-public class LiveStreamingFragment extends Fragment {
+public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    // for managing tokens
-    private SharedPreferences mPref;
-    private SharedPreferences.Editor mEditor;
+    private FavoTokenManager mFavoTokenManager;
 
     private RecyclerView mLiveStreamingList;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutmanager;
+
+    private SwipeRefreshLayout mRefreshLayout;
 
     private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
 
@@ -73,7 +74,6 @@ public class LiveStreamingFragment extends Fragment {
     public LiveStreamingFragment() {
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -81,13 +81,16 @@ public class LiveStreamingFragment extends Fragment {
 
         initView(view);
         if (isInit) {
-            initData();
+            loadData();
             isInit = false;
         }
         return view;
     }
 
     private void initView(View view) {
+
+        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
+        mRefreshLayout.setOnRefreshListener(this);
 
         mLiveStreamingList = (RecyclerView) view.findViewById(R.id.recyclerView_liveStreamingList);
         mAdapter = new LiveStreamingListAdapter(getContext(), mDataset);
@@ -97,14 +100,13 @@ public class LiveStreamingFragment extends Fragment {
         mLiveStreamingList.setLayoutManager(mLayoutmanager);
     }
 
-    private void initData() {
+    private void loadData() {
 
-        // preference
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
-        String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        String googleToken = mPref.getString(getString(R.string.google_token), "");
-        String twitchToken = mPref.getString(getString(R.string.twitch_token), "");
+        String facebookToken = mFavoTokenManager.getCurrentToken(PLATFORM_FACEBOOK);
+        String googleToken = mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE);
+        String twitchToken = mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
 
         mDataset.clear();
         mAdapter.notifyDataSetChanged();
@@ -128,7 +130,7 @@ public class LiveStreamingFragment extends Fragment {
 //        mRefreshLayout.setRefreshing(true);
 
         // get google credential access token
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), null));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         // set retrofit
         Retrofit retrofit = new Retrofit.Builder()
@@ -144,14 +146,16 @@ public class LiveStreamingFragment extends Fragment {
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
                 if (response.isSuccessful()) {
 
-
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
 
                         String[] params = {item.getSnippet().getResourceId().getChannelId(), item.getSnippet().getThumbnails().getHigh().getUrl()};
                         new GetYoutubeChannelStreams().executeOnExecutor(THREAD_POOL_EXECUTOR, params);
                     }
+
+                    mRefreshLayout.setRefreshing(false);
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
+                    mRefreshLayout.setRefreshing(false);
                 }
             }
 
@@ -159,6 +163,7 @@ public class LiveStreamingFragment extends Fragment {
             public void onFailure(Call<YoutubeSubscriptionData> call, Throwable t) {
                 Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to access youtube api server");
                 Toast.makeText(getContext(), "Fail to access youtube server", Toast.LENGTH_SHORT).show();
+                mRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -168,7 +173,7 @@ public class LiveStreamingFragment extends Fragment {
         @Override
         protected Void doInBackground(final String... params) {
 
-            String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+            String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
             final String profileUrl = params[1];
 
             Retrofit retrofit = new Retrofit.Builder()
@@ -240,7 +245,7 @@ public class LiveStreamingFragment extends Fragment {
         TwitchService service = retrofit.create(TwitchService.class);
         Call<TwitchStreamingDataV5> call = service.getTwitchFollowingStreams(TWITCH_ACCEPT_CODE,
                 getString(R.string.twitch_client_id),
-                "OAuth " + mPref.getString(getString(R.string.twitch_token), ""), 10);
+                "OAuth " + FavoTokenManager.getInstance().getCurrentToken(getString(R.string.twitch_token)), 10);
         call.enqueue(new Callback<TwitchStreamingDataV5>() {
             @Override
             public void onResponse(Call<TwitchStreamingDataV5> call, Response<TwitchStreamingDataV5> response) {
@@ -278,4 +283,8 @@ public class LiveStreamingFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onRefresh() {
+        loadData();
+    }
 }

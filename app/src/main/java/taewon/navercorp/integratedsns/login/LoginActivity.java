@@ -47,6 +47,11 @@ import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
 
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_GIPHY;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_REDIRECT_URL;
 
@@ -164,6 +169,10 @@ public class LoginActivity extends AppCompatActivity
             case R.id.button_twitch_login:
                 getTwitchToken();
                 break;
+
+            case R.id.button_giphy_login:
+                getGiphyToken();
+                break;
         }
     }
 
@@ -175,7 +184,7 @@ public class LoginActivity extends AppCompatActivity
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                mFavoTokenManager.createToken(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
+                mFavoTokenManager.createToken(PLATFORM_FACEBOOK, loginResult.getAccessToken().getToken());
                 enterMainService();
             }
 
@@ -204,7 +213,7 @@ public class LoginActivity extends AppCompatActivity
         mPinterestClient.login(this, Arrays.asList(PINTEREST_SCOPE), new PDKCallback() {
             @Override
             public void onSuccess(PDKResponse response) {
-                mFavoTokenManager.createToken(getString(R.string.pinterest_token), response.getUser().getUid());
+                mFavoTokenManager.createToken(PLATFORM_PINTEREST, response.getUser().getUid());
                 enterMainService();
             }
 
@@ -250,6 +259,10 @@ public class LoginActivity extends AppCompatActivity
         });
     }
 
+    private void getGiphyToken() {
+        mFavoTokenManager.createToken(PLATFORM_GIPHY, PLATFORM_GIPHY);
+    }
+
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
 
         @Override
@@ -261,7 +274,7 @@ public class LoginActivity extends AppCompatActivity
 
             // set google preference
             try {
-                mFavoTokenManager.createToken(getString(R.string.google_token), credential.getToken());
+                mFavoTokenManager.createToken(PLATFORM_YOUTUBE, credential.getToken());
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("ERROR_LOGIN", "Login Activity >>>>> fail to get credential token");
@@ -302,7 +315,7 @@ public class LoginActivity extends AppCompatActivity
         Log.d("CHECK_TOKEN", token);
 
         if (!token.equals("")) {
-            mFavoTokenManager.createToken(getString(R.string.twitch_token), token);
+            mFavoTokenManager.createToken(PLATFORM_TWITCH, token);
             enterMainService();
         }
     }

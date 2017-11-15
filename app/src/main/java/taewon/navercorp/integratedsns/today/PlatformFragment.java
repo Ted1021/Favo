@@ -1,7 +1,6 @@
 package taewon.navercorp.integratedsns.today;
 
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -31,8 +30,8 @@ import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.giphy.GiphyImageData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
-import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.R.id.viewPager;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.GIPHY_BASE_URL;
@@ -48,7 +47,7 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
 public class PlatformFragment extends Fragment {
 
     // for managing tokens
-    private SharedPreferences mPref;
+    private FavoTokenManager mFavoTokenManager;
 
     private VerticalCardStackViewPager mViewPager;
     private CardStackAdapter mAdapter;
@@ -112,7 +111,7 @@ public class PlatformFragment extends Fragment {
     private void initData(String platformType) {
 
         // preference
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         switch (platformType) {
 
@@ -137,7 +136,7 @@ public class PlatformFragment extends Fragment {
 
     private void getYoutubeTrendVideos() {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)

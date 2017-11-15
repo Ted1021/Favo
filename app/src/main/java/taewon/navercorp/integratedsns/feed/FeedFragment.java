@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -52,18 +51,18 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.comment.CommentListAdapter;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.model.facebook.FacebookCommentData;
-import taewon.navercorp.integratedsns.model.favo.FavoCommentData;
-import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
-import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.facebook.FacebookFeedData;
+import taewon.navercorp.integratedsns.model.favo.FavoCommentData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
-import static android.content.Context.MODE_PRIVATE;
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
@@ -83,9 +82,7 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
 
 public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    // for managing tokens
-    private SharedPreferences mPref;
-    private SharedPreferences.Editor mEditor;
+    private FavoTokenManager mFavoTokenManager;
 
     // for pinterest client
     private PDKClient mPinterestClient;
@@ -111,8 +108,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private SimpleDateFormat mStringFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
     private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-    private String tempUserId = "102859695";
-
     private int mAsyncCount = 0;
     private int mLastPosition = 0;
 
@@ -133,8 +128,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     @Override
-    public void onDestroy() {
-
+    public void onDetach() {
         // close Realm Instance
         mRealm.close();
 
@@ -142,21 +136,20 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mTokenUpdateReceiver);
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mAsyncFinishReceiver);
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mScrollToTopReceiver);
-
-        super.onDestroy();
+        Log.e("CHECK_DETACH", "   ");
+        super.onDetach();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_feed, container, false);
 
-        initData();
         initView(view);
 
         if (isInit) {
             isInit = false;
+            initData();
             checkToken();
         }
         return view;
@@ -205,12 +198,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void initData() {
 
+        // init token manager
+        mFavoTokenManager = FavoTokenManager.getInstance();
+
         // realm Instance
         mRealm = Realm.getDefaultInstance();
-
-        // preference
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        mEditor = mPref.edit();
 
         // pinterest client
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
@@ -220,6 +212,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mTokenUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Log.e("CHECK_REQUEST", ">>>>>>>>>>>>");
                 checkToken();
             }
         };
@@ -271,10 +264,10 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private void checkToken() {
 
         mAsyncCount = 0;
-        String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        String googleToken = mPref.getString(getString(R.string.google_token), "");
-        String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
-        String twitchToken = mPref.getString(getString(R.string.twitch_token), "");
+        String facebookToken = mFavoTokenManager.getCurrentToken(PLATFORM_FACEBOOK);
+        String googleToken = mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE);
+        String pinterestToken = mFavoTokenManager.getCurrentToken(PLATFORM_PINTEREST);
+        String twitchToken = mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
 
         mFeedDataset.clear();
         mFeedAdapter.notifyDataSetChanged();
@@ -536,7 +529,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mRefreshLayout.setRefreshing(true);
 
         // get google credential access token
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), null));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         // set retrofit
         Retrofit retrofit = new Retrofit.Builder()
@@ -561,8 +554,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
 
-                    mEditor.putString(getString(R.string.google_token), "");
-                    mEditor.commit();
+                    mFavoTokenManager.createToken(PLATFORM_YOUTUBE, "");
                     checkToken();
                 }
             }
@@ -580,7 +572,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         @Override
         protected Void doInBackground(final String... params) {
 
-            String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+            String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
             final String profileUrl = params[1];
 
             Retrofit retrofit = new Retrofit.Builder()
@@ -652,7 +644,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void getTwitchUserInfo() {
 
-        String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), "");
+        String currentToken = "Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
         Log.d("CHECK_TWITCH", currentToken);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
@@ -711,7 +703,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void getTwitchStreamerInfo(String userId) {
 
-        String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), userId);
+        String currentToken = "Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -830,7 +822,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void getYoutubeComment(String feedId) {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())

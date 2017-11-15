@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -42,8 +41,8 @@ import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
-import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
@@ -56,7 +55,7 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
  */
 public class SearchFragment extends Fragment implements EditText.OnEditorActionListener {
 
-    private SharedPreferences mPref;
+    private FavoTokenManager mFavoTokenManager;
 
     private EditText mSearch;
     private SearchResultLayout mPageResult, mVideoResult, mPhotoResult;
@@ -120,8 +119,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
     private void initData() {
 
-        // init preference
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         // request search detail receiver
         mSearchDetailReceiver = new BroadcastReceiver() {
@@ -247,7 +245,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
     private void getYoutubeChannel() {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)
@@ -330,7 +328,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
     private void getYoutubeVideo() {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)
@@ -380,7 +378,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
                 .build();
 
         TwitchService service = retrofit.create(TwitchService.class);
-        Call<TwitchStreamingDataV5> call = service.searchTwitchStreams(TWITCH_ACCEPT_CODE, "4n0mf4u10svjmioh7us0yxcw1wng56", mQuery, MAX_VIDEO_COUNT);
+        Call<TwitchStreamingDataV5> call = service.searchTwitchStreams(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mQuery, MAX_VIDEO_COUNT);
         call.enqueue(new Callback<TwitchStreamingDataV5>() {
             @Override
             public void onResponse(Call<TwitchStreamingDataV5> call, Response<TwitchStreamingDataV5> response) {

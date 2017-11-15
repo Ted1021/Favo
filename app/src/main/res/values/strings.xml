@@ -19,6 +19,7 @@
     <string name="twitch_client_secret">9wqgigujqzys0cnxpjdere8yk099rz</string>
 
     <string name="giphy_api_key">yfEUjOH0kmWK01krPXrhn2dgrs3n6CYB</string>
+    <string name="giphy_token">giphy_token</string>
 
     <string name="facebook_login_fail">페이스북 로그인에 실패 하였습니다.</string>
     <string name="google_login_fail">구글 로그인에 실패 하였습니다.</string>
@@ -38,5 +39,10 @@
     <string name="search_detail_request">search_detail_request</string>
 
     <string name="app_closing_alert">한번 더 누르시면 앱이 종료됩니다.</string>
+
+    <string name="login_success">Successfully connect to </string>
+    <string name="login_fail">Fail to connect to </string>
+    <string name="logout_success">Successfully logout </string>
+    <string name="logout_fail">Fail to logout </string>
 
 </resources>

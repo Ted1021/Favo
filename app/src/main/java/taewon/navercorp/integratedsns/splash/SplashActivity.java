@@ -2,7 +2,6 @@ package taewon.navercorp.integratedsns.splash;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +10,13 @@ import android.widget.ImageView;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 import taewon.navercorp.integratedsns.login.LoginActivity;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
+
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_GIPHY;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 /**
  * @author 김태원
@@ -40,21 +46,23 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void checkTokens() {
-
-        SharedPreferences pref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-
-        String facebookToken = pref.getString(getString(R.string.facebook_token), "");
-        String googleToken = pref.getString(getString(R.string.google_token), "");
-        String pinterestToken = pref.getString(getString(R.string.pinterest_token), "");
-        String twitchToken = pref.getString(getString(R.string.twitch_token), "");
+        FavoTokenManager favoTokenManager = FavoTokenManager.getInstance();
 
         Intent intent;
-        if (facebookToken.equals("") && googleToken.equals("") && pinterestToken.equals("") && twitchToken.equals("")) {
+        // jump to login activity
+        if (!favoTokenManager.isTokenVaild(PLATFORM_FACEBOOK) &&
+                !favoTokenManager.isTokenVaild(PLATFORM_YOUTUBE) &&
+                !favoTokenManager.isTokenVaild(PLATFORM_PINTEREST) &&
+                !favoTokenManager.isTokenVaild(PLATFORM_TWITCH) &&
+                !favoTokenManager.isTokenVaild(PLATFORM_GIPHY)) {
+
             intent = new Intent(SplashActivity.this, LoginActivity.class);
             ActivityOptions options = ActivityOptions
                     .makeSceneTransitionAnimation(this, mLogo, "logo");
             startActivity(intent, options.toBundle());
-        } else {
+        }
+        // jump to home activity
+        else {
             intent = new Intent(SplashActivity.this, HomeActivity.class);
             startActivity(intent);
         }

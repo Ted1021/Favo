@@ -1,7 +1,6 @@
 package taewon.navercorp.integratedsns.today;
 
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
-import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
@@ -27,7 +26,7 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE
 public class TodayFragment extends Fragment {
 
     // for managing tokens
-    private SharedPreferences mPref;
+    private FavoTokenManager mFavoTokenManager;
 
     private ParallaxViewPager mViewPager;
     private PlatformAdapter mAdapter;
@@ -63,26 +62,17 @@ public class TodayFragment extends Fragment {
     private void checkToken() {
 
         // preference
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
-        String facebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        String googleToken = mPref.getString(getString(R.string.google_token), "");
-//        String pinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
-        String twitchToken = mPref.getString(getString(R.string.twitch_token), "");
-
-        if (!facebookToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
             mPlatformList.add(PLATFORM_FACEBOOK);
         }
 
-        if (!googleToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
             mPlatformList.add(PLATFORM_YOUTUBE);
         }
 
-//        if (!pinterestToken.equals("")) {
-//            mPlatformList.add(PLATFORM_PINTEREST);
-//        }
-
-        if (!twitchToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)) {
             mPlatformList.add(PLATFORM_TWITCH);
         }
     }

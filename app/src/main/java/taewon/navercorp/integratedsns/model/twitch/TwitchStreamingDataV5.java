@@ -233,7 +233,7 @@ public class TwitchStreamingDataV5 {
             private String game;
             @SerializedName("language")
             private String language;
-//            @SerializedName("_id")
+            @SerializedName("_id")
             private Integer id;
             @SerializedName("name")
             private String name;

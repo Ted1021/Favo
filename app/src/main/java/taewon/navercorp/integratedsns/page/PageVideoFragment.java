@@ -1,7 +1,6 @@
 package taewon.navercorp.integratedsns.page;
 
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -29,14 +28,16 @@ import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.facebook.FacebookPageVideoData;
 import taewon.navercorp.integratedsns.model.favo.FavoPageVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelPlaylistData;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
-import static android.content.Context.MODE_PRIVATE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 
 public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+
+    private FavoTokenManager mFavoTokenManager;
 
     // recyclerView components
     private SwipeRefreshLayout mRefreshLayout;
@@ -45,7 +46,6 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
     private PageVideoAdapter mAdapter;
 
     // platform & video data
-    private SharedPreferences mPref;
     private String mPlatformType;
     private String mPageId;
 
@@ -107,7 +107,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
     private void bindData() {
 
         // get access tokens
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         // call video lists along with platform
         switch (mPlatformType) {
@@ -162,7 +162,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
     private void getYoutubePlaylist() {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)

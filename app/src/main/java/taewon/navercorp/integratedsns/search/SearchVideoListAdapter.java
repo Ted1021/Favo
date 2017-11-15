@@ -84,7 +84,7 @@ public class SearchVideoListAdapter extends RecyclerView.Adapter<SearchVideoList
                     break;
 
                 case PLATFORM_TWITCH:
-                    String twitchUrl = String.format("http://player.twitch.tv?video=%s", mDataset.get(position).getVideoUrl());
+                    String twitchUrl = String.format("http://player.twitch.tv?channel=%s", mDataset.get(position).getUserName());
                     intent = new Intent(mContext, TwitchWebViewActivity.class);
                     intent.putExtra("REQ_TYPE", "video");
                     intent.putExtra("REQ_URL", twitchUrl);
@@ -123,7 +123,6 @@ public class SearchVideoListAdapter extends RecyclerView.Adapter<SearchVideoList
         Glide.with(mContext.getApplicationContext()).load(data.getPicture())
                 .apply(new RequestOptions().override(864, 486))
                 .apply(new RequestOptions().centerCrop())
-//                .thumbnail(0.5f)
                 .transition(new DrawableTransitionOptions().crossFade())
                 .into(holder.mPicture);
 
@@ -131,24 +130,28 @@ public class SearchVideoListAdapter extends RecyclerView.Adapter<SearchVideoList
 
             case PLATFORM_FACEBOOK:
                 Glide.with(mContext.getApplicationContext()).load(R.drawable.icon_facebook_small)
+                        .apply(new RequestOptions().centerCrop())
                         .transition(new DrawableTransitionOptions().crossFade())
                         .into(holder.mProfile);
                 break;
 
             case PLATFORM_YOUTUBE:
                 Glide.with(mContext.getApplicationContext()).load(R.drawable.icon_youtube_small)
+                        .apply(new RequestOptions().centerCrop())
                         .transition(new DrawableTransitionOptions().crossFade())
                         .into(holder.mProfile);
                 break;
 
             case PLATFORM_PINTEREST:
                 Glide.with(mContext.getApplicationContext()).load(R.drawable.icon_pinterest_small)
+                        .apply(new RequestOptions().centerCrop())
                         .transition(new DrawableTransitionOptions().crossFade())
                         .into(holder.mProfile);
                 break;
 
             case PLATFORM_TWITCH:
                 Glide.with(mContext.getApplicationContext()).load(R.drawable.twitch_icon_small)
+                        .apply(new RequestOptions().centerCrop())
                         .transition(new DrawableTransitionOptions().crossFade())
                         .into(holder.mProfile);
                 break;

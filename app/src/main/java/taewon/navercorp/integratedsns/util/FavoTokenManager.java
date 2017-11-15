@@ -44,7 +44,7 @@ public class FavoTokenManager {
     }
 
     public String getCurrentToken(String platformType) {
-        return mFavoTokens.get(platformType);
+        return mPref.getString(platformType, "");
     }
 
     public HashMap checkTokenStatus() {
@@ -52,7 +52,7 @@ public class FavoTokenManager {
     }
 
     public void removeToken(String platFormType) {
-        mEditor.remove(platFormType);
+        mEditor.putString(platFormType, "");
         mEditor.commit();
         mFavoTokens.remove(platFormType);
     }
@@ -61,5 +61,9 @@ public class FavoTokenManager {
         mEditor.clear();
         mEditor.commit();
         mFavoTokens.clear();
+    }
+
+    public boolean isTokenVaild(String platformType){
+        return !getCurrentToken(platformType).equals("");
     }
 }

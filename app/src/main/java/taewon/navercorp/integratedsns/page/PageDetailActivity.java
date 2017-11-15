@@ -1,7 +1,6 @@
 package taewon.navercorp.integratedsns.page;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -34,10 +33,11 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.model.facebook.FacebookPageInfoData;
 import taewon.navercorp.integratedsns.model.favo.FavoPageInfoData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelInfoData;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
@@ -46,6 +46,8 @@ import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
 public class PageDetailActivity extends AppCompatActivity {
+
+    private FavoTokenManager mFavoTokenManager;
 
     // ui components
     private ImageView mCover, mProfile;
@@ -56,7 +58,6 @@ public class PageDetailActivity extends AppCompatActivity {
     private Button mSubscribe;
 
     // page data
-    private SharedPreferences mPref;
     private String mPageId;
     private String mPlatformType;
     private String mProfileImage;
@@ -79,7 +80,7 @@ public class PageDetailActivity extends AppCompatActivity {
     private void initData() {
 
         // init preference
-        mPref = PageDetailActivity.this.getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         // init platform type & page ID
         Intent intent = getIntent();
@@ -177,7 +178,7 @@ public class PageDetailActivity extends AppCompatActivity {
 
     private void getYoutubeChannelInfo() {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)
@@ -215,7 +216,7 @@ public class PageDetailActivity extends AppCompatActivity {
 
     private void getTwitchStreamerInfo() {
 
-        String currentToken = "Bearer " + mPref.getString(getString(R.string.twitch_token), "");
+        String currentToken = "Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())

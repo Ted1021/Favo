@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -34,8 +33,12 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.profile.following.FollowingListFragment;
 import taewon.navercorp.integratedsns.profile.pin.MyPinFragment;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
-import static android.content.Context.MODE_PRIVATE;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 /**
  * @author 김태원
@@ -45,15 +48,8 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
-    private static final String BOARD_FIELDS = "id,name";
-    private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
-
-    private SharedPreferences mPref;
-    private SharedPreferences.Editor mEditor;
-
+    private FavoTokenManager mFavoTokenManager;
     private BroadcastReceiver mTokenUpdateReceiver;
-
-    private String mFacebookToken, mGoogleToken, mPinterestToken;
     private PDKClient mPinterestClient;
 
     private ImageView mProfile;
@@ -67,6 +63,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private static final int TAB_COUNT = 2;
     private static final int TAB_FOLLOWING = 0;
     private static final int TAB_MY_PIN = 1;
+
+    private static final String BOARD_FIELDS = "id,name";
+    private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
 
     public ProfileFragment() {
     }
@@ -97,12 +96,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private void initData() {
 
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        mEditor = mPref.edit();
-
-        mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        mGoogleToken = mPref.getString(getString(R.string.google_token), "");
-        mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
         mPinterestClient = PDKClient.getInstance();
@@ -132,11 +126,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private void setProfileInfo() {
 
-        if (!mFacebookToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
             getFacebookUserInfo();
-        } else if (!mGoogleToken.equals("")) {
+        } else if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
 
-        } else {
+        } else if(mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
+
+        } else if(mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)){
 
         }
     }

@@ -1,7 +1,6 @@
 package taewon.navercorp.integratedsns.feed.comment;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -28,10 +27,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.facebook.FacebookCommentData;
+import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubePostCommentData;
-import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -40,7 +40,7 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
 
 public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private SharedPreferences mPref;
+    private FavoTokenManager mFavoTokenManager;
 
     private RecyclerView mCommentList;
     private RecyclerView.Adapter mAdapter;
@@ -76,8 +76,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
     private void initData() {
 
-        // init preference
-        mPref = CommentActivity.this.getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         Intent intent = getIntent();
         mContentType = intent.getIntExtra("CONTENT_TYPE", 0);
@@ -212,7 +211,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
 
     private void getYoutubeComment() {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)
@@ -254,7 +253,7 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         commentData.getSnippet().setVideoId(mVideoId);
         commentData.getSnippet().getTopLevelComment().getSnippet().setTextOriginal(userComment);
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
         Log.d("CHECK_TOKEN", accessToken);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)

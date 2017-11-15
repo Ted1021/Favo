@@ -5,12 +5,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,6 +45,7 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.favo.FavoFollowingInfoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -57,8 +57,7 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
  */
 public class FollowingListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
-    private SharedPreferences mPref;
-    private SharedPreferences.Editor mEditor;
+    private FavoTokenManager mFavoTokenManager;
 
     private PDKClient mPinterestClient;
 
@@ -71,10 +70,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     private RelativeLayout mLayoutDisconnection;
 
     private ArrayList<FavoFollowingInfoData> mDataset = new ArrayList<>();
-
-    private String mFacebookToken;
-    private String mGoogleToken;
-    private String mPinterestToken;
 
     private String mCurrentPlatform = PLATFORM_FACEBOOK;
 
@@ -118,8 +113,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
 
         // init preference
-        mPref = getContext().getSharedPreferences(getString(R.string.tokens), Context.MODE_PRIVATE);
-        mEditor = mPref.edit();
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         // init pinterest client
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
@@ -154,16 +148,12 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         mAdapter = new FollowingListAdapter(getContext(), mDataset);
         mFollowingList.setAdapter(mAdapter);
 
-//        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mFollowingList.setLayoutManager(layoutManager);
     }
 
     private void setFollowingList(String platformType) {
-
-        mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        mGoogleToken = mPref.getString(getString(R.string.google_token), "");
-        mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
 
         mDataset.clear();
         mAdapter.notifyDataSetChanged();
@@ -171,21 +161,21 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         switch (platformType) {
 
             case PLATFORM_FACEBOOK:
-                if (!mFacebookToken.equals("")) {
+                if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
                     mLayoutDisconnection.setVisibility(View.GONE);
                     getFacebookUserPages();
                 }
                 break;
 
             case PLATFORM_YOUTUBE:
-                if (!mGoogleToken.equals("")) {
+                if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
                     mLayoutDisconnection.setVisibility(View.GONE);
                     getYoutubeSubscriptionList();
                 }
                 break;
 
             case PLATFORM_PINTEREST:
-                if (!mPinterestToken.equals("")) {
+                if (mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
                     mLayoutDisconnection.setVisibility(View.GONE);
                     getPinterestFollowingBoards();
                 }
@@ -246,7 +236,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         mRefreshLayout.setRefreshing(true);
 
         // get google credential access token
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), null));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         // set retrofit
         Retrofit retrofit = new Retrofit.Builder()
@@ -276,9 +266,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
                 } else {
                     Log.e(getClass().getName(), " >>>>> Token is expired" + response.toString());
-
-                    mEditor.putString(getString(R.string.google_token), "");
-                    mEditor.commit();
+                    mFavoTokenManager.removeToken(PLATFORM_YOUTUBE);
                 }
                 mRefreshLayout.setRefreshing(false);
             }

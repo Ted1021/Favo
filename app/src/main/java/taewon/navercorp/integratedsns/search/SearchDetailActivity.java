@@ -1,6 +1,5 @@
 package taewon.navercorp.integratedsns.search;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -32,6 +31,7 @@ import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
@@ -45,7 +45,7 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
 
 public class SearchDetailActivity extends AppCompatActivity {
 
-    private SharedPreferences mPref;
+    private FavoTokenManager mFavoTokenManager;
 
     private RecyclerView mSearchDetailList;
     private RecyclerView.Adapter mAdapter;
@@ -69,8 +69,7 @@ public class SearchDetailActivity extends AppCompatActivity {
 
     private void initData() {
 
-        // init preference
-        mPref = this.getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         mResultType = getIntent().getIntExtra("RESULT_TYPE", 0);
         mQuery = getIntent().getStringExtra("QUERY");
@@ -185,7 +184,7 @@ public class SearchDetailActivity extends AppCompatActivity {
 
     private void getYoutubeChannel() {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)
@@ -266,7 +265,7 @@ public class SearchDetailActivity extends AppCompatActivity {
 
     private void getYoutubeVideo() {
 
-        String accessToken = String.format("Bearer " + mPref.getString(getString(R.string.google_token), ""));
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)

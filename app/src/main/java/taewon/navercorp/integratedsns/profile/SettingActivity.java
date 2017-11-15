@@ -2,7 +2,6 @@ package taewon.navercorp.integratedsns.profile;
 
 import android.accounts.Account;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.GoogleAuthException;
@@ -38,9 +38,26 @@ import com.pinterest.android.pdk.PDKResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.interfaces.TwitchService;
+import taewon.navercorp.integratedsns.util.FavoTokenManager;
+import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
 
-public class SettingActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_GIPHY;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_REDIRECT_URL;
+
+public class SettingActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, Switch.OnCheckedChangeListener {
 
     // Auth for facebook
     private CallbackManager mCallbackManager;
@@ -65,17 +82,17 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     };
 
     // managing tokens
-    private SharedPreferences mPref;
-    private SharedPreferences.Editor mEditor;
+    private FavoTokenManager mFavoTokenManager;
 
     // UI Components
-    private Switch mFacebookSwitch, mYoutubeSwitch, mPinterestSwitch, mBandSwitch;
-    private String mFacebookToken, mGoogleToken, mPinterestToken, mBandToken;
+    private Switch mFacebookSwitch, mYoutubeSwitch, mPinterestSwitch, mTwitchSwitch, mGiphySwitch;
 
     // Auth Request Code
-    private static final int REQ_FACEBOOK_SIGN_IN = 100;
+    private static final int REQ_FACEBOOK_SIGN_IN = FacebookSdk.getCallbackRequestCodeOffset() + 0;
     private static final int REQ_GOOGLE_SIGN_IN = 101;
     private static final int REQ_PINTEREST_SIGN_IN = 8772;
+    private static final int REQ_TWITCH_SIGN_IN = 102;
+    private static final int REQ_GIPHY_SIGN_IN = 103;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,18 +101,12 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
         initData();
         initView();
-        setAction();
     }
 
     private void initData() {
 
-        // init preference of tokens
-        mPref = getSharedPreferences(getString(R.string.tokens), MODE_PRIVATE);
-        mEditor = mPref.edit();
-
-        mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
-        mGoogleToken = mPref.getString(getString(R.string.google_token), "");
-        mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
+        // init token manager
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         // init google client
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -122,58 +133,21 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     private void initView() {
 
         mFacebookSwitch = (Switch) findViewById(R.id.switch_facebook);
+        mFacebookSwitch.setOnCheckedChangeListener(this);
+
         mYoutubeSwitch = (Switch) findViewById(R.id.switch_youtube);
+        mYoutubeSwitch.setOnCheckedChangeListener(this);
+
         mPinterestSwitch = (Switch) findViewById(R.id.switch_pinterest);
+        mPinterestSwitch.setOnCheckedChangeListener(this);
+
+        mTwitchSwitch = (Switch) findViewById(R.id.switch_twitch);
+        mTwitchSwitch.setOnCheckedChangeListener(this);
+
+        mGiphySwitch = (Switch) findViewById(R.id.switch_giphy);
+        mGiphySwitch.setOnCheckedChangeListener(this);
 
         checkTokens();
-    }
-
-    private void setAction() {
-
-        mFacebookSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (mFacebookToken.equals("")) {
-                        getFacebookToken();
-                    }
-                } else {
-                    if (!mFacebookToken.equals("")) {
-                        deleteFacebookToken();
-                    }
-                }
-            }
-        });
-
-        mYoutubeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (mGoogleToken.equals("")) {
-                        getGoogleToken();
-                    }
-                } else {
-                    if (!mGoogleToken.equals("")) {
-                        deleteGoogleToken();
-                    }
-                }
-            }
-        });
-
-        mPinterestSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    if (mPinterestToken.equals("")) {
-                        getPinterestToken();
-                    }
-                } else {
-                    if (!mPinterestToken.equals("")) {
-                        deletePinterestToken();
-                    }
-                }
-            }
-        });
     }
 
     // send status of tokens to "FeedFragment"
@@ -185,22 +159,34 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     // check remained token
     private void checkTokens() {
 
-        if (!mFacebookToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
             mFacebookSwitch.setChecked(true);
         } else {
             mFacebookSwitch.setChecked(false);
         }
 
-        if (!mGoogleToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
             mYoutubeSwitch.setChecked(true);
         } else {
             mYoutubeSwitch.setChecked(false);
         }
 
-        if (!mPinterestToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
             mPinterestSwitch.setChecked(true);
         } else {
             mPinterestSwitch.setChecked(false);
+        }
+
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)) {
+            mTwitchSwitch.setChecked(true);
+        } else {
+            mTwitchSwitch.setChecked(false);
+        }
+
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_GIPHY)) {
+            mGiphySwitch.setChecked(true);
+        } else {
+            mGiphySwitch.setChecked(false);
         }
     }
 
@@ -214,17 +200,14 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             public void onSuccess(LoginResult loginResult) {
 
                 // set facebook preference
-                mEditor.putString(getString(R.string.facebook_token), loginResult.getAccessToken().getToken());
-                mEditor.commit();
-
-                Toast.makeText(SettingActivity.this, "Connect to facebook", Toast.LENGTH_SHORT).show();
-                Log.d("CHECK_PREF", "Setting Activity >>>>" + mPref.getString(getString(R.string.facebook_token), ""));
+                mFavoTokenManager.createToken(PLATFORM_FACEBOOK, loginResult.getAccessToken().getToken());
+                Toast.makeText(SettingActivity.this, getString(R.string.login_success) + " Facebook", Toast.LENGTH_SHORT).show();
                 sendTokenStatus();
             }
 
             @Override
             public void onCancel() {
-                Toast.makeText(SettingActivity.this, getString(R.string.facebook_login_fail), Toast.LENGTH_SHORT).show();
+                Toast.makeText(SettingActivity.this, getString(R.string.login_fail) + " Facebook", Toast.LENGTH_SHORT).show();
                 mFacebookSwitch.setChecked(false);
             }
 
@@ -239,13 +222,14 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
     private void deleteFacebookToken() {
 
         if (com.facebook.AccessToken.getCurrentAccessToken() != null) {
+
+            // delete facebook preference
+            mFavoTokenManager.removeToken(PLATFORM_FACEBOOK);
+
             // call expire facebook token
             LoginManager.getInstance().logOut();
 
-            // delete facebook preference
-            mEditor.putString(getString(R.string.facebook_token), "");
-            mEditor.commit();
-            Toast.makeText(SettingActivity.this, "disconnect facebook successfully!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SettingActivity.this, getString(R.string.logout_success) + " Facebook", Toast.LENGTH_SHORT).show();
             sendTokenStatus();
         }
     }
@@ -259,16 +243,16 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
     private void deleteGoogleToken() {
 
-        if (!mPref.getString(getString(R.string.google_token), "").equals("")) {
-            // call expire google token
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
+            // call revoke google token
             Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
                 @Override
                 public void onResult(@NonNull Status status) {
 
                     // delete google token
-                    mEditor.putString(getString(R.string.google_token), "");
-                    mEditor.commit();
-                    Toast.makeText(SettingActivity.this, "disconnect google successfully!!", Toast.LENGTH_SHORT).show();
+                    mFavoTokenManager.removeToken(PLATFORM_YOUTUBE);
+                    Toast.makeText(SettingActivity.this, getString(R.string.logout_success) + " Youtube", Toast.LENGTH_SHORT).show();
+                    sendTokenStatus();
                 }
             });
         }
@@ -280,9 +264,9 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mPinterestClient.login(this, Arrays.asList(PINTEREST_SCOPE), new PDKCallback() {
             @Override
             public void onSuccess(PDKResponse response) {
-                mEditor.putString(getString(R.string.pinterest_token), response.getUser().getUid());
-                mEditor.commit();
-                Log.d("CHECK_TOKEN", "Setting Activity >>>>> pinterest " + response.getUser().getUid());
+
+                mFavoTokenManager.createToken(PLATFORM_PINTEREST, response.getUser().getUid());
+                Toast.makeText(SettingActivity.this, getString(R.string.login_success) + " Pinterest", Toast.LENGTH_SHORT).show();
                 sendTokenStatus();
             }
 
@@ -290,17 +274,110 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             public void onFailure(PDKException exception) {
                 Log.e("ERROR_LOGIN", exception.getDetailMessage());
                 mPinterestSwitch.setChecked(false);
+                Toast.makeText(SettingActivity.this, getString(R.string.login_fail) + " Pinterest", Toast.LENGTH_SHORT).show();
+
             }
         });
     }
 
     private void deletePinterestToken() {
 
+        mFavoTokenManager.removeToken(PLATFORM_PINTEREST);
         mPinterestClient.logout();
-        mEditor.putString(getString(R.string.pinterest_token), "");
-        mEditor.commit();
-        Toast.makeText(SettingActivity.this, "disconnect pinterest successfully!!", Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(SettingActivity.this, getString(R.string.logout_success) + " Pinterest", Toast.LENGTH_SHORT).show();
         sendTokenStatus();
+    }
+
+    // request twitch token
+    private void getTwitchToken() {
+
+        // set retrofit
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TwitchService service = retrofit.create(TwitchService.class);
+        Call<ResponseBody> call = service.getTwitchAccessToken(
+                getString(R.string.twitch_client_id),
+                TWITCH_REDIRECT_URL,
+                "token",
+                "user:edit",
+                getString(R.string.twitch_client_id));
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                if (response.isSuccessful()) {
+
+                    String requestUrl = response.raw().request().url().toString();
+                    Intent intent = new Intent(SettingActivity.this, TwitchWebViewActivity.class);
+                    intent.putExtra("REQ_TYPE", "login");
+                    intent.putExtra("REQ_URL", requestUrl);
+                    startActivityForResult(intent, REQ_TWITCH_SIGN_IN);
+                } else {
+                    Toast.makeText(SettingActivity.this, getString(R.string.login_fail) + " Twitch", Toast.LENGTH_SHORT).show();
+                    mTwitchSwitch.setChecked(false);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                Toast.makeText(SettingActivity.this, getString(R.string.login_fail) + " Twitch", Toast.LENGTH_SHORT).show();
+                Log.d("CHECK_URL ", t.toString());
+                mTwitchSwitch.setChecked(false);
+            }
+        });
+    }
+
+    private void deleteTwitchToken() {
+
+        // set retrofit
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        TwitchService service = retrofit.create(TwitchService.class);
+        Call<ResponseBody> call = service.deleteTwitchAccessToken(
+                getString(R.string.twitch_client_id),
+                mFavoTokenManager.getCurrentToken(getString(R.string.twitch_token)));
+        Log.d("CHECK_TOKEN", mFavoTokenManager.getCurrentToken(getString(R.string.twitch_token)));
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(SettingActivity.this, getString(R.string.logout_success) + " Twitch", Toast.LENGTH_SHORT).show();
+                    mFavoTokenManager.removeToken(PLATFORM_TWITCH);
+                    mTwitchSwitch.setChecked(false);
+                    sendTokenStatus();
+                } else {
+                    Toast.makeText(SettingActivity.this, getString(R.string.logout_fail) + " Twitch", Toast.LENGTH_SHORT).show();
+                    mTwitchSwitch.setChecked(true);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(SettingActivity.this, getString(R.string.logout_fail) + " Twitch", Toast.LENGTH_SHORT).show();
+                mTwitchSwitch.setChecked(true);
+                t.printStackTrace();
+            }
+        });
+    }
+
+    private void getGiphyToken() {
+        mFavoTokenManager.createToken(PLATFORM_GIPHY, getString(R.string.giphy_token));
+        Toast.makeText(SettingActivity.this, getString(R.string.login_success) + " Giphy", Toast.LENGTH_SHORT).show();
+    }
+
+    private void deleteGiphyToken() {
+        mFavoTokenManager.removeToken(PLATFORM_GIPHY);
+        Toast.makeText(SettingActivity.this, getString(R.string.logout_success) + " Giphy", Toast.LENGTH_SHORT).show();
+
     }
 
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
@@ -314,17 +391,13 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
             // set google preference
             try {
-                mEditor.putString(getString(R.string.google_token), credential.getToken());
-                mEditor.commit();
-                Log.d("CHECK_TOKEN", "Setting Activity >>>>> " + credential.getToken());
+                mFavoTokenManager.createToken(PLATFORM_YOUTUBE, credential.getToken());
                 sendTokenStatus();
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e("ERROR_LOGIN", "Setting Activity >>>>> fail to get credential token");
             } catch (GoogleAuthException e) {
                 e.printStackTrace();
-                Log.e("ERROR_LOGIN", "Setting Activity >>>>> fail to get credential token");
             }
 
             return null;
@@ -333,6 +406,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            Toast.makeText(SettingActivity.this, getString(R.string.login_success) + " Youtube", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -345,8 +419,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
             new GetGoogleTokenAsync().execute(account.getAccount());
 
         } else {
-            Log.d("ERROR_LOGIN", "Setting Activity >>>>> fail to get google Account");
-            Toast.makeText(SettingActivity.this, getString(R.string.google_login_fail), Toast.LENGTH_SHORT).show();
+            Toast.makeText(SettingActivity.this, getString(R.string.login_fail) + " Youtube", Toast.LENGTH_SHORT).show();
             mYoutubeSwitch.setChecked(false);
         }
     }
@@ -356,23 +429,107 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
     }
 
+    // twitch auth callback method
+    private void twitchSignInResult(String callbackResult) {
+
+        int startPoint = callbackResult.indexOf("=") + 1;
+        int endPoint = callbackResult.indexOf("&");
+
+        String token = callbackResult.substring(startPoint, endPoint);
+
+        if (!token.equals("")) {
+            Toast.makeText(SettingActivity.this, getString(R.string.login_success) + " Twitch", Toast.LENGTH_SHORT).show();
+            mFavoTokenManager.createToken(PLATFORM_TWITCH, token);
+            mTwitchSwitch.setChecked(true);
+            sendTokenStatus();
+        } else {
+            Toast.makeText(SettingActivity.this, getString(R.string.login_fail) + " Twitch", Toast.LENGTH_SHORT).show();
+            mTwitchSwitch.setChecked(false);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // google login activity result
-        if (requestCode == REQ_GOOGLE_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            googleSignInResult(result);
-        }
+        if (resultCode == RESULT_OK) {
 
-        // pinterest login activity result
-        else if (requestCode == REQ_PINTEREST_SIGN_IN) {
-            mPinterestClient.onOauthResponse(requestCode, resultCode, data);
+            // facebook login activity result
+            if (requestCode == REQ_FACEBOOK_SIGN_IN) {
+                mCallbackManager.onActivityResult(requestCode, resultCode, data);
+            }
+            // google login activity result
+            else if (requestCode == REQ_GOOGLE_SIGN_IN) {
+
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                googleSignInResult(result);
+            }
+            // pinterest login activity result
+            else if (requestCode == REQ_PINTEREST_SIGN_IN) {
+                mPinterestClient.onOauthResponse(requestCode, resultCode, data);
+            }
+            // giphy login activity result
+            else if (requestCode == REQ_GIPHY_SIGN_IN) {
+
+            }
+            // twitch login activity result
+            else if (requestCode == REQ_TWITCH_SIGN_IN) {
+                String callbackResult = data.getStringExtra("CALLBACK");
+                twitchSignInResult(callbackResult);
+            } else {
+
+            }
         }
-        // facebook login activity result
-        else {
-            mCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+        switch (buttonView.getId()) {
+
+            case R.id.switch_facebook:
+
+                if (isChecked && !mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
+                    getFacebookToken();
+                } else if (!isChecked && mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
+                    deleteFacebookToken();
+                }
+                break;
+
+            case R.id.switch_youtube:
+
+                if (isChecked && !mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
+                    getGoogleToken();
+                } else if (!isChecked && mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
+                    deleteGoogleToken();
+                }
+                break;
+
+            case R.id.switch_pinterest:
+
+                if (isChecked && !mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
+                    getPinterestToken();
+                } else if (!isChecked && mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
+                    deletePinterestToken();
+                }
+                break;
+
+            case R.id.switch_giphy:
+                if (isChecked && !mFavoTokenManager.isTokenVaild(PLATFORM_GIPHY)) {
+                    getGiphyToken();
+                } else if (!isChecked && mFavoTokenManager.isTokenVaild(PLATFORM_GIPHY)) {
+                    deleteGiphyToken();
+                }
+                break;
+
+            case R.id.switch_twitch:
+
+                if (isChecked && !mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)) {
+                    getTwitchToken();
+                } else if (!isChecked && mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)) {
+                    deleteTwitchToken();
+                }
+                break;
         }
     }
 }

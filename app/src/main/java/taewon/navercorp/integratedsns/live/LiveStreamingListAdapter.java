@@ -103,7 +103,7 @@ public class LiveStreamingListAdapter extends RecyclerView.Adapter<LiveStreaming
                     break;
 
                 case PLATFORM_TWITCH:
-                    String twitchUrl = String.format("http://player.twitch.tv?video=%s", mDataset.get(position).getVideoUrl());
+                    String twitchUrl = String.format("http://player.twitch.tv?channel=%s", mDataset.get(position).getUserName());
                     intent = new Intent(mContext, TwitchWebViewActivity.class);
                     intent.putExtra("REQ_TYPE", "video");
                     intent.putExtra("REQ_URL", twitchUrl);

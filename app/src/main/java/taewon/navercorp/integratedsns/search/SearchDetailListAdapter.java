@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -49,9 +48,8 @@ public class SearchDetailListAdapter extends RecyclerView.Adapter<SearchDetailLi
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // common components
-        private TextView mUserName, mUploadTime, mDescription, mComment, mAbout;
+        private TextView mUserName, mTitle, mDescription, mAbout;
         private ImageView mProfile, mPicture, mPlatformType;
-        private Button mShare, mMore;
         private FrameLayout mVideoPageDetail;
         private LinearLayout mPageDetail;
 
@@ -89,19 +87,10 @@ public class SearchDetailListAdapter extends RecyclerView.Adapter<SearchDetailLi
 
         private void createVideoViewHolder(View itemView) {
             mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
-            mUploadTime = (TextView) itemView.findViewById(R.id.textView_uploadTime);
-            mDescription = (TextView) itemView.findViewById(R.id.textView_description);
-
+            mTitle = (TextView) itemView.findViewById(R.id.textView_title);
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
-            mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
             mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
             mPicture.setOnClickListener(this);
-            mComment = (TextView) itemView.findViewById(R.id.textView_comment);
-            mComment.setOnClickListener(this);
-            mMore = (Button) itemView.findViewById(R.id.button_more);
-            mMore.setOnClickListener(this);
-            mVideoPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
-            mVideoPageDetail.setOnClickListener(this);
         }
 
         private void createPhotoViewHolder(View itemView) {
@@ -119,7 +108,7 @@ public class SearchDetailListAdapter extends RecyclerView.Adapter<SearchDetailLi
                 break;
 
             case RESULT_VIDEO:
-                itemView = mLayoutInflater.inflate(R.layout.item_image_article_test, parent, false);
+                itemView = mLayoutInflater.inflate(R.layout.item_search_result_video, parent, false);
                 break;
 
             case RESULT_PHOTO:
@@ -184,9 +173,8 @@ public class SearchDetailListAdapter extends RecyclerView.Adapter<SearchDetailLi
     private void bindVideoResult(ViewHolder holder, int position) {
         FavoSearchResultData data = mDataset.get(position);
 
-        holder.mUploadTime.setText(data.getCreatedTime());
+        holder.mTitle.setText(data.getDescription());
         holder.mUserName.setText(data.getUserName());
-        holder.mDescription.setText(data.getDescription());
 
         Glide.with(mContext.getApplicationContext()).load(data.getPicture())
                 .apply(new RequestOptions().override(864, 486))
