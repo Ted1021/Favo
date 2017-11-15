@@ -96,7 +96,6 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
         mFacebookToken = mPref.getString(getString(R.string.facebook_token), "");
         mGoogleToken = mPref.getString(getString(R.string.google_token), "");
         mPinterestToken = mPref.getString(getString(R.string.pinterest_token), "");
-        mBandToken = mPref.getString(getString(R.string.band_token), "");
 
         // init google client
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

@@ -3,6 +3,7 @@ package taewon.navercorp.integratedsns.util;
 import android.app.Application;
 
 import com.bumptech.glide.Glide;
+import com.facebook.stetho.Stetho;
 
 import io.realm.Realm;
 
@@ -30,6 +31,7 @@ public class AppController extends Application {
 
     public static final String GIPHY_BASE_URL = "https://api.giphy.com/";
     public static final String YOUTUBE_BASE_URL = "https://www.googleapis.com/";
+
     public static final String TWITCH_BASE_URL = "https://api.twitch.tv/";
     public static final String TWITCH_REDIRECT_URL = "http://174.138.18.90/message";
     public static final String TWITCH_ACCEPT_CODE = "application/vnd.twitchtv.v5+json";
@@ -43,6 +45,9 @@ public class AppController extends Application {
 
         // init Realm
         Realm.init(this);
+
+        // init stetho
+        Stetho.initializeWithDefaults(this);
     }
 
     public static AppController getFavoContext(){

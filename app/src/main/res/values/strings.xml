@@ -14,10 +14,6 @@
     <string name="pinterest_app_id">4928301781867311512</string>
     <string name="pinterest_token">pinterest_token</string>
 
-    <string name="band_token">band_token</string>
-    <string name="band_client_id">219449230</string>
-    <string name="band_client_secret">LRGkEU_Pm8ixZk7Y9348Z2X2ylve2L5M</string>
-
     <string name="twitch_token">twitch_token</string>
     <string name="twitch_client_id">4n0mf4u10svjmioh7us0yxcw1wng56</string>
     <string name="twitch_client_secret">9wqgigujqzys0cnxpjdere8yk099rz</string>
@@ -42,8 +38,5 @@
     <string name="search_detail_request">search_detail_request</string>
 
     <string name="app_closing_alert">한번 더 누르시면 앱이 종료됩니다.</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

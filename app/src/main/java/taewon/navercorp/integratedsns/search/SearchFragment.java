@@ -380,30 +380,31 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
                 .build();
 
         TwitchService service = retrofit.create(TwitchService.class);
-        Call<TwitchStreamingDataV5> call = service.searchTwitchStreams(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mQuery, MAX_VIDEO_COUNT);
+        Call<TwitchStreamingDataV5> call = service.searchTwitchStreams(TWITCH_ACCEPT_CODE, "4n0mf4u10svjmioh7us0yxcw1wng56", mQuery, MAX_VIDEO_COUNT);
         call.enqueue(new Callback<TwitchStreamingDataV5>() {
             @Override
             public void onResponse(Call<TwitchStreamingDataV5> call, Response<TwitchStreamingDataV5> response) {
-                Log.d("CHECK_SEARCH", " >>>>>>>>>>>> in");
                 if (response.isSuccessful()) {
                     TwitchStreamingDataV5 result = response.body();
-                    for (TwitchStreamingDataV5.Stream item : result.getStreams()) {
 
-                        FavoSearchResultData data = new FavoSearchResultData();
+                    if (result.getTotal() != 0) {
+                        for (TwitchStreamingDataV5.Stream item : result.getStreams()) {
 
-                        data.setPlatformType(PLATFORM_TWITCH);
-                        data.setUserName(item.getChannel().getName());
-                        data.setDescription(item.getChannel().getStatus());
-                        data.setPicture(item.getPreview().getLarge());
+                            FavoSearchResultData data = new FavoSearchResultData();
 
-                        data.setFeedId(item.getChannel().getName());
-                        data.setPageId(item.getChannel().getId() + "");
-                        data.setVideoUrl(item.getChannel().getName());
+                            data.setPlatformType(PLATFORM_TWITCH);
+                            data.setUserName(item.getChannel().getName());
+                            data.setDescription(item.getChannel().getStatus());
+                            data.setPicture(item.getPreview().getLarge());
 
-                        mVideoDataset.add(data);
+                            data.setFeedId(item.getChannel().getName());
+                            data.setPageId(item.getChannel().getId() + "");
+                            data.setVideoUrl(item.getChannel().getName());
+
+                            mVideoDataset.add(data);
+                        }
+                        mVideoResult.getAdapter().notifyDataSetChanged();
                     }
-                    mVideoResult.getAdapter().notifyDataSetChanged();
-
                 } else {
                     Log.e("ERROR_SEARCH", response.raw().toString());
                 }

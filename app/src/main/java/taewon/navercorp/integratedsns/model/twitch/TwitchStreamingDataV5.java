@@ -13,7 +13,7 @@ public class TwitchStreamingDataV5 {
     @SerializedName("_total")
     private Integer total;
     @SerializedName("streams")
-    private List<Stream> streams = null;
+    private List<Stream> streams;
 
     public Integer getTotal() {
         return total;
@@ -33,7 +33,7 @@ public class TwitchStreamingDataV5 {
 
     public class Stream {
 
-        @SerializedName("_id")
+//        @SerializedName("_id")
         private Integer id;
         @SerializedName("game")
         private String game;
@@ -233,7 +233,7 @@ public class TwitchStreamingDataV5 {
             private String game;
             @SerializedName("language")
             private String language;
-            @SerializedName("_id")
+//            @SerializedName("_id")
             private Integer id;
             @SerializedName("name")
             private String name;

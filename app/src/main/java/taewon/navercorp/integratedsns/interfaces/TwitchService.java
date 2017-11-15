@@ -32,7 +32,7 @@ public interface TwitchService {
                                                           @Header("Authorization") String auth,
                                                           @Query("limit") int limit);
 
-    @GET("kraken/search/channels")
+    @GET("kraken/search/streams")
     Call<TwitchStreamingDataV5> searchTwitchStreams(@Header("Accept") String accept,
                                                     @Header("Client-ID") String clientId,
                                                     @Query("query") String query,

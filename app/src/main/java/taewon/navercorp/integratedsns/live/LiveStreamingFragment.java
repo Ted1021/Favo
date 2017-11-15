@@ -13,12 +13,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -224,17 +227,20 @@ public class LiveStreamingFragment extends Fragment {
 
     private void getTwitchStreams() {
 
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new StethoInterceptor())
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         TwitchService service = retrofit.create(TwitchService.class);
-
         Call<TwitchStreamingDataV5> call = service.getTwitchFollowingStreams(TWITCH_ACCEPT_CODE,
                 getString(R.string.twitch_client_id),
-                "OAuth "+mPref.getString(getString(R.string.twitch_token), ""), 10);
-
+                "OAuth " + mPref.getString(getString(R.string.twitch_token), ""), 10);
         call.enqueue(new Callback<TwitchStreamingDataV5>() {
             @Override
             public void onResponse(Call<TwitchStreamingDataV5> call, Response<TwitchStreamingDataV5> response) {
@@ -250,9 +256,10 @@ public class LiveStreamingFragment extends Fragment {
                         data.setUserName(item.getChannel().getName());
                         data.setDescription(item.getChannel().getStatus());
                         data.setPicture(item.getPreview().getLarge());
-
+                        data.setProfileImage(item.getChannel().getLogo());
                         data.setFeedId(item.getChannel().getName());
                         data.setPageId(item.getChannel().getId() + "");
+                        Log.d("CHECK_SEARCH", item.getChannel().getId() + "");
                         data.setVideoUrl(item.getChannel().getName());
 
                         mDataset.add(data);
@@ -267,7 +274,6 @@ public class LiveStreamingFragment extends Fragment {
             @Override
             public void onFailure(Call<TwitchStreamingDataV5> call, Throwable t) {
                 t.printStackTrace();
-                Log.e("ERROR_SEARCH",call.request().toString() + " // " + call.request().headers().toString() );
             }
         });
     }
