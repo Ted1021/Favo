@@ -376,6 +376,7 @@ public class LoginActivity extends AppCompatActivity
                 !mFavoTokenManager.isTokenVaild(PLATFORM_GIPHY)) {
 
             Toast.makeText(LoginActivity.this, "하나 이상의 플랫폼을 선택해 주셔야 합니다.", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);

@@ -35,6 +35,7 @@ import taewon.navercorp.integratedsns.model.facebook.FacebookFeedData;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
@@ -50,19 +51,18 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     private FavoTokenManager mFavoTokenManager;
 
     private SwipeRefreshLayout mRefreshLayout;
+
     private RecyclerView mPageFeedList;
-
-    private String mPageId;
-    private String mPlatformType;
-    private String mProfileImage;
-
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private FeedListAdapter mAdapter;
 
+    private String mPageId, mPlatformType, mProfileImage;
     private Realm mRealm;
+    private EndlessRecyclerViewScrollListener mScrollListener;
+    private String mNext = null;
 
-    SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
+    private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
     private static final int MAX_COUNTS = 25;
 
@@ -84,16 +84,10 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mPageId = getArguments().getString(ARG_PARAM1);
-            mPlatformType = getArguments().getString(ARG_PARAM2);
-            mProfileImage = getArguments().getString(ARG_PARAM3);
-        }
+    public void onDestroyView() {
+        mRealm.close();
+        super.onDestroyView();
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -106,13 +100,14 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
         return view;
     }
 
-    @Override
-    public void onDestroyView() {
-        mRealm.close();
-        super.onDestroyView();
-    }
-
     private void initData() {
+
+        // init page data
+        if (getArguments() != null) {
+            mPageId = getArguments().getString(ARG_PARAM1);
+            mPlatformType = getArguments().getString(ARG_PARAM2);
+            mProfileImage = getArguments().getString(ARG_PARAM3);
+        }
 
         // init Realm
         mRealm = Realm.getDefaultInstance();
@@ -148,6 +143,27 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mPageFeedList.setLayoutManager(layoutManager);
+
+        mScrollListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                switch (mPlatformType) {
+
+                    case PLATFORM_FACEBOOK:
+                        getFacebookPageFeed();
+                        break;
+
+                    case PLATFORM_YOUTUBE:
+                        getYoutubeChannelFeed();
+                        break;
+
+                    case PLATFORM_TWITCH:
+                        getTwitchVideoList();
+                        break;
+                }
+            }
+        };
+        mPageFeedList.addOnScrollListener(mScrollListener);
     }
 
     private void getFacebookPageFeed() {
@@ -165,6 +181,8 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                             try {
 
                                 FacebookFeedData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedData.class);
+                                mNext = result.getPaging().getCursors().getAfter();
+                                Log.d("CHECK_NEXT", " >>>>>>>> " + mNext);
                                 FacebookFeedData.ArticleData article;
                                 for (int i = 0; i < result.getData().size(); i++) {
 
@@ -207,8 +225,11 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                 });
 
         Bundle parameters = new Bundle();
+        if(mNext != null){
+            parameters.putString("after", mNext);
+        }
         parameters.putString("fields", "link,created_time,from{name, picture.height(1024){url}},message,description,full_picture,id,likes.limit(0).summary(true),comments.limit(0).summary(true),source");
-        parameters.putString("limit", "25");
+        parameters.putString("limit", "10");
         request.setParameters(parameters);
         request.executeAsync();
     }
