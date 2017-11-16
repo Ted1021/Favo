@@ -128,7 +128,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     @Override
-    public void onDetach() {
+    public void onDestroyView() {
         // close Realm Instance
         mRealm.close();
 
@@ -136,8 +136,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mTokenUpdateReceiver);
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mAsyncFinishReceiver);
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mScrollToTopReceiver);
-        Log.e("CHECK_DETACH", "   ");
-        super.onDetach();
+
+        super.onDestroyView();
     }
 
     @Override
@@ -145,11 +145,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         View view = inflater.inflate(R.layout.fragment_feed, container, false);
 
+        initData();
         initView(view);
 
         if (isInit) {
             isInit = false;
-            initData();
             checkToken();
         }
         return view;
@@ -196,13 +196,13 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         });
     }
 
-    private void initData() {
-
-        // init token manager
-        mFavoTokenManager = FavoTokenManager.getInstance();
+    private void initData(){
 
         // realm Instance
         mRealm = Realm.getDefaultInstance();
+
+        // init token manager
+        mFavoTokenManager = FavoTokenManager.getInstance();
 
         // pinterest client
         PDKClient.configureInstance(getContext(), getString(R.string.pinterest_app_id));
@@ -259,32 +259,29 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mAsyncFinishReceiver, new IntentFilter(getString(R.string.async_finish_status)));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mScrollToTopReceiver, new IntentFilter(getString(R.string.scroll_to_top_status)));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mCommentRequestReceiver, new IntentFilter(getString(R.string.comment_request)));
+
     }
 
     private void checkToken() {
 
         mAsyncCount = 0;
-        String facebookToken = mFavoTokenManager.getCurrentToken(PLATFORM_FACEBOOK);
-        String googleToken = mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE);
-        String pinterestToken = mFavoTokenManager.getCurrentToken(PLATFORM_PINTEREST);
-        String twitchToken = mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
 
         mFeedDataset.clear();
         mFeedAdapter.notifyDataSetChanged();
 
-        if (!facebookToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
             getFacebookUserPages();
         }
 
-        if (!googleToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
             getYoutubeSubscriptionList();
         }
 
-        if (!pinterestToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
             getPinterestFollowingBoards();
         }
 
-        if (!twitchToken.equals("")) {
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)) {
             getTwitchUserInfo();
         }
     }
@@ -553,7 +550,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     }
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
-
                     mFavoTokenManager.createToken(PLATFORM_YOUTUBE, "");
                     checkToken();
                 }

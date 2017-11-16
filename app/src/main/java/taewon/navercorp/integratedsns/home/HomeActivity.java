@@ -149,7 +149,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                         }
                         break;
                 }
-                replaceFragment(mFragmentList[tab.getPosition()]);
+                replaceFragment(mFragmentList[tab.getPosition()], tab.getPosition()+"");
                 tab.getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, android.R.color.white), PorterDuff.Mode.SRC_IN);
             }
 
@@ -176,9 +176,10 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
 
     }
 
-    public void replaceFragment(Fragment fragment) {
+    public void replaceFragment(Fragment fragment, String tag) {
+
         mFragmentManager.beginTransaction()
-                .replace(R.id.layout_container, fragment)
+                .replace(R.id.layout_container, fragment, tag)
                 .commit();
     }
 

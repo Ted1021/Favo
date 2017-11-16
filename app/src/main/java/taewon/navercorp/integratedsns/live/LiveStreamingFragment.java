@@ -245,7 +245,7 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
         TwitchService service = retrofit.create(TwitchService.class);
         Call<TwitchStreamingDataV5> call = service.getTwitchFollowingStreams(TWITCH_ACCEPT_CODE,
                 getString(R.string.twitch_client_id),
-                "OAuth " + FavoTokenManager.getInstance().getCurrentToken(getString(R.string.twitch_token)), 10);
+                "OAuth " + FavoTokenManager.getInstance().getCurrentToken(PLATFORM_TWITCH), 10);
         call.enqueue(new Callback<TwitchStreamingDataV5>() {
             @Override
             public void onResponse(Call<TwitchStreamingDataV5> call, Response<TwitchStreamingDataV5> response) {
