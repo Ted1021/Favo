@@ -273,7 +273,7 @@ public class SearchDetailActivity extends AppCompatActivity {
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNT, null, null, mQuery, "viewCount", "video", null, "KR");
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNT, null, null, null, mQuery, "viewCount", "video", null, "KR");
         call.enqueue(new Callback<YoutubeSearchVideoData>() {
             @Override
             public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {

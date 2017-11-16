@@ -34,6 +34,7 @@ public interface YoutubeService {
                                               @Query("part") String part,
                                               @Query("maxResults") int maxResults,
                                               @Query("channelId") String channelId,
+                                              @Query("pageToken") String pageToken,
                                               @Query("eventType") String eventType,
                                               @Query("q") String query,
                                               @Query("order") String order,

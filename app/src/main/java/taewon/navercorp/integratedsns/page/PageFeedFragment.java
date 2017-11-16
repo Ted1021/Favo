@@ -244,13 +244,20 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, mPageId, null, null,  "date", "video", null, null);
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, mPageId, mNext, null, null,  "date", "video", null, null);
         call.enqueue(new Callback<YoutubeSearchVideoData>() {
             @Override
             public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
                 if (response.isSuccessful()) {
 
-                    for (YoutubeSearchVideoData.Item item : response.body().getItems()) {
+                    YoutubeSearchVideoData result = response.body();
+                    if(result.getNextPageToken() == null){
+                        return;
+                    } else {
+                        mNext = result.getNextPageToken();
+                    }
+
+                    for (YoutubeSearchVideoData.Item item : result.getItems()) {
 
                         FavoFeedData data = new FavoFeedData();
                         Date date = null;
@@ -350,6 +357,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
 
+        mNext=null;
         mDataset.clear();
         mAdapter.notifyDataSetChanged();
         initData();

@@ -14,19 +14,16 @@ import java.util.List;
 public class YoutubeSearchVideoData implements Serializable{
 
     @SerializedName("kind")
-    @Expose
     private String kind;
     @SerializedName("etag")
-    @Expose
     private String etag;
+    @SerializedName("nextPageToken")
+    private String nextPageToken;
     @SerializedName("regionCode")
-    @Expose
     private String regionCode;
     @SerializedName("pageInfo")
-    @Expose
     private PageInfo pageInfo = new PageInfo();
     @SerializedName("items")
-    @Expose
     private List<Item> items = null;
 
     public String getKind() {
@@ -43,6 +40,14 @@ public class YoutubeSearchVideoData implements Serializable{
 
     public void setEtag(String etag) {
         this.etag = etag;
+    }
+
+    public String getNextPageToken() {
+        return nextPageToken;
+    }
+
+    public void setNextPageToken(String nextPageToken) {
+        this.nextPageToken = nextPageToken;
     }
 
     public String getRegionCode() {

@@ -182,7 +182,7 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                     .build();
 
             YoutubeService service = retrofit.create(YoutubeService.class);
-            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 5, params[0], "live", null, "viewCount", "video", null, null);
+            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 5, params[0], null, "live", null, "viewCount", "video", null, null);
             call.enqueue(new Callback<YoutubeSearchVideoData>() {
                 @Override
                 public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
