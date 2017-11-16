@@ -27,7 +27,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.facebook.FacebookCommentData;
-import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubePostCommentData;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
@@ -41,26 +40,17 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
 public class CommentActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FavoTokenManager mFavoTokenManager;
-
     private RecyclerView mCommentList;
     private RecyclerView.Adapter mAdapter;
-
     private FacebookCommentData mFeedDetail = new FacebookCommentData();
     private ArrayList<FacebookCommentData.Comments.CommentData> mFacebookDataset = new ArrayList<>();
-
     private ArrayList<YoutubeCommentData.Item> mYoutubeDataset = new ArrayList<>();
-    private FavoFeedData mYoutubeSearchVideoData;
-
-    private int mContentType;
     private String mPlatformType;
     private String mArticleId, mVideoId, mPinId;
     private EditText mUserComment;
     private ImageButton mCamera, mSend;
-
     private EndlessRecyclerViewScrollListener mScrollListener;
-
     private String mNextPage;
-    private String mPrevPage;
 
     private static final int MAX_COUNTS = 10;
 
@@ -79,21 +69,17 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         mFavoTokenManager = FavoTokenManager.getInstance();
 
         Intent intent = getIntent();
-        mContentType = intent.getIntExtra("CONTENT_TYPE", 0);
         mPlatformType = intent.getStringExtra("PLATFORM_TYPE");
 
         switch (mPlatformType) {
 
             case PLATFORM_FACEBOOK:
-
                 mArticleId = intent.getStringExtra("ARTICLE_ID");
                 getFacebookComment();
                 break;
 
             case PLATFORM_YOUTUBE:
-
                 mVideoId = intent.getStringExtra("VIDEO_ID");
-                mYoutubeSearchVideoData = (FavoFeedData) intent.getSerializableExtra("VIDEO_CONTENT");
                 break;
 
             case PLATFORM_PINTEREST:
@@ -175,40 +161,6 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         request.executeAsync();
     }
 
-    private void getFacebookCommentNext() {
-
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        GraphRequest request = GraphRequest.newGraphPathRequest(
-                accessToken,
-                mArticleId,
-                new GraphRequest.Callback() {
-                    @Override
-                    public void onCompleted(GraphResponse response) {
-
-                        if (response.getError() == null) {
-
-                            mFeedDetail = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
-
-                            if (mFeedDetail.getComments().getPaging().getCursors().getAfter() == null) {
-                                mNextPage = null;
-                            } else {
-                                mNextPage = mFeedDetail.getComments().getPaging().getCursors().getAfter();
-                            }
-                            mFacebookDataset.addAll(mFeedDetail.getComments().getData());
-                            mAdapter.notifyDataSetChanged();
-                        } else {
-                            Log.e("ERROR_FACEBOOK", response.getError().toString());
-                        }
-                    }
-                });
-
-        Bundle parameters = new Bundle();
-        parameters.putString("after", mNextPage);
-        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(2048){url}},attachments{subattachments},source,comments{from{name, picture.height(2048){url}},message,created_time}");
-        request.setParameters(parameters);
-        request.executeAsync();
-    }
-
     private void getYoutubeComment() {
 
         String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
@@ -254,7 +206,6 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
         commentData.getSnippet().getTopLevelComment().getSnippet().setTextOriginal(userComment);
 
         String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
-        Log.d("CHECK_TOKEN", accessToken);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(YOUTUBE_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -284,7 +235,6 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
 
         String comment = mUserComment.getText().toString();
-
         switch (v.getId()) {
 
             case R.id.button_camera:
@@ -294,7 +244,6 @@ public class CommentActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.button_send:
 
                 mUserComment.setText(null);
-
                 if (mPlatformType == PLATFORM_YOUTUBE) {
                     setYoutubeComment(comment);
                 }

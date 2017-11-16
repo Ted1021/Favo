@@ -58,9 +58,7 @@ public class PageDetailActivity extends AppCompatActivity {
     private Button mSubscribe;
 
     // page data
-    private String mPageId;
-    private String mPlatformType;
-    private String mProfileImage;
+    private String mPageId, mUserName, mPlatformType, mProfileImage;
     private FavoPageInfoData mPageData = new FavoPageInfoData();
 
     // fragment index
@@ -101,6 +99,7 @@ public class PageDetailActivity extends AppCompatActivity {
             case PLATFORM_TWITCH:
                 mPageId = intent.getStringExtra("USER_ID");
                 mProfileImage = intent.getStringExtra("PROFILE_URL");
+                mUserName = intent.getStringExtra("USER_NAME");
                 getTwitchStreamerInfo();
                 break;
         }
@@ -263,7 +262,7 @@ public class PageDetailActivity extends AppCompatActivity {
             Fragment fragment = new FeedFragment();
             switch (position) {
                 case TAB_FEED:
-                    fragment = PageFeedFragment.newInstance(mPageId, mPlatformType, mProfileImage);
+                    fragment = PageFeedFragment.newInstance(mPageId, mPlatformType, mProfileImage, mUserName);
                     break;
 
                 case TAB_VIDEO:

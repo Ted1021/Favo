@@ -221,6 +221,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 case PLATFORM_TWITCH:
                     intent.putExtra("USER_ID", mDataset.get(position).getPageId());
                     intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
+                    intent.putExtra("USER_NAME", mDataset.get(position).getUserName());
                     break;
             }
             mContext.startActivity(intent);

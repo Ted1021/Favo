@@ -56,7 +56,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     private Vector<FavoFeedData> mDataset = new Vector<>();
     private FeedListAdapter mAdapter;
 
-    private String mPageId, mPlatformType, mProfileImage;
+    private String mPageId, mPlatformType, mProfileImage, mUserName;
     private Realm mRealm;
     private EndlessRecyclerViewScrollListener mScrollListener;
     private String mNext = null;
@@ -69,8 +69,9 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     private static final String ARG_PARAM1 = "PAGE_ID";
     private static final String ARG_PARAM2 = "PLATFORM_TYPE";
     private static final String ARG_PARAM3 = "PROFILE_IMAGE";
+    private static final String ARG_PARAM4 = "USER_NAME";
 
-    public static PageFeedFragment newInstance(String param1, String param2, String param3) {
+    public static PageFeedFragment newInstance(String param1, String param2, String param3, String param4) {
 
         PageFeedFragment fragment = new PageFeedFragment();
 
@@ -78,6 +79,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         args.putString(ARG_PARAM3, param3);
+        args.putString(ARG_PARAM4, param4);
         fragment.setArguments(args);
 
         return fragment;
@@ -107,7 +109,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
             mPageId = getArguments().getString(ARG_PARAM1);
             mPlatformType = getArguments().getString(ARG_PARAM2);
             mProfileImage = getArguments().getString(ARG_PARAM3);
-            Log.d("CHECK_PAGE_ID", mPageId);
+            mUserName = getArguments().getString(ARG_PARAM4);
         }
 
         // init Realm
@@ -182,7 +184,10 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                             try {
 
                                 FacebookFeedData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedData.class);
-                                mNext = result.getPaging().getCursors().getAfter();
+
+                                if(result.getPaging() != null){
+                                    mNext = result.getPaging().getCursors().getAfter();
+                                }
                                 Log.d("CHECK_NEXT", " >>>>>>>> " + mNext);
                                 FacebookFeedData.ArticleData article;
                                 for (int i = 0; i < result.getData().size(); i++) {
@@ -336,7 +341,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                         data.setContentsType(CONTENTS_VIDEO);
                         data.setPageId(item.getUserId());
                         data.setProfileImage(mProfileImage);
-                        data.setUserName("xodnjs");
+                        data.setUserName(mUserName);
                         data.setCreatedTime(mFormat.format(data.getPubDate()));
                         int position = item.getThumbnailUrl().indexOf("{width}");
                         String thumbnail = item.getThumbnailUrl().substring(0, position - 1) + "1280x720.jpg";

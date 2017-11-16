@@ -28,9 +28,11 @@ import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.facebook.FacebookPageVideoData;
 import taewon.navercorp.integratedsns.model.favo.FavoPageVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelPlaylistData;
+import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
@@ -49,9 +51,12 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
     private String mPlatformType;
     private String mPageId;
 
+    private EndlessRecyclerViewScrollListener mScrollListener;
+    private String mNext=null;
+
     private static final String ARG_PARAM1 = "PAGE_ID";
     private static final String ARG_PARAM2 = "PLATFORM_TYPE";
-    private static final int MAX_COUNT = 50;
+    private static final int MAX_COUNT = 10;
 
     public PageVideoFragment() {
     }
@@ -102,6 +107,27 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mPageVideoList.setLayoutManager(layoutManager);
+
+        mScrollListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                switch (mPlatformType) {
+
+                    case PLATFORM_FACEBOOK:
+                        getFacebookVideoList();
+                        break;
+
+                    case PLATFORM_YOUTUBE:
+                        getYoutubePlaylist();
+                        break;
+
+                    case PLATFORM_TWITCH:
+//                        getTwitchVideoList();
+                        break;
+                }
+            }
+        };
+        mPageVideoList.addOnScrollListener(mScrollListener);
     }
 
     private void bindData() {
@@ -134,6 +160,10 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
                         if (response.getError() == null) {
 
                             FacebookPageVideoData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookPageVideoData.class);
+                            if(result.getPaging() != null){
+                                mNext = result.getPaging().getCursors().getAfter();
+                            }
+
                             for (FacebookPageVideoData.Video video : result.getData()) {
 
                                 FavoPageVideoData data = new FavoPageVideoData();
@@ -155,7 +185,11 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
                 });
 
         Bundle parameters = new Bundle();
+        if(mNext != null){
+            parameters.putString("after", mNext);
+        }
         parameters.putString("fields", "description,picture.height(1024),source,length,created_time");
+        parameters.putString("limit", MAX_COUNT+"");
         request.setParameters(parameters);
         request.executeAsync();
     }
