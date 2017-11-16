@@ -2,6 +2,9 @@ package taewon.navercorp.integratedsns.login;
 
 import android.accounts.Account;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,8 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -65,7 +72,11 @@ import static taewon.navercorp.integratedsns.util.AppController.TWITCH_REDIRECT_
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
-    private Button mFacebookLogin, mGoogleLogin, mPinterestLogin, mTwitchLogin;
+    private ImageView mFacebookLogin, mGoogleLogin, mPinterestLogin, mTwitchLogin, mGiphyLogin;
+    private Typeface mTypeface;
+    private TextView mLogo;
+    private ImageView mBackground;
+    private Button mEnter;
 
     // managing tokens
     private FavoTokenManager mFavoTokenManager;
@@ -136,17 +147,31 @@ public class LoginActivity extends AppCompatActivity
 
     private void initView() {
 
-        mFacebookLogin = (Button) findViewById(R.id.button_fb_login);
+        mLogo = (TextView) findViewById(R.id.textView_logo);
+        mTypeface = Typeface.createFromAsset(this.getAssets(), "BullettoKilla.ttf");
+        mLogo.setTypeface(mTypeface);
+
+        mFacebookLogin = (ImageView) findViewById(R.id.imageView_facebook);
         mFacebookLogin.setOnClickListener(this);
 
-        mGoogleLogin = (Button) findViewById(R.id.button_google_login);
+        mGoogleLogin = (ImageView) findViewById(R.id.imageView_google);
         mGoogleLogin.setOnClickListener(this);
 
-        mPinterestLogin = (Button) findViewById(R.id.button_tumblr_login);
+        mPinterestLogin = (ImageView) findViewById(R.id.imageView_pinterest);
         mPinterestLogin.setOnClickListener(this);
 
-        mTwitchLogin = (Button) findViewById(R.id.button_twitch_login);
+        mTwitchLogin = (ImageView) findViewById(R.id.imageView_twitch);
         mTwitchLogin.setOnClickListener(this);
+
+        mGiphyLogin = (ImageView) findViewById(R.id.imageView_giphy);
+        mGiphyLogin.setOnClickListener(this);
+
+        mBackground = (ImageView) findViewById(R.id.imageView_background);
+        mBackground.setColorFilter(Color.parseColor("#aaBDBDBD"), PorterDuff.Mode.MULTIPLY);
+        Glide.with(this.getApplicationContext()).load(R.drawable.login_background).into(mBackground);
+
+        mEnter = (Button) findViewById(R.id.button_enter);
+        mEnter.setOnClickListener(this);
     }
 
     @Override
@@ -154,24 +179,28 @@ public class LoginActivity extends AppCompatActivity
 
         switch (v.getId()) {
 
-            case R.id.button_fb_login:
+            case R.id.imageView_facebook:
                 getFacebookToken();
                 break;
 
-            case R.id.button_google_login:
+            case R.id.imageView_google:
                 getGoogleToken();
                 break;
 
-            case R.id.button_tumblr_login:
+            case R.id.imageView_pinterest:
                 getPinterestToken();
                 break;
 
-            case R.id.button_twitch_login:
+            case R.id.imageView_twitch:
                 getTwitchToken();
                 break;
 
-            case R.id.button_giphy_login:
+            case R.id.imageView_giphy:
                 getGiphyToken();
+                break;
+
+            case R.id.button_enter:
+                enterMainService();
                 break;
         }
     }
@@ -185,7 +214,10 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onSuccess(LoginResult loginResult) {
                 mFavoTokenManager.createToken(PLATFORM_FACEBOOK, loginResult.getAccessToken().getToken());
-                enterMainService();
+                Glide.with(LoginActivity.this)
+                        .load(R.drawable.icon_facebook_selected)
+                        .transition(new DrawableTransitionOptions().crossFade())
+                        .into(mFacebookLogin);
             }
 
             @Override
@@ -214,7 +246,10 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onSuccess(PDKResponse response) {
                 mFavoTokenManager.createToken(PLATFORM_PINTEREST, response.getUser().getUid());
-                enterMainService();
+                Glide.with(LoginActivity.this)
+                        .load(R.drawable.icon_pinterest_selected)
+                        .transition(new DrawableTransitionOptions().crossFade())
+                        .into(mPinterestLogin);
             }
 
             @Override
@@ -261,6 +296,11 @@ public class LoginActivity extends AppCompatActivity
 
     private void getGiphyToken() {
         mFavoTokenManager.createToken(PLATFORM_GIPHY, PLATFORM_GIPHY);
+        Glide.with(LoginActivity.this)
+                .load(R.drawable.icon_giphy_selected)
+                .transition(new DrawableTransitionOptions().crossFade())
+                .into(mGiphyLogin);
+
     }
 
     private class GetGoogleTokenAsync extends AsyncTask<Account, Void, Void> {
@@ -288,7 +328,10 @@ public class LoginActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            enterMainService();
+            Glide.with(LoginActivity.this)
+                    .load(R.drawable.icon_google_selected)
+                    .transition(new DrawableTransitionOptions().crossFade())
+                    .into(mGoogleLogin);
         }
     }
 
@@ -316,14 +359,24 @@ public class LoginActivity extends AppCompatActivity
 
         if (!token.equals("")) {
             mFavoTokenManager.createToken(PLATFORM_TWITCH, token);
-            enterMainService();
+            Glide.with(LoginActivity.this)
+                    .load(R.drawable.icon_twitch_selected)
+                    .transition(new DrawableTransitionOptions().crossFade())
+                    .into(mTwitchLogin);
         }
     }
 
     // jump to HomeActivity
     private void enterMainService() {
 
-        Toast.makeText(LoginActivity.this, "Login succeed.", Toast.LENGTH_SHORT).show();
+        if (!mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK) &&
+                !mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE) &&
+                !mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST) &&
+                !mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH) &&
+                !mFavoTokenManager.isTokenVaild(PLATFORM_GIPHY)) {
+
+            Toast.makeText(LoginActivity.this, "하나 이상의 플랫폼을 선택해 주셔야 합니다.", Toast.LENGTH_SHORT).show();
+        }
 
         Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         startActivity(intent);

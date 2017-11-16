@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape xmlns:android="http://schemas.android.com/apk/res/android"
+            android:shape="oval">
+
+            <stroke
+                android:width="3px"
+                android:color="#ffffff" />
+            <size
+                android:width="64dp"
+                android:height="64dp" />
+
+        </shape>
+    </item>
+    <item
+        android:bottom="20dp"
+        android:drawable="@drawable/facebook_icon"
+        android:left="20dp"
+        android:right="20dp"
+        android:top="20dp" />
+</layer-list>
