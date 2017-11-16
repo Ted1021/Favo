@@ -733,7 +733,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
 
-        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), userId, 1);
+        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), userId, 1, null);
         call.enqueue(new Callback<TwitchVideoData>() {
             @Override
             public void onResponse(Call<TwitchVideoData> call, Response<TwitchVideoData> response) {

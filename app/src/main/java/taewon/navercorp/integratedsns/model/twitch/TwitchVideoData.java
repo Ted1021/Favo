@@ -12,6 +12,8 @@ public class TwitchVideoData {
 
     @SerializedName("data")
     private List<VideoInfo> data = null;
+    @SerializedName("pagination")
+    private Pagination pagination;
 
     public List<VideoInfo> getData() {
         return data;
@@ -19,6 +21,14 @@ public class TwitchVideoData {
 
     public void setData(List<VideoInfo> data) {
         this.data = data;
+    }
+
+    public Pagination getPagination() {
+        return pagination;
+    }
+
+    public void setPagination(Pagination pagination) {
+        this.pagination = pagination;
     }
 
     public class VideoInfo {
@@ -114,5 +124,19 @@ public class TwitchVideoData {
             this.language = language;
         }
 
+    }
+
+    public class Pagination {
+
+        @SerializedName("cursor")
+        private String cursor;
+
+        public String getCursor() {
+            return cursor;
+        }
+
+        public void setCursor(String cursor) {
+            this.cursor = cursor;
+        }
     }
 }

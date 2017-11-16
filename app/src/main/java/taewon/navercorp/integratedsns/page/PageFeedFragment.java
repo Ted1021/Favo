@@ -64,7 +64,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
-    private static final int MAX_COUNTS = 25;
+    private static final int MAX_COUNTS = 10;
 
     private static final String ARG_PARAM1 = "PAGE_ID";
     private static final String ARG_PARAM2 = "PLATFORM_TYPE";
@@ -107,6 +107,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
             mPageId = getArguments().getString(ARG_PARAM1);
             mPlatformType = getArguments().getString(ARG_PARAM2);
             mProfileImage = getArguments().getString(ARG_PARAM3);
+            Log.d("CHECK_PAGE_ID", mPageId);
         }
 
         // init Realm
@@ -229,7 +230,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
             parameters.putString("after", mNext);
         }
         parameters.putString("fields", "link,created_time,from{name, picture.height(1024){url}},message,description,full_picture,id,likes.limit(0).summary(true),comments.limit(0).summary(true),source");
-        parameters.putString("limit", "10");
+        parameters.putString("limit", MAX_COUNTS+"");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -308,33 +309,40 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
 
-        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), mPageId, 1);
+        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), mPageId, MAX_COUNTS, mNext);
         call.enqueue(new Callback<TwitchVideoData>() {
             @Override
             public void onResponse(Call<TwitchVideoData> call, Response<TwitchVideoData> response) {
                 if (response.isSuccessful()) {
 
-                    for (TwitchVideoData.VideoInfo result : response.body().getData()) {
+                    TwitchVideoData result = response.body();
+                    if(result.getPagination().getCursor() == null){
+                        return;
+                    } else {
+                        mNext = result.getPagination().getCursor();
+                    }
+
+                    for (TwitchVideoData.VideoInfo item : result.getData()) {
 
                         FavoFeedData data = new FavoFeedData();
 
                         try {
-                            data.setPubDate(mDateConverter.parse(result.getPublishedAt()));
+                            data.setPubDate(mDateConverter.parse(item.getPublishedAt()));
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                        data.setFeedId(result.getId());
+                        data.setFeedId(item.getId());
                         data.setPlatformType(PLATFORM_TWITCH);
                         data.setContentsType(CONTENTS_VIDEO);
-                        data.setPageId(result.getUserId());
+                        data.setPageId(item.getUserId());
                         data.setProfileImage(mProfileImage);
                         data.setUserName("xodnjs");
                         data.setCreatedTime(mFormat.format(data.getPubDate()));
-                        int position = result.getThumbnailUrl().indexOf("{width}");
-                        String thumbnail = result.getThumbnailUrl().substring(0, position - 1) + "1280x720.jpg";
+                        int position = item.getThumbnailUrl().indexOf("{width}");
+                        String thumbnail = item.getThumbnailUrl().substring(0, position - 1) + "1280x720.jpg";
                         data.setPicture(thumbnail);
-                        data.setVideoUrl(result.getId());
-                        data.setDescription(result.getTitle());
+                        data.setVideoUrl(item.getId());
+                        data.setDescription(item.getTitle());
 
                         mDataset.add(data);
                     }

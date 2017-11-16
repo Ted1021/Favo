@@ -254,7 +254,7 @@ public class PlatformFragment extends Fragment {
                 .build();
 
         TwitchService service = retrofit.create(TwitchService.class);
-        Call<TwitchStreamingData> call = service.getTwitchStreams(getString(R.string.twitch_client_id), MAX_COUNTS);
+        Call<TwitchStreamingData> call = service.getTwitchStreams(getString(R.string.twitch_client_id), MAX_COUNTS, null);
         call.enqueue(new Callback<TwitchStreamingData>() {
             @Override
             public void onResponse(Call<TwitchStreamingData> call, Response<TwitchStreamingData> response) {

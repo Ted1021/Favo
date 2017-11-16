@@ -57,9 +57,11 @@ public interface TwitchService {
     @GET("helix/videos")
     Call<TwitchVideoData> getTwitchVideoInfo(@Header("Client-ID") String clientId,
                                              @Query("user_id") String userId,
-                                             @Query("first") int limit);
+                                             @Query("first") int limit,
+                                             @Query("after") String after);
 
     @GET("helix/streams")
     Call<TwitchStreamingData> getTwitchStreams(@Header("Client-ID") String clinetId,
-                                               @Query("first") int count);
+                                               @Query("first") int count,
+                                               @Query("after") String after);
 }
