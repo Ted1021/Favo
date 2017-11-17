@@ -69,6 +69,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         private TextView mUserName, mUploadTime, mDescription, mComment;
         private ImageView mProfile, mPicture, mPlatformType;
         private Button mShare, mMore;
+//        private ImageButton mPlay;
         private FrameLayout mPageDetail;
         private LinearLayout mCommentDetail;
 
@@ -96,6 +97,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             mPageDetail.setOnClickListener(this);
             mCommentDetail = (LinearLayout) itemView.findViewById(R.id.layout_comment);
             mCommentDetail.setOnClickListener(this);
+//            mPlay = (ImageButton) itemView.findViewById(R.id.imageButton_play);
+//            mPlay.setOnClickListener(this);
 
 //            if (viewType == CONTENTS_VIDEO) {
 //
@@ -117,9 +120,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             switch (v.getId()) {
 
-                case R.id.button_play:
-//                    loadVideo(position, platformType);
-                    break;
+//                case R.id.imageButton_play:
+////                    loadVideo(position, platformType);
+//                    break;
 
                 case R.id.layout_comment:
                     loadComments(position);

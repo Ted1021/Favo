@@ -170,7 +170,7 @@ public class CommentActivity extends AppCompatActivity {
                         if(response.getError() == null){
 
                             FacebookCommentData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
-                            if(result.getPaging().getCursors() != null){
+                            if(result.getPaging() != null){
                                 mNext = result.getPaging().getCursors().getAfter();
                             }
                             for(FacebookCommentData.Comment item : result.getData()){

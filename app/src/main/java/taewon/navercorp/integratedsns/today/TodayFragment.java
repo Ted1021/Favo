@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.today;
 
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,6 +25,8 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE
  * A simple {@link Fragment} subclass.
  */
 public class TodayFragment extends Fragment {
+
+    private Typeface mTypeface;
 
     // for managing tokens
     private FavoTokenManager mFavoTokenManager;

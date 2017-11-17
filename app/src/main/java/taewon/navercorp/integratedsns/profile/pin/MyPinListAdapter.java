@@ -84,7 +84,7 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
             if (viewType == CONTENTS_VIDEO) {
 
                 mPicture.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
-                mPlay = (ImageButton) itemView.findViewById(R.id.button_play);
+                mPlay = (ImageButton) itemView.findViewById(R.id.imageButton_play);
                 mPlay.setOnClickListener(this);
             } else {
                 mPicture.setOnClickListener(this);
