@@ -313,7 +313,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 new GraphRequest.Callback() {
                     @Override
                     public void onCompleted(GraphResponse response) {
-
                         if (response.getError() == null) {
                             try {
 
@@ -336,7 +335,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("limit", "10");
+        parameters.putString("limit", MAX_COUNTS+"");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -355,8 +354,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         if (response.getError() == null) {
                             try {
                                 FacebookFeedData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedData.class);
-                                if(result.getPaging() != null){
-                                    mPlatformPagingInfo.put(PLATFORM_FACEBOOK+pageId, result.getPaging().getCursors().getAfter());
+                                if (result.getPaging() != null) {
+                                    mPlatformPagingInfo.put(PLATFORM_FACEBOOK + pageId, result.getPaging().getCursors().getAfter());
                                     Log.d("CHECK_NEXT", pageId);
                                 }
                                 FacebookFeedData.ArticleData article;
@@ -406,8 +405,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        if(mPlatformPagingInfo.get(PLATFORM_FACEBOOK+pageId) != null){
-            parameters.putString("after", mPlatformPagingInfo.get(PLATFORM_FACEBOOK+pageId));
+        if (mPlatformPagingInfo.get(PLATFORM_FACEBOOK + pageId) != null) {
+            parameters.putString("after", mPlatformPagingInfo.get(PLATFORM_FACEBOOK + pageId));
         }
         parameters.putString("fields", "link,created_time,message,full_picture,likes.limit(0).summary(true),comments.limit(0).summary(true),from{name, picture.height(2048){url}},attachments{subattachments},source");
         parameters.putString("limit", "1");

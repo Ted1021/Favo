@@ -13,7 +13,8 @@
     sothree:umanoOverlay="true"
     sothree:umanoPanelHeight="0dp"
     sothree:umanoScrollableView="@+id/recyclerView_commentList"
-    sothree:umanoShadowHeight="4dp">
+    sothree:umanoShadowHeight="4dp"
+    sothree:umanoScrollInterpolator="@anim/overshoot">
 
     <FrameLayout
         android:layout_width="match_parent"

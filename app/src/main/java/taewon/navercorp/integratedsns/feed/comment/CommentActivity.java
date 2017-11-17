@@ -46,7 +46,7 @@ public class CommentActivity extends AppCompatActivity {
     private EndlessRecyclerViewScrollListener mScrollListener;
     private EditText mUserComment;
 
-    private String mNextPage, mPlatformType, mArticleId, mVideoId, mPinId;
+    private String mNext, mPlatformType, mFeedId;
 
     // Comment list components
     private SlidingUpPanelLayout mCommentSlidingLayout;
@@ -56,7 +56,7 @@ public class CommentActivity extends AppCompatActivity {
     private ArrayList<FavoCommentData> mCommentDataset = new ArrayList<>();
 
     private static final int MAX_COUNTS = 10;
-    private static final int TRANSITION_TIME = 500;
+    private static final int TRANSITION_TIME = 700;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,17 +82,18 @@ public class CommentActivity extends AppCompatActivity {
         switch (mPlatformType) {
 
             case PLATFORM_FACEBOOK:
-                mArticleId = intent.getStringExtra("ARTICLE_ID");
-                getFacebookComment(mArticleId);
+                mFeedId = intent.getStringExtra("ARTICLE_ID");
+                Log.d("CHECK_FEED_ID", mFeedId);
+                getFacebookComment();
                 break;
 
             case PLATFORM_YOUTUBE:
-                mVideoId = intent.getStringExtra("VIDEO_ID");
-                getYoutubeComment(mVideoId);
+                mFeedId = intent.getStringExtra("VIDEO_ID");
+                getYoutubeComment();
                 break;
 
             case PLATFORM_PINTEREST:
-                mPinId = intent.getStringExtra("PIN_ID");
+
                 break;
         }
     }
@@ -109,6 +110,7 @@ public class CommentActivity extends AppCompatActivity {
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
                 if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
                     CommentActivity.this.finish();
+                    CommentActivity.this.overridePendingTransition(0, 0);
                 }
             }
         });
@@ -145,15 +147,11 @@ public class CommentActivity extends AppCompatActivity {
                 switch (mPlatformType) {
 
                     case PLATFORM_FACEBOOK:
-
+                        getFacebookComment();
                         break;
 
                     case PLATFORM_YOUTUBE:
-
-                        break;
-
-                    case PLATFORM_PINTEREST:
-
+                        getYoutubeComment();
                         break;
                 }
             }
@@ -161,61 +159,47 @@ public class CommentActivity extends AppCompatActivity {
         mCommentList.addOnScrollListener(mScrollListener);
     }
 
-//    private void loadComments(String platformType, String feedId) {
-//
-//        mCommentDataset.clear();
-//        mCommentAdapter.notifyDataSetChanged();
-//
-//        switch (platformType) {
-//            case PLATFORM_FACEBOOK:
-//                getFacebookComment(feedId);
-//                break;
-//
-//            case PLATFORM_YOUTUBE:
-//                getYoutubeComment(feedId);
-//                break;
-//        }
-//    }
+    private void getFacebookComment() {
 
-    private void getFacebookComment(String feedId) {
-
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newGraphPathRequest(
-                accessToken,
-                feedId,
+                AccessToken.getCurrentAccessToken(),
+                String.format("%s/comments", mFeedId),
                 new GraphRequest.Callback() {
                     @Override
                     public void onCompleted(GraphResponse response) {
-
-                        if (response.getError() == null) {
+                        if(response.getError() == null){
 
                             FacebookCommentData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
-                            for (FacebookCommentData.Comments.CommentData comment : result.getComments().getData()) {
+                            if(result.getPaging().getCursors() != null){
+                                mNext = result.getPaging().getCursors().getAfter();
+                            }
+                            for(FacebookCommentData.Comment item : result.getData()){
 
                                 FavoCommentData data = new FavoCommentData();
 
-                                data.setProfileImage(comment.getFrom().getPicture().getData().getUrl());
-                                data.setCreatedTime(comment.getUploadTime());
-                                data.setMessage(comment.getMessage());
-                                data.setUserName(comment.getFrom().getName());
+                                data.setProfileImage(item.getFrom().getPicture().getData().getUrl());
+                                data.setUserName(item.getFrom().getName());
+                                data.setCreatedTime(item.getCreatedTime());
+                                data.setMessage(item.getMessage());
 
                                 mCommentDataset.add(data);
                             }
                             mCommentAdapter.notifyDataSetChanged();
-
-                        } else {
-                            Log.e("CHECK_COMMENT", response.getError().toString());
                         }
                     }
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(1024){url}},attachments{subattachments},source,likes.limit(0).summary(true),comments.summary(true){from{name, picture.height(1024){url}},message,created_time}");
+        if(mNext != null){
+            parameters.putString("after", mNext);
+        }
+        parameters.putString("fields", "created_time,message,full_picture,from{name, picture{url}},attachments{subattachments},source,comments.limit(1){from{name, picture{url}},message}");
+        parameters.putString("limit", MAX_COUNTS+"");
         request.setParameters(parameters);
         request.executeAsync();
     }
 
-    private void getYoutubeComment(String feedId) {
+    private void getYoutubeComment() {
 
         String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
         Retrofit retrofit = new Retrofit.Builder()
@@ -224,16 +208,22 @@ public class CommentActivity extends AppCompatActivity {
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeCommentData> call = service.getCommentListNext(accessToken, "snippet", null, MAX_COUNTS, feedId);
+        Call<YoutubeCommentData> call = service.getCommentListNext(accessToken, "snippet", mNext, MAX_COUNTS, mFeedId);
         call.enqueue(new Callback<YoutubeCommentData>() {
             @Override
             public void onResponse(Call<YoutubeCommentData> call, Response<YoutubeCommentData> response) {
 
                 if (response.isSuccessful()) {
 
-                    for (YoutubeCommentData.Item result : response.body().getItems()) {
+                    YoutubeCommentData result = response.body();
+                    if (result.getNextPageToken() == null) {
+                        return;
+                    } else {
+                        mNext = result.getNextPageToken();
+                    }
+                    for (YoutubeCommentData.Item item : result.getItems()) {
 
-                        YoutubeCommentData.Item.TopLevelComment.Author comment = result.getSnippet().getTopLevelComment().getSnippet();
+                        YoutubeCommentData.Item.TopLevelComment.Author comment = item.getSnippet().getTopLevelComment().getSnippet();
                         FavoCommentData data = new FavoCommentData();
 
                         data.setProfileImage(comment.getAuthorProfileImageUrl());
@@ -261,7 +251,7 @@ public class CommentActivity extends AppCompatActivity {
     private void setYoutubeComment(String userComment) {
 
         YoutubePostCommentData commentData = new YoutubePostCommentData();
-        commentData.getSnippet().setVideoId(mVideoId);
+        commentData.getSnippet().setVideoId(mFeedId);
         commentData.getSnippet().getTopLevelComment().getSnippet().setTextOriginal(userComment);
 
         String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
@@ -277,7 +267,6 @@ public class CommentActivity extends AppCompatActivity {
             public void onResponse(Call<Void> call, Response<Void> response) {
 
                 mScrollListener.resetState();
-                mNextPage = "";
             }
 
             @Override
@@ -289,10 +278,13 @@ public class CommentActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
-        if (mCommentSlidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-            mCommentSlidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-        }
+        mCommentSlidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                CommentActivity.this.finish();
+                CommentActivity.this.overridePendingTransition(0, 0);
+            }
+        }, TRANSITION_TIME);
     }
 }
