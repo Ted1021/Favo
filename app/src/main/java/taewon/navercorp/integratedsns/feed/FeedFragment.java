@@ -28,7 +28,6 @@ import com.pinterest.android.pdk.PDKClient;
 import com.pinterest.android.pdk.PDKException;
 import com.pinterest.android.pdk.PDKPin;
 import com.pinterest.android.pdk.PDKResponse;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,7 +35,6 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -49,17 +47,13 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.feed.comment.CommentListAdapter;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
-import taewon.navercorp.integratedsns.model.facebook.FacebookCommentData;
 import taewon.navercorp.integratedsns.model.facebook.FacebookFeedData;
-import taewon.navercorp.integratedsns.model.favo.FavoCommentData;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
-import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
@@ -95,7 +89,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private PDKClient mPinterestClient;
 
     // BroadcastReceivers
-    private BroadcastReceiver mTokenUpdateReceiver, mAsyncFinishReceiver, mScrollToTopReceiver, mCommentRequestReceiver;
+    private BroadcastReceiver mTokenUpdateReceiver, mAsyncFinishReceiver, mScrollToTopReceiver;
 
     // Feed list components
     private RecyclerView mFeedList;
@@ -104,12 +98,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private RecyclerView.LayoutManager mFeedLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
 //    private RelativeLayout mLayoutDisconnection;
-
-    // Comment list components
-    private SlidingUpPanelLayout mCommentSlidingLayout;
-    private RecyclerView mCommentList;
-    private CommentListAdapter mCommentAdapter;
-    private ArrayList<FavoCommentData> mCommentDataset = new ArrayList<>();
 
     private Realm mRealm;
     private SimpleDateFormat mStringFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
@@ -177,31 +165,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mFeedLayoutManager = new LinearLayoutManager(getContext());
         mFeedList.setLayoutManager(mFeedLayoutManager);
 
-        // set comment recyclerView
-        mCommentList = (RecyclerView) view.findViewById(R.id.recyclerView_commentList);
-        mCommentAdapter = new CommentListAdapter(getContext(), mCommentDataset);
-        mCommentList.setAdapter(mCommentAdapter);
-        RecyclerView.LayoutManager commentLayoutManager = new LinearLayoutManager(getContext());
-        mCommentList.setLayoutManager(commentLayoutManager);
-
-        // set sliding panel for comment
-        mCommentSlidingLayout = (SlidingUpPanelLayout) view.findViewById(R.id.slidingLayout);
-        mCommentSlidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) {
-            }
-
-            @Override
-            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-            }
-        });
-        mCommentSlidingLayout.setFadeOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCommentSlidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-            }
-        });
-
         mPagingListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) mFeedLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
@@ -261,23 +224,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             }
         };
 
-        // comment request receiver
-        mCommentRequestReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                String platformType = intent.getStringExtra("PLATFORM_TYPE");
-                String feedId = intent.getStringExtra("FEED_ID");
-
-                loadComments(platformType, feedId);
-            }
-        };
-
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mAsyncFinishReceiver, new IntentFilter(getString(R.string.async_finish_status)));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mScrollToTopReceiver, new IntentFilter(getString(R.string.scroll_to_top_status)));
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mCommentRequestReceiver, new IntentFilter(getString(R.string.comment_request)));
-
     }
 
     private void checkToken() {
@@ -345,23 +294,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             mFeedLayoutManager.scrollToPosition(position - 10);
         }
         mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
-    }
-
-    private void loadComments(String platformType, String feedId) {
-
-        mCommentDataset.clear();
-        mCommentAdapter.notifyDataSetChanged();
-
-        mCommentSlidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-        switch (platformType) {
-            case PLATFORM_FACEBOOK:
-                getFacebookComment(feedId);
-                break;
-
-            case PLATFORM_YOUTUBE:
-                getYoutubeComment(feedId);
-                break;
-        }
     }
 
     // send status of asyncTasks
@@ -835,87 +767,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 if (mAsyncCount == 0) {
                     sendAsyncStatus();
                 }
-            }
-        });
-    }
-
-    private void getFacebookComment(String feedId) {
-
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        GraphRequest request = GraphRequest.newGraphPathRequest(
-                accessToken,
-                feedId,
-                new GraphRequest.Callback() {
-                    @Override
-                    public void onCompleted(GraphResponse response) {
-
-                        if (response.getError() == null) {
-
-                            FacebookCommentData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookCommentData.class);
-                            for (FacebookCommentData.Comments.CommentData comment : result.getComments().getData()) {
-
-                                FavoCommentData data = new FavoCommentData();
-
-                                data.setProfileImage(comment.getFrom().getPicture().getData().getUrl());
-                                data.setCreatedTime(comment.getUploadTime());
-                                data.setMessage(comment.getMessage());
-                                data.setUserName(comment.getFrom().getName());
-
-                                mCommentDataset.add(data);
-                            }
-                            mCommentAdapter.notifyDataSetChanged();
-
-                        } else {
-                            Log.e("CHECK_COMMENT", response.getError().toString());
-                        }
-                    }
-                });
-
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "created_time,message,full_picture,from{name, picture.height(1024){url}},attachments{subattachments},source,likes.limit(0).summary(true),comments.summary(true){from{name, picture.height(1024){url}},message,created_time}");
-        request.setParameters(parameters);
-        request.executeAsync();
-    }
-
-    private void getYoutubeComment(String feedId) {
-
-        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(YOUTUBE_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeCommentData> call = service.getCommentListNext(accessToken, "snippet", null, MAX_COUNTS, feedId);
-        call.enqueue(new Callback<YoutubeCommentData>() {
-            @Override
-            public void onResponse(Call<YoutubeCommentData> call, Response<YoutubeCommentData> response) {
-
-                if (response.isSuccessful()) {
-
-                    for (YoutubeCommentData.Item result : response.body().getItems()) {
-
-                        YoutubeCommentData.Item.TopLevelComment.Author comment = result.getSnippet().getTopLevelComment().getSnippet();
-                        FavoCommentData data = new FavoCommentData();
-
-                        data.setProfileImage(comment.getAuthorProfileImageUrl());
-                        data.setCreatedTime(comment.getPublishedAt());
-                        data.setMessage(comment.getTextOriginal());
-                        data.setUserName(comment.getAuthorDisplayName());
-
-                        mCommentDataset.add(data);
-                    }
-                    mCommentAdapter.notifyDataSetChanged();
-
-                } else {
-                    Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to get json for video " + response.raw().toString());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<YoutubeCommentData> call, Throwable t) {
-                t.printStackTrace();
-                Log.e("ERROR_YOUTUBE", "Comment Activity >>>>> Fail to access youtube api server");
             }
         });
     }

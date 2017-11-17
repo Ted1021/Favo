@@ -1,9 +1,9 @@
 package taewon.navercorp.integratedsns.feed;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -26,6 +26,7 @@ import java.util.Vector;
 
 import io.realm.Realm;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
@@ -175,30 +176,21 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
             String platformType = mDataset.get(position).getPlatformType();
 
-            // send call 'load comment'
-            Intent intent = new Intent(mContext.getString(R.string.comment_request));
+            Intent intent = new Intent(mContext, CommentActivity.class);
             intent.putExtra("PLATFORM_TYPE", platformType);
-            intent.putExtra("FEED_ID", mDataset.get(position).getFeedId());
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
 
-//            Intent intent = new Intent(mContext, CommentActivity.class);
-//            intent.putExtra("PLATFORM_TYPE", platformType);
-//            intent.putExtra("CONTENTS_TYPE", contentsType);
-//
-//            switch (platformType) {
-//
-//                case PLATFORM_FACEBOOK:
-//                    intent.putExtra("ARTICLE_ID", mDataset.get(position).getFeedId());
-//                    break;
-//
-//                case PLATFORM_YOUTUBE:
-//                    Bundle bundle = new Bundle();
-//                    bundle.putSerializable("VIDEO_CONTENT", mDataset.get(position));
-//                    intent.putExtras(bundle);
-//                    intent.putExtra("VIDEO_ID", mDataset.get(position).getFeedId());
-//                    break;
-//            }
-//            mContext.startActivity(intent);
+            switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    intent.putExtra("ARTICLE_ID", mDataset.get(position).getFeedId());
+                    break;
+
+                case PLATFORM_YOUTUBE:
+                    intent.putExtra("VIDEO_ID", mDataset.get(position).getFeedId());
+                    break;
+            }
+            mContext.startActivity(intent);
+            ((Activity)mContext).overridePendingTransition(0, 0);
         }
 
         private void loadPageDetail(int position) {

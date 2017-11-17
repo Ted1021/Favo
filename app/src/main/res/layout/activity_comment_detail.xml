@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <com.sothree.slidinguppanel.SlidingUpPanelLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -14,19 +15,11 @@
     sothree:umanoScrollableView="@+id/recyclerView_commentList"
     sothree:umanoShadowHeight="4dp">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/refreshLayout"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView_feed"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="always" />
-
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/dragView"
@@ -67,5 +60,45 @@
         </android.support.v7.widget.CardView>
 
     </LinearLayout>
+    <!--<LinearLayout-->
+        <!--android:id="@+id/linearLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:padding="8dp">-->
+
+        <!--<ImageButton-->
+            <!--android:id="@+id/button_camera"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="?android:attr/selectableItemBackground"-->
+            <!--app:srcCompat="@android:drawable/ic_menu_camera" />-->
+
+        <!--<EditText-->
+            <!--android:id="@+id/editText_userComment"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_alignParentStart="true"-->
+            <!--android:layout_marginLeft="8dp"-->
+            <!--android:layout_marginRight="8dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@drawable/comment_background"-->
+            <!--android:ems="10"-->
+            <!--android:gravity="center_vertical"-->
+            <!--android:hint="input comment here ..."-->
+            <!--android:inputType="textPersonName"-->
+            <!--android:paddingLeft="8dp" />-->
+
+        <!--<ImageButton-->
+            <!--android:id="@+id/button_send"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="?android:attr/selectableItemBackground"-->
+            <!--app:srcCompat="@android:drawable/ic_menu_send" />-->
+
+    <!--</LinearLayout>-->
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>
