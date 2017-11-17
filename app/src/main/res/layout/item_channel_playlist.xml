@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/linearLayout_item"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="4dp"
-        android:orientation="horizontal"
-        android:padding="8dp">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <FrameLayout
             android:layout_width="160dp"
@@ -21,7 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
-                android:scaleType="fitXY" />
+                android:scaleType="centerCrop" />
 
             <FrameLayout
                 android:layout_width="70dp"
@@ -54,24 +53,15 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="8dp">
-
-            <TextView
-                android:id="@+id/textView_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="Title"
-                android:textColor="@android:color/white"
-                android:textStyle="bold" />
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:layout_margin="8dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -84,8 +74,28 @@
                     android:textSize="14sp" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Title"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
         </FrameLayout>
 
     </LinearLayout>
+
+    <View
+        android:id="@+id/view4"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_above="@+id/tabLayout"
+        android:layout_marginLeft="168dp"
+        android:layout_marginRight="8dp"
+        android:background="#535353" />
 
 </LinearLayout>

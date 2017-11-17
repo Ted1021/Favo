@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Vector;
 
@@ -61,6 +62,7 @@ import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
@@ -83,6 +85,9 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
 public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private FavoTokenManager mFavoTokenManager;
+
+    private EndlessRecyclerViewScrollListener mPagingListener;
+    private HashMap<String, String> mPlatformPagingInfo = new HashMap<>();
 
     // for pinterest client
     private PDKClient mPinterestClient;
@@ -194,6 +199,14 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 mCommentSlidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
         });
+
+        mPagingListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) mFeedLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+
+            }
+        };
+        mFeedList.addOnScrollListener(mPagingListener);
     }
 
     private void initData() {
@@ -267,7 +280,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mAsyncCount = 0;
 
         mFeedDataset.clear();
-        mFeedAdapter.notifyDataSetChanged();
 
         if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
             getFacebookUserPages();
@@ -417,6 +429,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     data.setCommentCount(article.getComments().getSummary().getTotalCount());
 
                                     mFeedDataset.add(data);
+                                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+
                                 }
                             } catch (ParseException e) {
                                 e.printStackTrace();
@@ -489,6 +503,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     data.setDescription(pin.getNote());
 
                     mFeedDataset.add(data);
+                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
 
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
@@ -608,6 +623,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                             data.setDescription(item.getSnippet().getTitle());
 
                             mFeedDataset.add(data);
+                            mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                         }
                     } else {
                         Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
@@ -762,18 +778,34 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setDescription(result.getTitle());
 
                         mFeedDataset.add(data);
+                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                     }
+
                 } else {
                     Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login // " + response.raw().toString());
                 }
-//                mFeedAdapter.notifyDataSetChanged();
-                mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+
+                synchronized ((Integer) mAsyncCount) {
+                    mAsyncCount = mAsyncCount - 1;
+                }
+
+                if (mAsyncCount == 0) {
+                    sendAsyncStatus();
+                }
             }
 
             @Override
             public void onFailure(Call<TwitchVideoData> call, Throwable t) {
                 Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to login ");
                 t.printStackTrace();
+
+                synchronized ((Integer) mAsyncCount) {
+                    mAsyncCount = mAsyncCount - 1;
+                }
+
+                if (mAsyncCount == 0) {
+                    sendAsyncStatus();
+                }
             }
         });
     }

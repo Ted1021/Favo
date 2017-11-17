@@ -204,13 +204,19 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeChannelPlaylistData> call = service.getChannelPlaylist(accessToken, "snippet,contentDetails", MAX_COUNT, mPageId);
+        Call<YoutubeChannelPlaylistData> call = service.getChannelPlaylist(accessToken, "snippet,contentDetails", MAX_COUNT, mPageId, mNext);
         call.enqueue(new Callback<YoutubeChannelPlaylistData>() {
             @Override
             public void onResponse(Call<YoutubeChannelPlaylistData> call, Response<YoutubeChannelPlaylistData> response) {
 
                 if (response.isSuccessful()) {
 
+                    YoutubeChannelPlaylistData result = response.body();
+                    if(result.getNextPageToken() == null){
+                        return;
+                    } else {
+                        mNext = result.getNextPageToken();
+                    }
                     for (YoutubeChannelPlaylistData.Item video : response.body().getItems()) {
 
                         FavoPageVideoData data = new FavoPageVideoData();
@@ -245,6 +251,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onRefresh() {
 
+        mNext = null;
         mDataset.clear();
         mAdapter.notifyDataSetChanged();
         bindData();

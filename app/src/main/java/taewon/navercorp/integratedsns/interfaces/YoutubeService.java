@@ -72,7 +72,8 @@ public interface YoutubeService {
     Call<YoutubeChannelPlaylistData> getChannelPlaylist (@Header("Authorization") String auth,
                                                          @Query("part") String part,
                                                          @Query("maxResults") int maxResults,
-                                                         @Query("channelId") String channelId);
+                                                         @Query("channelId") String channelId,
+                                                         @Query("pageToken") String pageToken);
 
     @POST("youtube/v3/commentThreads")
     Call<Void> setComment(@Header("Authorization") String auth,
