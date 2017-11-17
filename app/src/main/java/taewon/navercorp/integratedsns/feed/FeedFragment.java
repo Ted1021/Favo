@@ -86,8 +86,10 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private FavoTokenManager mFavoTokenManager;
 
-    private EndlessRecyclerViewScrollListener mPagingListener;
+    // key : platform + pageId
+    // value : nextPageToken
     private HashMap<String, String> mPlatformPagingInfo = new HashMap<>();
+    private EndlessRecyclerViewScrollListener mPagingListener;
 
     // for pinterest client
     private PDKClient mPinterestClient;
@@ -203,7 +205,10 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mPagingListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) mFeedLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-
+//
+//                Log.d("CHECK_PAGE", page+"");
+//
+//                loadMore();
             }
         };
         mFeedList.addOnScrollListener(mPagingListener);
@@ -278,7 +283,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private void checkToken() {
 
         mAsyncCount = 0;
-
         mFeedDataset.clear();
 
         if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
@@ -298,9 +302,29 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }
     }
 
+    private void loadMore() {
+
+        mAsyncCount = 0;
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
+            getFacebookUserPages();
+        }
+
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
+            getYoutubeSubscriptionList();
+        }
+
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
+            getPinterestFollowingBoards();
+        }
+
+        if (mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)) {
+            getTwitchUserInfo();
+        }
+    }
+
     private void refreshDataset() {
 
-        mFeedAdapter.notifyDataSetChanged();
+//        mFeedAdapter.notifyDataSetChanged();
         if (mLastPosition > mFeedDataset.size() - 1) {
             mLastPosition = mFeedDataset.size() - 1;
         }
@@ -385,7 +409,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         request.executeAsync();
     }
 
-    private void getFacebookPageFeed(String pageId) {
+    private void getFacebookPageFeed(final String pageId) {
 
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         String path = String.format("/%s/feed", pageId);
@@ -398,8 +422,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                         if (response.getError() == null) {
                             try {
-
                                 FacebookFeedData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedData.class);
+                                if(result.getPaging() != null){
+                                    mPlatformPagingInfo.put(PLATFORM_FACEBOOK+pageId, result.getPaging().getCursors().getAfter());
+                                    Log.d("CHECK_NEXT", pageId);
+                                }
                                 FacebookFeedData.ArticleData article;
                                 for (int i = 0; i < result.getData().size(); i++) {
 
@@ -430,7 +457,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                                     mFeedDataset.add(data);
                                     mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
-
                                 }
                             } catch (ParseException e) {
                                 e.printStackTrace();
@@ -448,6 +474,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
+        if(mPlatformPagingInfo.get(PLATFORM_FACEBOOK+pageId) != null){
+            parameters.putString("after", mPlatformPagingInfo.get(PLATFORM_FACEBOOK+pageId));
+        }
         parameters.putString("fields", "link,created_time,message,full_picture,likes.limit(0).summary(true),comments.limit(0).summary(true),from{name, picture.height(2048){url}},attachments{subattachments},source");
         parameters.putString("limit", "1");
         request.setParameters(parameters);
@@ -566,7 +595,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
                     mFavoTokenManager.createToken(PLATFORM_YOUTUBE, "");
-                    checkToken();
+//                    checkToken();
                 }
             }
 
@@ -894,6 +923,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onRefresh() {
 
+        mPlatformPagingInfo.clear();
         mFeedDataset.clear();
         mFeedAdapter.notifyDataSetChanged();
         checkToken();
