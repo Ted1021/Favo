@@ -150,19 +150,21 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
         mScrollListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                switch (mPlatformType) {
 
-                    case PLATFORM_FACEBOOK:
-                        getFacebookPageFeed();
-                        break;
+                if (page != 0) {
+                    switch (mPlatformType) {
+                        case PLATFORM_FACEBOOK:
+                            getFacebookPageFeed();
+                            break;
 
-                    case PLATFORM_YOUTUBE:
-                        getYoutubeChannelFeed();
-                        break;
+                        case PLATFORM_YOUTUBE:
+                            getYoutubeChannelFeed();
+                            break;
 
-                    case PLATFORM_TWITCH:
-                        getTwitchVideoList();
-                        break;
+                        case PLATFORM_TWITCH:
+                            getTwitchVideoList();
+                            break;
+                    }
                 }
             }
         };
@@ -188,7 +190,6 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                                 if(result.getPaging() != null){
                                     mNext = result.getPaging().getCursors().getAfter();
                                 }
-                                Log.d("CHECK_NEXT", " >>>>>>>> " + mNext);
                                 FacebookFeedData.ArticleData article;
                                 for (int i = 0; i < result.getData().size(); i++) {
 

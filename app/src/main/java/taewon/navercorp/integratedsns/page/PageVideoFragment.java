@@ -219,6 +219,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
                     for (YoutubeChannelPlaylistData.Item item : response.body().getItems()) {
 
+
                         FavoPageVideoData data = new FavoPageVideoData();
 
 
@@ -252,7 +253,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
     @Override
     public void onRefresh() {
 
-        mNext=null;
+        mNext = null;
         mDataset.clear();
         mAdapter.notifyDataSetChanged();
         bindData();

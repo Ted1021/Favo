@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.today;
 
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -45,6 +46,8 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
  * A simple {@link Fragment} subclass.
  */
 public class PlatformFragment extends Fragment {
+
+    private Typeface mTypeface;
 
     // for managing tokens
     private FavoTokenManager mFavoTokenManager;
@@ -101,11 +104,14 @@ public class PlatformFragment extends Fragment {
 
     private void initView(View view) {
 
+        mTypeface = Typeface.createFromAsset(getContext().getAssets(), "BullettoKilla.ttf");
+
         mViewPager = (VerticalCardStackViewPager) view.findViewById(viewPager);
         mViewPager.setOffscreenPageLimit(MAX_COUNTS);
         mViewPager.setClipToPadding(false);
 
         mPlatformName = (TextView) view.findViewById(R.id.textView_platform);
+        mPlatformName.setTypeface(mTypeface);
     }
 
     private void initData(String platformType) {

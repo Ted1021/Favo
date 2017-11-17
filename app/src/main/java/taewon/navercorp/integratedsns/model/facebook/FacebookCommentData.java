@@ -1,9 +1,7 @@
 package taewon.navercorp.integratedsns.model.facebook;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,151 +10,108 @@ import java.util.List;
 
 public class FacebookCommentData {
 
-    @SerializedName("link")
-    private String link;
-    @SerializedName("created_time")
-    private String createdTime;
-    @SerializedName("message")
-    private String message;
-    @SerializedName("full_picture")
-    private String fullPicture;
-    @SerializedName("from")
-    private From from = new From();
-    @SerializedName("source")
-    private String source;
-    @SerializedName("comments")
-    private Comments comments = new Comments();
-    @SerializedName("likes")
-    private Likes likes;
-    @SerializedName("id")
-    private String id;
+    @SerializedName("data")
+    private List<Comment> data = null;
+    @SerializedName("paging")
+    private Paging paging;
 
-    public String getLink() {
-        return link;
+    public List<Comment> getData() {
+        return data;
     }
 
-    public void setLink(String link) {
-        this.link = link;
+    public void setData(List<Comment> data) {
+        this.data = data;
     }
 
-    public String getCreatedTime() {
-        return createdTime;
+    public Paging getPaging() {
+        return paging;
     }
 
-    public void setCreatedTime(String createdTime) {
-        this.createdTime = createdTime;
+    public void setPaging(Paging paging) {
+        this.paging = paging;
     }
 
-    public String getMessage() {
-        return message;
-    }
+    public class Paging {
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+        @SerializedName("cursors")
+        private Cursors cursors;
+        @SerializedName("next")
+        private String next;
 
-    public String getFullPicture() {
-        return fullPicture;
-    }
+        public Cursors getCursors() {
+            return cursors;
+        }
 
-    public void setFullPicture(String fullPicture) {
-        this.fullPicture = fullPicture;
-    }
+        public void setCursors(Cursors cursors) {
+            this.cursors = cursors;
+        }
 
-    public From getFrom() {
-        return from;
-    }
+        public String getNext() {
+            return next;
+        }
 
-    public void setFrom(From from) {
-        this.from = from;
-    }
+        public void setNext(String next) {
+            this.next = next;
+        }
 
-    public String getSource() {
-        return source;
-    }
+        public class Cursors {
 
-    public void setSource(String source) {
-        this.source = source;
-    }
+            @SerializedName("before")
+            private String before;
+            @SerializedName("after")
+            private String after;
 
-    public Comments getComments() {
-        return comments;
-    }
-
-    public void setComments(Comments comments) {
-        this.comments = comments;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Likes getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Likes likes) {
-        this.likes = likes;
-    }
-
-    public class Likes {
-
-        @SerializedName("summary")
-        private Summary summary;
-
-        public class Summary {
-
-            @SerializedName("total_count")
-            private int totalCount;
-
-            public int getTotalCount() {
-                return totalCount;
+            public String getBefore() {
+                return before;
             }
 
-            public void setTotalCount(int totalCount) {
-                this.totalCount = totalCount;
+            public void setBefore(String before) {
+                this.before = before;
             }
-        }
 
-        public Summary getSummary() {
-            return summary;
-        }
+            public String getAfter() {
+                return after;
+            }
 
-        public void setSummary(Summary summary) {
-            this.summary = summary;
+            public void setAfter(String after) {
+                this.after = after;
+            }
         }
     }
 
-    public class From {
+    public class Comment {
 
-        @SerializedName("name")
-        @Expose
-        private String name;
-        @SerializedName("picture")
-        @Expose
-        private Picture picture = new Picture();
+        @SerializedName("created_time")
+        private String createdTime;
+        @SerializedName("message")
+        private String message;
+        @SerializedName("from")
+        private From from;
         @SerializedName("id")
-        @Expose
         private String id;
 
-        public String getName() {
-            return name;
+        public String getCreatedTime() {
+            return createdTime;
         }
 
-        public void setName(String name) {
-            this.name = name;
+        public void setCreatedTime(String createdTime) {
+            this.createdTime = createdTime;
         }
 
-        public Picture getPicture() {
-            return picture;
+        public String getMessage() {
+            return message;
         }
 
-        public void setPicture(Picture picture) {
-            this.picture = picture;
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public From getFrom() {
+            return from;
+        }
+
+        public void setFrom(From from) {
+            this.from = from;
         }
 
         public String getId() {
@@ -167,110 +122,29 @@ public class FacebookCommentData {
             this.id = id;
         }
 
-        public class Picture {
+        public class From {
 
-            @SerializedName("data")
-            @Expose
-            private Data data = new Data();
-
-            public Data getData() {
-                return data;
-            }
-
-            public void setData(Data data) {
-                this.data = data;
-            }
-
-            public class Data {
-
-                @SerializedName("url")
-                @Expose
-                private String url;
-
-                public String getUrl() {
-                    return url;
-                }
-
-                public void setUrl(String url) {
-                    this.url = url;
-                }
-
-            }
-        }
-    }
-
-    public class Comments {
-
-        @SerializedName("data")
-        private List<CommentData> data = new ArrayList<>();
-        @SerializedName("paging")
-        private Paging paging = new Paging();
-        @SerializedName("summary")
-        private Summary summary;
-
-        public Summary getSummary() {
-            return summary;
-        }
-
-        public void setSummary(Summary summary) {
-            this.summary = summary;
-        }
-
-        public List<CommentData> getData() {
-            return data;
-        }
-
-        public void setData(List<CommentData> data) {
-            this.data = data;
-        }
-
-        public Paging getPaging() {
-            return paging;
-        }
-
-        public void setPaging(Paging paging) {
-            this.paging = paging;
-        }
-
-        public class Summary {
-
-            @SerializedName("total_count")
-            private int totalCount;
-
-            public int getTotalCount() {
-                return totalCount;
-            }
-
-            public void setTotalCount(int totalCount) {
-                this.totalCount = totalCount;
-            }
-        }
-
-        public class CommentData {
-
-            @SerializedName("from")
-            private CommentFrom from = new CommentFrom();
-            @SerializedName("message")
-            private String message;
-            @SerializedName("created_time")
-            private String uploadTime;
+            @SerializedName("name")
+            private String name;
+            @SerializedName("picture")
+            private Picture picture;
             @SerializedName("id")
             private String id;
 
-            public CommentFrom getFrom() {
-                return from;
+            public String getName() {
+                return name;
             }
 
-            public void setFrom(CommentFrom from) {
-                this.from = from;
+            public void setName(String name) {
+                this.name = name;
             }
 
-            public String getMessage() {
-                return message;
+            public Picture getPicture() {
+                return picture;
             }
 
-            public void setMessage(String message) {
-                this.message = message;
+            public void setPicture(Picture picture) {
+                this.picture = picture;
             }
 
             public String getId() {
@@ -281,121 +155,33 @@ public class FacebookCommentData {
                 this.id = id;
             }
 
-            public String getUploadTime() {
-                return uploadTime;
-            }
+            public class Picture {
 
-            public void setUploadTime(String uploadTime) {
-                this.uploadTime = uploadTime;
-            }
+                @SerializedName("data")
+                private Data data;
 
-            public class CommentFrom {
-
-                @SerializedName("name")
-                private String name;
-                @SerializedName("picture")
-                private CommentPicture picture = new CommentPicture();
-                @SerializedName("id")
-                private String id;
-
-                public String getName() {
-                    return name;
+                public Data getData() {
+                    return data;
                 }
 
-                public void setName(String name) {
-                    this.name = name;
+                public void setData(Data data) {
+                    this.data = data;
                 }
 
-                public CommentPicture getPicture() {
-                    return picture;
-                }
+                public class Data {
 
-                public void setPicture(CommentPicture picture) {
-                    this.picture = picture;
-                }
+                    @SerializedName("url")
+                    private String url;
 
-                public String getId() {
-                    return id;
-                }
-
-                public void setId(String id) {
-                    this.id = id;
-                }
-
-                public class CommentPicture {
-
-                    @SerializedName("data")
-                    @Expose
-                    private Url data = new Url();
-
-                    public Url getData() {
-                        return data;
+                    public String getUrl() {
+                        return url;
                     }
 
-                    public void setData(Url data) {
-                        this.data = data;
-                    }
-
-                    public class Url {
-
-                        @SerializedName("url")
-                        @Expose
-                        private String url;
-
-                        public String getUrl() {
-                            return url;
-                        }
-
-                        public void setUrl(String url) {
-                            this.url = url;
-                        }
-
+                    public void setUrl(String url) {
+                        this.url = url;
                     }
                 }
             }
-        }
-
-        public class Paging {
-
-            @SerializedName("cursors")
-            @Expose
-            private Cursors cursors = new Cursors();
-
-            public Cursors getCursors() {
-                return cursors;
-            }
-
-            public void setCursors(Cursors cursors) {
-                this.cursors = cursors;
-            }
-
-            public class Cursors {
-
-                @SerializedName("before")
-                @Expose
-                private String before;
-                @SerializedName("after")
-                @Expose
-                private String after;
-
-                public String getBefore() {
-                    return before;
-                }
-
-                public void setBefore(String before) {
-                    this.before = before;
-                }
-
-                public String getAfter() {
-                    return after;
-                }
-
-                public void setAfter(String after) {
-                    this.after = after;
-                }
-
-            }
-
         }
     }
 }
