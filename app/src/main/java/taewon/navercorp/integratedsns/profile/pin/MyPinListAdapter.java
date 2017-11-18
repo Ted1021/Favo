@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 
 import io.realm.OrderedRealmCollection;
@@ -45,7 +46,7 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // common components
         private TextView mUserName, mUploadTime, mDescription;
@@ -146,7 +147,16 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
         holder.mLike.setText(data.getLikeCount() + "");
         holder.mComment.setText(data.getCommentCount() + "");
 
-        Glide.with(mContext).load(data.getPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+        if (data.getContentsType() == CONTENTS_VIDEO) {
+            Glide.with(mContext.getApplicationContext()).load(data.getPicture())
+                    .apply(new RequestOptions().override(864, 486))
+                    .apply(new RequestOptions().centerCrop())
+//                .thumbnail(0.5f)
+                    .transition(new DrawableTransitionOptions().crossFade())
+                    .into(holder.mPicture);
+        } else {
+            Glide.with(mContext).load(data.getPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+        }
         Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
 
         switch (data.getPlatformType()) {

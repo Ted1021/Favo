@@ -4,92 +4,105 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/cardView_item"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:cardBackgroundColor="@color/deepGray"
-        app:cardElevation="0dp">
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/layout_page_detail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/imageView_profile"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:scaleType="fitXY"
+                    app:srcCompat="@drawable/com_facebook_profile_picture_blank_portrait" />
+
+                <ImageView
+                    android:id="@+id/imageView_platformType"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="bottom|right"
+                    android:adjustViewBounds="true"
+                    android:background="@android:color/transparent"
+                    android:scaleType="fitXY" />
+
+            </FrameLayout>
 
             <LinearLayout
-                android:id="@+id/layout_page_detail"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="8dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:id="@+id/imageView_profile"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:scaleType="fitXY"
-                        app:srcCompat="@drawable/com_facebook_profile_picture_blank_portrait" />
-
-                    <ImageView
-                        android:id="@+id/imageView_platformType"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="bottom|right"
-                        android:adjustViewBounds="true"
-                        android:background="@android:color/transparent"
-                        android:scaleType="fitXY" />
-
-                </FrameLayout>
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/textView_userName"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="8dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:text="user name"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/textView_userName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:text="user name"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/textView_uploadTime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="upload time"
-                        android:textSize="10sp" />
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/button_more"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
-                    android:drawableRight="@drawable/ic_action_pin"
-                    android:gravity="center_vertical" />
+                <TextView
+                    android:id="@+id/textView_uploadTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="upload time"
+                    android:textColor="@color/secondaryTextColor"
+                    android:textSize="10sp" />
 
             </LinearLayout>
+
+            <Button
+                android:id="@+id/button_more"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:drawableRight="@drawable/ic_action_pin"
+                android:gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="50dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="8dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_arrow" />
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="8dp"
-                app:cardBackgroundColor="@color/darkGray"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@color/deepGray"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp">
 
@@ -102,7 +115,6 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="8dp"
                         android:layout_weight="1">
 
                         <ImageView
@@ -131,12 +143,14 @@
                         android:id="@+id/textView_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginTop="16dp"
                         android:layout_weight="1"
                         android:ellipsize="end"
                         android:maxLines="5"
                         android:text="story"
-                        android:textColor="@color/colorCremeWhite"
+                        android:textColor="@color/secondaryTextColor"
                         android:textSize="14sp" />
 
                     <RelativeLayout
@@ -162,21 +176,20 @@
                             style="@style/Widget.AppCompat.Button.Borderless"
                             android:layout_width="40dp"
                             android:layout_height="40dp"
+                            android:layout_alignParentTop="true"
+                            android:layout_toStartOf="@+id/button_comment"
                             android:drawableLeft="@drawable/ic_like"
                             android:gravity="left|center_vertical"
                             android:textColor="@color/unselected_color"
-                            android:textSize="10sp"
-                            android:layout_alignParentTop="true"
-                            android:layout_toStartOf="@+id/button_comment" />
+                            android:textSize="10sp" />
                     </RelativeLayout>
 
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
+        </FrameLayout>
 
-        </LinearLayout>
-
-    </android.support.v7.widget.CardView>
+    </LinearLayout>
 
 </LinearLayout>
 

@@ -23,4 +23,9 @@
     <color name="darkGray">#303030</color>
     <color name="lightGray">#424242</color>
 
+    <color name="primaryTextColor">#FFFFFFFF</color>
+    <color name="secondaryTextColor">#b3ffffff</color>
+    <color name="hintTextColor">#80FFFFFF</color>
+    <color name="divider">#1FFFFFFF</color>
+
 </resources>
