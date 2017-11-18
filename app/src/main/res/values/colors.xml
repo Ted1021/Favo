@@ -21,11 +21,19 @@
 
     <color name="deepGray">#212121</color>
     <color name="darkGray">#303030</color>
-    <color name="lightGray">#424242</color>
+    <!--<color name="lightGray">#424242</color>-->
+    <color name="lightGray">#3e3e3e</color>
+
 
     <color name="primaryTextColor">#FFFFFFFF</color>
     <color name="secondaryTextColor">#b3ffffff</color>
     <color name="hintTextColor">#80FFFFFF</color>
     <color name="divider">#1FFFFFFF</color>
+    <color name="darkFilter">#DE8e8e8e</color>
+
+
+    <!--<color name="deepGray">#1e1d23</color>-->
+    <!--<color name="darkGray">#2a2b30</color>-->
+    <!--<color name="lightGray">#303136</color>-->
 
 </resources>

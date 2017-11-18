@@ -18,7 +18,7 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/deepGray"
+            app:contentScrim="@android:color/black"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <FrameLayout
@@ -135,8 +135,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentStart="false"
-            android:background="@color/deepGray"
-            app:tabIndicatorColor="@android:color/white"
+            android:background="@android:color/black"
+            app:tabIndicatorColor="@android:color/transparent"
             app:tabSelectedTextColor="@android:color/white"
             app:tabTextAppearance="@style/CustomTabItemTextSize"
             app:tabTextColor="@color/unselected_color">
@@ -159,6 +159,7 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/deepGray"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -9,9 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -52,7 +52,7 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
         private TextView mUserName, mUploadTime, mDescription;
         private ImageView mProfile, mPicture, mPlatformType;
         private Button mLike, mComment, mShare, mMore;
-        private LinearLayout mPageDetail;
+        private FrameLayout mPageDetail;
 
         // video component
         private ImageButton mPlay;
@@ -79,12 +79,12 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
             mMore = (Button) itemView.findViewById(R.id.button_more);
             mMore.setOnClickListener(this);
 
-            mPageDetail = (LinearLayout) itemView.findViewById(R.id.layout_page_detail);
+            mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
 
             if (viewType == CONTENTS_VIDEO) {
 
-                mPicture.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
+                mPicture.setColorFilter(Color.parseColor("#618e8e8e"), PorterDuff.Mode.MULTIPLY);
                 mPlay = (ImageButton) itemView.findViewById(R.id.imageButton_play);
                 mPlay.setOnClickListener(this);
             } else {

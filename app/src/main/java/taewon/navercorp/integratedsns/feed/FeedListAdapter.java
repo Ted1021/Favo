@@ -3,6 +3,8 @@ package taewon.navercorp.integratedsns.feed;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -33,6 +35,7 @@ import taewon.navercorp.integratedsns.page.PageDetailActivity;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
 import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
 
+import static taewon.navercorp.integratedsns.R.layout.item_image_article;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_MULTI_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
@@ -69,7 +72,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         private TextView mUserName, mUploadTime, mDescription, mComment;
         private ImageView mProfile, mPicture, mPlatformType;
         private Button mShare, mMore;
-//        private ImageButton mPlay;
         private FrameLayout mPageDetail;
         private LinearLayout mCommentDetail;
 
@@ -89,40 +91,34 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
             mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
             mPicture.setOnClickListener(this);
-            mComment = (TextView) itemView.findViewById(R.id.textView_comment);
-            mComment.setOnClickListener(this);
+//            mComment = (TextView) itemView.findViewById(R.id.textView_comment);
+//            mComment.setOnClickListener(this);
             mMore = (Button) itemView.findViewById(R.id.button_more);
             mMore.setOnClickListener(this);
             mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
-            mCommentDetail = (LinearLayout) itemView.findViewById(R.id.layout_comment);
-            mCommentDetail.setOnClickListener(this);
-//            mPlay = (ImageButton) itemView.findViewById(R.id.imageButton_play);
-//            mPlay.setOnClickListener(this);
+//            mCommentDetail = (LinearLayout) itemView.findViewById(R.id.layout_comment);
+//            mCommentDetail.setOnClickListener(this);
 
-//            if (viewType == CONTENTS_VIDEO) {
-//
-//                mPicture.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
-//                mPlay = (ImageButton) itemView.findViewById(R.id.button_play);
-//                mPlay.setOnClickListener(this);
-//
-//            } else {
-//
-//            }
+            if (viewType == CONTENTS_VIDEO) {
+
+                mPicture.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
+                mPlay = (ImageButton) itemView.findViewById(R.id.imageButton_play);
+                mPlay.setOnClickListener(this);
+            } else {
+                mPicture.setOnClickListener(this);
+            }
         }
 
         @Override
         public void onClick(View v) {
 
             int position = getLayoutPosition();
-            String platformType = mDataset.get(position).getPlatformType();
-            int contentsType = mDataset.get(position).getContentsType();
-
             switch (v.getId()) {
 
-//                case R.id.imageButton_play:
-////                    loadVideo(position, platformType);
-//                    break;
+                case R.id.imageButton_play:
+                    loadVideo(position);
+                    break;
 
                 case R.id.layout_comment:
                     loadComments(position);
@@ -280,15 +276,15 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         View itemView;
         switch (viewType) {
             case CONTENTS_IMAGE:
-                itemView = mLayoutInflater.inflate(R.layout.item_image_article_test, parent, false);
+                itemView = mLayoutInflater.inflate(item_image_article, parent, false);
                 return new ViewHolder(itemView, viewType);
 
             case CONTENTS_VIDEO:
-                itemView = mLayoutInflater.inflate(R.layout.item_image_article_test, parent, false);
+                itemView = mLayoutInflater.inflate(R.layout.item_video_article, parent, false);
                 return new ViewHolder(itemView, viewType);
 
             case CONTENTS_MULTI_IMAGE:
-                itemView = mLayoutInflater.inflate(R.layout.item_multi_image_article_test, parent, false);
+                itemView = mLayoutInflater.inflate(R.layout.item_image_article, parent, false);
                 return new ViewHolder(itemView, viewType);
         }
         return null;
@@ -302,19 +298,19 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mUploadTime.setText(data.getCreatedTime());
         holder.mUserName.setText(data.getUserName());
         holder.mDescription.setText(data.getDescription());
-        holder.mComment.setText(data.getCommentCount() + "");
+//        holder.mComment.setText(data.getCommentCount() + "");
 
-        Glide.with(mContext.getApplicationContext()).load(data.getProfileImage())
-                .apply(new RequestOptions().circleCropTransform())
-                .transition(new DrawableTransitionOptions().crossFade())
-                .into(holder.mProfile);
-
-        Glide.with(mContext.getApplicationContext()).load(data.getPicture())
-                .apply(new RequestOptions().override(864, 486))
-                .apply(new RequestOptions().centerCrop())
+        if (data.getContentsType() == CONTENTS_VIDEO) {
+            Glide.with(mContext.getApplicationContext()).load(data.getPicture())
+                    .apply(new RequestOptions().override(864, 486))
+                    .apply(new RequestOptions().centerCrop())
 //                .thumbnail(0.5f)
-                .transition(new DrawableTransitionOptions().crossFade())
-                .into(holder.mPicture);
+                    .transition(new DrawableTransitionOptions().crossFade())
+                    .into(holder.mPicture);
+        } else {
+            Glide.with(mContext).load(data.getPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
+        }
+        Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
 
         switch (data.getPlatformType()) {
 
