@@ -193,7 +193,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mTokenUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.e("CHECK_REQUEST", ">>>>>>>>>>>>");
                 checkToken();
             }
         };
@@ -273,7 +272,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void refreshDataset() {
 
-//        mFeedAdapter.notifyDataSetChanged();
         if (mLastPosition > mFeedDataset.size() - 1) {
             mLastPosition = mFeedDataset.size() - 1;
         }
@@ -281,17 +279,22 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void scrollToTopPosition(int position) {
-        if (position > 10) {
-            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 10);
-            mFeedLayoutManager.scrollToPosition(10);
+        if (position > 5) {
+            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
+            mFeedLayoutManager.scrollToPosition(5);
         }
         mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
     }
 
     private void scrollToLastPosition(int position) {
-        if (position >= 10) {
-            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position - 10);
-            mFeedLayoutManager.scrollToPosition(position - 10);
+
+        if(position < 0){
+            return;
+        }
+
+        if (position > 5) {
+            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position - 5);
+            mFeedLayoutManager.scrollToPosition(position - 5);
         }
         mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
     }

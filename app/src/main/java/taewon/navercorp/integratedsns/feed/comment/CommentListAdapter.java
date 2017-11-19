@@ -69,6 +69,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
                 .apply(new RequestOptions().circleCropTransform())
                 .transition(new DrawableTransitionOptions().crossFade())
                 .into(holder.mCommentProfile);
+
     }
 
     @Override

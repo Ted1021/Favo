@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.feed;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
@@ -27,6 +28,7 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
     private void initData() {
 
         mVideoId = getIntent().getStringExtra("VIDEO_ID");
+        Log.d("CHECK_ID", mVideoId);
     }
 
     private void initView() {
