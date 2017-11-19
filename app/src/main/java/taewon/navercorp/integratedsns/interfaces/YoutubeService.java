@@ -13,6 +13,7 @@ import taewon.navercorp.integratedsns.model.youtube.YoutubePostCommentData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeTrendVideoData;
 
 /**
  * @author 김태원
@@ -41,6 +42,13 @@ public interface YoutubeService {
                                               @Query("type") String type,
                                               @Query("chart") String chart,
                                               @Query("regionCode") String regionCode);
+
+    @GET("youtube/v3/videos")
+    Call<YoutubeTrendVideoData> getTrendVideoList(@Header("Authorization") String auth,
+                                                  @Query("part") String part,
+                                                  @Query("maxResults") int maxResults,
+                                                  @Query("chart") String chart,
+                                                  @Query("regionCode") String regionCode);
 
     @GET("youtube/v3/search")
     Call<YoutubeSearchChannelData> searchChannelList (@Header("Authorization") String auth,

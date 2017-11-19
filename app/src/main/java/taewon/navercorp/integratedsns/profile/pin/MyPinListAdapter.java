@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,14 +31,13 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOO
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
-/**
- * Created by USER on 2017-10-30.
- */
 
 public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, MyPinListAdapter.ViewHolder> {
 
     private Context mContext;
     private LayoutInflater mLayoutInflater;
+
+    private int speed;
 
     public MyPinListAdapter(@Nullable OrderedRealmCollection<FavoMyPinData> data, boolean autoUpdate, Context context) {
         super(data, autoUpdate);
@@ -96,6 +96,20 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
         public void onClick(View v) {
 
         }
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+
+        recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
+            @Override
+            public boolean onFling(int velocityX, int velocityY) {
+
+                speed = velocityY;
+                return false;
+            }
+        });
     }
 
     @Override
@@ -173,5 +187,11 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
                 Glide.with(mContext).load(R.drawable.icon_pinterest_small).into(holder.mPlatformType);
                 break;
         }
+
+        Log.d("CHECK_SPEED", speed+"");
+
     }
+
+
 }
+
