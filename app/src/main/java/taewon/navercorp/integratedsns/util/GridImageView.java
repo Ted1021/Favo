@@ -2,6 +2,7 @@ package taewon.navercorp.integratedsns.util;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
@@ -18,13 +19,8 @@ import static android.view.Gravity.FILL_VERTICAL;
 
 public class GridImageView extends GridLayout {
 
-    private int mWidth, mHeight, mImageCount;
-    private ArrayList<Photo> mImageset = new ArrayList<>();
-
     private GridLayout.LayoutParams mHeaderItemParam;
     private ArrayList<GridLayout.LayoutParams> mBodyItemParam = new ArrayList<>();
-
-    private int mOrientation;
 
     public GridImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -42,20 +38,25 @@ public class GridImageView extends GridLayout {
 
     public void initView(ArrayList<Photo> imageset) {
 
-        mImageset = imageset;
-        mWidth = mImageset.get(0).getWidth();
-        mHeight = mImageset.get(0).getHeight();
-        mImageCount = mImageset.size();
-        mOrientation = (mWidth > mHeight) ? FILL_HORIZONTAL : FILL_VERTICAL;
+        int width, height, imageCount;
+        int orientation;
+        ArrayList<Photo> mImageset = imageset;
 
-        if (mOrientation == FILL_HORIZONTAL) {
+        width = mImageset.get(0).getWidth();
+        height = mImageset.get(0).getHeight();
+        imageCount = mImageset.size();
+        orientation = (width > height) ? FILL_HORIZONTAL : FILL_VERTICAL;
+
+        if (orientation == FILL_HORIZONTAL) {
             this.setOrientation(HORIZONTAL);
 
         } else {
             this.setOrientation(VERTICAL);
         }
 
-        if (mImageCount == 2 || mImageCount == 3) {
+        Log.e("CHECK_SPAN", "before - row : " + getRowCount() + " // column : " + getColumnCount());
+        if (imageCount == 2 || imageCount == 3) {
+
             this.setColumnCount(2);
             this.setRowCount(2);
 
@@ -63,18 +64,19 @@ public class GridImageView extends GridLayout {
             this.setColumnCount(3);
             this.setRowCount(3);
         }
+        Log.e("CHECK_SPAN", "after - row : " + getRowCount() + "// column : " + getColumnCount());
 
-        initHeaderImageFrame();
-        initBodyImageFrame();
-        setImages();
+        initHeaderImageFrame(imageCount, orientation);
+        initBodyImageFrame(imageCount, orientation);
+        setImages(imageCount, imageset);
     }
 
-    private void initHeaderImageFrame() {
+    private void initHeaderImageFrame(int imageCount, int orientation) {
 
         GridLayout.Spec headerRow, headerCol;
-        if (mOrientation == FILL_HORIZONTAL) {
+        if (orientation == FILL_HORIZONTAL) {
 
-            if (mImageCount == 2 || mImageCount == 3) {
+            if (imageCount == 2 || imageCount == 3) {
                 headerRow = GridLayout.spec(0, 1, 1.0f);
                 headerCol = GridLayout.spec(0, 2, 2.0f);
 
@@ -84,7 +86,7 @@ public class GridImageView extends GridLayout {
             }
         } else {
 
-            if (mImageCount == 2 || mImageCount == 3) {
+            if (imageCount == 2 || imageCount == 3) {
                 headerRow = GridLayout.spec(0, 2, 2.0f);
                 headerCol = GridLayout.spec(0, 1, 1.0f);
             } else {
@@ -93,69 +95,69 @@ public class GridImageView extends GridLayout {
             }
         }
         mHeaderItemParam = new GridLayout.LayoutParams(headerRow, headerCol);
-        mHeaderItemParam.setGravity(mOrientation);
+        mHeaderItemParam.setGravity(orientation);
     }
 
-    private void initBodyImageFrame() {
+    private void initBodyImageFrame(int imageCount, int orientation) {
 
-        int spanCount = (mImageCount <= 4) ? mImageCount : 4;
+        mBodyItemParam.clear();
+        int spanCount = (imageCount <= 4) ? imageCount : 4;
         for (int i = 0; i < spanCount - 1; i++) {
 
             GridLayout.Spec bodyRow, bodyCol;
             GridLayout.LayoutParams data;
 
-            if (mOrientation == FILL_HORIZONTAL) {
+            if (orientation == FILL_HORIZONTAL) {
 
-                if (mImageCount == 2) {
+                if (imageCount == 2) {
 
                     bodyRow = GridLayout.spec(1, 1, 1.0f);
-                    bodyCol = GridLayout.spec(i,2,1.0f);
+                    bodyCol = GridLayout.spec(i, 2, 1.0f);
 
-                } else if (mImageCount == 3) {
+                } else if (imageCount == 3) {
 
-                    bodyRow = GridLayout.spec(1,1,1.0f);
-                    bodyCol = GridLayout.spec(i,1,1.0f);
+                    bodyRow = GridLayout.spec(1, 1, 1.0f);
+                    bodyCol = GridLayout.spec(i, 1, 1.0f);
 
                 } else {
 
-                    bodyRow = GridLayout.spec(2,1,1.0f);
-                    bodyCol = GridLayout.spec(i,1,1.0f);
+                    bodyRow = GridLayout.spec(2, 1, 1.0f);
+                    bodyCol = GridLayout.spec(i, 1, 1.0f);
                 }
 
             } else {
 
-                if (mImageCount == 2) {
+                if (imageCount == 2) {
 
-                    bodyRow = GridLayout.spec(i,2,1.0f);
-                    bodyCol = GridLayout.spec(1,1,1.0f);
+                    bodyRow = GridLayout.spec(i, 2, 1.0f);
+                    bodyCol = GridLayout.spec(1, 1, 1.0f);
 
-                } else if (mImageCount == 3) {
+                } else if (imageCount == 3) {
 
-                    bodyRow = GridLayout.spec(i,1,1.0f);
-                    bodyCol = GridLayout.spec(1,1,1.0f);
+                    bodyRow = GridLayout.spec(i, 1, 1.0f);
+                    bodyCol = GridLayout.spec(1, 1, 1.0f);
 
                 } else {
 
-                    bodyRow = GridLayout.spec(i,1,1.0f);
-                    bodyCol = GridLayout.spec(2,1,1.0f);
+                    bodyRow = GridLayout.spec(i, 1, 1.0f);
+                    bodyCol = GridLayout.spec(2, 1, 1.0f);
                 }
             }
 
             data = new GridLayout.LayoutParams(bodyRow, bodyCol);
-            data.setGravity(mOrientation);
+            data.setGravity(orientation);
             mBodyItemParam.add(data);
         }
     }
 
-    private void setImages() {
+    private void setImages(int imageCount, ArrayList<Photo> imageset) {
 
-        int spanCount = (mImageCount <= 4) ? mImageCount : 4;
-
+        int spanCount = (imageCount <= 4) ? imageCount : 4;
         for (int i = 0; i < spanCount; i++) {
 
             ImageView imageView = new ImageView(getContext());
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(4,4,4,4);
+            imageView.setPadding(4, 4, 4, 4);
 
             if (i == 0) {
                 imageView.setLayoutParams(mHeaderItemParam);
@@ -165,7 +167,7 @@ public class GridImageView extends GridLayout {
                 this.addView(imageView, mBodyItemParam.get(i - 1));
             }
 
-            Glide.with(getContext()).load(mImageset.get(i).getSrc()).into(imageView);
+            Glide.with(getContext()).load(imageset.get(i).getSrc()).into(imageView);
         }
     }
 }

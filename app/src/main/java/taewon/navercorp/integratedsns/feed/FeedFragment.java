@@ -216,7 +216,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 if (!mRefreshLayout.isRefreshing()) {
                     int currentPosition = ((LinearLayoutManager) mFeedLayoutManager).findFirstCompletelyVisibleItemPosition();
                     if (currentPosition == 0) {
-//                        scrollToLastPosition(mLastPosition);
+                        scrollToLastPosition(mLastPosition);
                         mLastPosition = 0;
                     } else {
                         mLastPosition = currentPosition;
@@ -282,11 +282,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void scrollToTopPosition(int position) {
-//        if (position > 5) {
-//            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
-//            mFeedLayoutManager.scrollToPosition(5);
-//        }
-//        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+        if (position > 5) {
+            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
+            mFeedLayoutManager.scrollToPosition(5);
+        }
+        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
 
         mFeedLayoutManager.scrollToPosition(0);
     }
