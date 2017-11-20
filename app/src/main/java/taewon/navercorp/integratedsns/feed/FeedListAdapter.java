@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -33,7 +34,6 @@ import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
 import taewon.navercorp.integratedsns.util.GridImageView;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
-import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
 import taewon.navercorp.integratedsns.video.VideoActivity;
 
 import static taewon.navercorp.integratedsns.R.layout.item_image_article;
@@ -134,7 +134,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     break;
 
                 case R.id.imageView_picture:
-                    loadVideo(position);
+//                    loadVideo(position);
                     break;
 
                 case R.id.button_more:
@@ -150,30 +150,36 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 return;
             }
 
-            String videoUrl = mDataset.get(position).getVideoUrl();
-            String platformType = mDataset.get(position).getPlatformType();
-            Intent intent = null;
-            switch (platformType) {
-
-                case PLATFORM_FACEBOOK:
-                    Uri uri = Uri.parse(videoUrl);
-                    intent = new Intent(Intent.ACTION_VIEW, uri);
-                    intent.setDataAndType(uri, "video/*");
-                    break;
-
-                case PLATFORM_YOUTUBE:
-                    intent = new Intent(mContext, VideoActivity.class);
-                    intent.putExtra("VIDEO_ID", videoUrl);
-                    break;
-
-                case PLATFORM_TWITCH:
-                    String twitchUrl = String.format("http://player.twitch.tv?video=%s", mDataset.get(position).getVideoUrl());
-                    intent = new Intent(mContext, TwitchWebViewActivity.class);
-                    intent.putExtra("REQ_TYPE", "video");
-                    intent.putExtra("REQ_URL", twitchUrl);
-                    break;
-            }
+            FavoFeedData videoData = mDataset.get(position);
+            Intent intent = new Intent(mContext, VideoActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("FEED_DATA", videoData);
+            intent.putExtras(bundle);
             mContext.startActivity(intent);
+
+//            String videoUrl = mDataset.get(position).getVideoUrl();
+//            String platformType = mDataset.get(position).getPlatformType();
+//            Intent intent = null;
+//            switch (platformType) {
+//
+//                case PLATFORM_FACEBOOK:
+//                    Uri uri = Uri.parse(videoUrl);
+//                    intent = new Intent(Intent.ACTION_VIEW, uri);
+//                    intent.setDataAndType(uri, "video/*");
+//                    break;
+//
+//                case PLATFORM_YOUTUBE:
+//                    intent = new Intent(mContext, VideoActivity.class);
+//                    intent.putExtra("VIDEO_ID", videoUrl);
+//                    break;
+//
+//                case PLATFORM_TWITCH:
+//                    String twitchUrl = String.format("http://player.twitch.tv?video=%s", mDataset.get(position).getVideoUrl());
+//                    intent = new Intent(mContext, TwitchWebViewActivity.class);
+//                    intent.putExtra("REQ_TYPE", "video");
+//                    intent.putExtra("REQ_URL", twitchUrl);
+//                    break;
+//            }
         }
 
         private void loadComments(int position) {

@@ -7,6 +7,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
 
@@ -167,7 +168,10 @@ public class GridImageView extends GridLayout {
                 this.addView(imageView, mBodyItemParam.get(i - 1));
             }
 
-            Glide.with(getContext()).load(imageset.get(i).getSrc()).into(imageView);
+            Glide.with(getContext())
+                    .load(imageset.get(i).getSrc())
+                    .transition(new DrawableTransitionOptions().crossFade())
+                    .into(imageView);
         }
     }
 }

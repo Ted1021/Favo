@@ -7,7 +7,6 @@
     <taewon.navercorp.integratedsns.today.ParallaxViewPager
         android:id="@+id/viewPager_parent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </taewon.navercorp.integratedsns.today.ParallaxViewPager>
+        android:layout_height="match_parent"></taewon.navercorp.integratedsns.today.ParallaxViewPager>
 
 </FrameLayout>

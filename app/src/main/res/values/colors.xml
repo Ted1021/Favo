@@ -19,10 +19,14 @@
 
     <color name="transparent_dark">#8e8e8e</color>
 
-    <color name="deepGray">#212121</color>
-    <color name="darkGray">#303030</color>
-    <!--<color name="lightGray">#424242</color>-->
-    <color name="lightGray">#767676</color>
+    <!--<color name="deepGray">#212121</color>-->
+    <!--<color name="darkGray">#303030</color>-->
+    <color name="lightGray">#262629</color>
+
+    <color name="deepGray">#000000</color>
+    <color name="darkGray">#212121</color>
+    <!--<color name="lightGray">#2C2C2C</color>-->
+    <color name="midNightBlack">#16171A</color>
 
 
     <color name="primaryTextColor">#FFFFFFFF</color>
@@ -30,10 +34,5 @@
     <color name="hintTextColor">#80FFFFFF</color>
     <color name="divider">#1FFFFFFF</color>
     <color name="darkFilter">#DE8e8e8e</color>
-
-
-    <!--<color name="deepGray">#1e1d23</color>-->
-    <!--<color name="darkGray">#2a2b30</color>-->
-    <!--<color name="lightGray">#303136</color>-->
 
 </resources>

@@ -282,13 +282,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void scrollToTopPosition(int position) {
+
         if (position > 5) {
             mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
             mFeedLayoutManager.scrollToPosition(5);
         }
         mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
-
-        mFeedLayoutManager.scrollToPosition(0);
     }
 
     private void scrollToLastPosition(int position) {
@@ -573,7 +572,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     .build();
 
             YoutubeService service = retrofit.create(YoutubeService.class);
-            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 1, params[0], null, null, null, "date", "video", null, null);
+            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 1, params[0], null, null, null, "date", "video", null, null, null);
             call.enqueue(new Callback<YoutubeSearchVideoData>() {
                 @Override
                 public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {

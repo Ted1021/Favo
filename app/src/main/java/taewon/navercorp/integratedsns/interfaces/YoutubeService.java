@@ -41,7 +41,8 @@ public interface YoutubeService {
                                               @Query("order") String order,
                                               @Query("type") String type,
                                               @Query("chart") String chart,
-                                              @Query("regionCode") String regionCode);
+                                              @Query("regionCode") String regionCode,
+                                              @Query("relatedToVideoId") String relatedTovideoId);
 
     @GET("youtube/v3/videos")
     Call<YoutubeTrendVideoData> getTrendVideoList(@Header("Authorization") String auth,
