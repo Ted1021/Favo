@@ -68,7 +68,7 @@
             android:name=".page.PageDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
-            android:name=".feed.VideoActivity"
+            android:name=".video.VideoActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
             android:name=".util.TwitchWebViewActivity"

@@ -1,12 +1,15 @@
-package taewon.navercorp.integratedsns.feed;
+package taewon.navercorp.integratedsns.video;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
+
+import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
 
@@ -15,6 +18,10 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
     private String mVideoId;
 
     private YouTubePlayerView mPlayerView;
+
+    private RecyclerView mNextVideoList;
+    private ArrayList mDataset = new ArrayList<>();
+    private NextVideoListAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,13 +35,20 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
     private void initData() {
 
         mVideoId = getIntent().getStringExtra("VIDEO_ID");
-        Log.d("CHECK_ID", mVideoId);
+
     }
 
     private void initView() {
 
-        mPlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player_view);
+        mPlayerView = (YouTubePlayerView) findViewById(R.id.videoView_youtube);
         mPlayerView.initialize(getString(R.string.google_api_key), this);
+
+        mNextVideoList = (RecyclerView) findViewById(R.id.recyclerView_nextVideo);
+        mAdapter = new NextVideoListAdapter(VideoActivity.this, mDataset);
+        mNextVideoList.setAdapter(mAdapter);
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(VideoActivity.this);
+        mNextVideoList.setLayoutManager(layoutManager);
     }
 
     @Override

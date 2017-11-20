@@ -34,6 +34,7 @@ import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
 import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
+import taewon.navercorp.integratedsns.video.VideoActivity;
 
 import static taewon.navercorp.integratedsns.R.layout.item_image_article;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;

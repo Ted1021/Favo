@@ -19,7 +19,7 @@ import com.bumptech.glide.request.RequestOptions;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.feed.VideoActivity;
+import taewon.navercorp.integratedsns.video.VideoActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
 import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;

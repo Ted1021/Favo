@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="taewon.navercorp.integratedsns.feed.VideoActivity">
+    android:orientation="vertical"
+    tools:context="taewon.navercorp.integratedsns.video.VideoActivity">
 
-    <com.google.android.youtube.player.YouTubePlayerView
-        android:id="@+id/youtube_player_view"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp" />
+        android:layout_height="250dp">
 
-</FrameLayout>
+        <com.google.android.youtube.player.YouTubePlayerView
+            android:id="@+id/youtube_player"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <VideoView
+            android:id="@+id/facebook_player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_x="135dp"
+            android:layout_y="102dp" />
+
+        <WebView
+            android:id="@+id/twitch_player"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+        </WebView>
+    </FrameLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView_nextVideo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
