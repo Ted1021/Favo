@@ -40,7 +40,7 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
 
     private void initView() {
 
-        mPlayerView = (YouTubePlayerView) findViewById(R.id.videoView_youtube);
+        mPlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player);
         mPlayerView.initialize(getString(R.string.google_api_key), this);
 
         mNextVideoList = (RecyclerView) findViewById(R.id.recyclerView_nextVideo);

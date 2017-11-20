@@ -35,6 +35,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -58,9 +59,11 @@ import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
+import taewon.navercorp.integratedsns.util.Photo;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_MULTI_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -213,7 +216,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 if (!mRefreshLayout.isRefreshing()) {
                     int currentPosition = ((LinearLayoutManager) mFeedLayoutManager).findFirstCompletelyVisibleItemPosition();
                     if (currentPosition == 0) {
-                        scrollToLastPosition(mLastPosition);
+//                        scrollToLastPosition(mLastPosition);
                         mLastPosition = 0;
                     } else {
                         mLastPosition = currentPosition;
@@ -279,16 +282,18 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void scrollToTopPosition(int position) {
-        if (position > 5) {
-            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
-            mFeedLayoutManager.scrollToPosition(5);
-        }
-        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+//        if (position > 5) {
+//            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
+//            mFeedLayoutManager.scrollToPosition(5);
+//        }
+//        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+
+        mFeedLayoutManager.scrollToPosition(0);
     }
 
     private void scrollToLastPosition(int position) {
 
-        if(position < 0){
+        if (position < 0) {
             return;
         }
 
@@ -338,7 +343,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("limit", MAX_COUNTS+"");
+        parameters.putString("limit", MAX_COUNTS + "");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -359,7 +364,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 FacebookFeedData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedData.class);
                                 if (result.getPaging() != null) {
                                     mPlatformPagingInfo.put(PLATFORM_FACEBOOK + pageId, result.getPaging().getCursors().getAfter());
-                                    Log.d("CHECK_NEXT", pageId);
                                 }
                                 FacebookFeedData.ArticleData article;
                                 for (int i = 0; i < result.getData().size(); i++) {
@@ -368,11 +372,25 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     FavoFeedData data = new FavoFeedData();
 
                                     data.setPlatformType(PLATFORM_FACEBOOK);
+
                                     if (!(article.getSource() == null)) {
                                         data.setContentsType(CONTENTS_VIDEO);
                                         data.setVideoUrl(article.getSource());
                                     } else {
-                                        data.setContentsType(CONTENTS_IMAGE);
+                                        if (article.getAttachments() == null) {
+                                            data.setContentsType(CONTENTS_IMAGE);
+                                        } else {
+                                            data.setContentsType(CONTENTS_MULTI_IMAGE);
+                                            ArrayList<Photo> imageset = new ArrayList<>();
+                                            for (FacebookFeedData.ArticleData.Attachments.PhotoSet.Subattachments.Photo item : article.getAttachments().getData().get(0).getSubattachments().getData()) {
+                                                Photo image = new Photo();
+                                                image.setHeight(item.getMedia().getImage().getHeight());
+                                                image.setWidth(item.getMedia().getImage().getWidth());
+                                                image.setSrc(item.getMedia().getImage().getSrc());
+                                                imageset.add(image);
+                                            }
+                                            data.setSubAttatchments(imageset);
+                                        }
                                     }
                                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                                     Date date = format.parse(article.getCreatedTime());
