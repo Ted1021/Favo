@@ -1,13 +1,16 @@
 package taewon.navercorp.integratedsns.video;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.webkit.WebView;
+import android.widget.VideoView;
 
+import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerView;
 
 import java.util.ArrayList;
 
@@ -23,16 +26,24 @@ import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelInfoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
+import static android.view.View.VISIBLE;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
-public class VideoActivity extends AppCompatActivity implements YouTubePlayer.OnInitializedListener, YouTubePlayer.PlayerStateChangeListener {
+public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
 
     private FavoTokenManager mFavoTokenManager;
+    private FavoFeedData mOriginVideo;
 
     private RecyclerView mMoreVideoList;
     private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
     private MoreVideoListAdapter mAdapter;
+
+    private YouTubePlayerView mYoutubePlayerView;
+    private WebView mTwitchPlayerView;
+    private VideoView mFacebookPlayerView;
 
     private static final int MAX_COUNT = 20;
 
@@ -47,26 +58,34 @@ public class VideoActivity extends AppCompatActivity implements YouTubePlayer.On
 
     private void initView() {
 
+        mTwitchPlayerView = (WebView) findViewById(R.id.twitch_player);
+        mFacebookPlayerView = (VideoView) findViewById(R.id.facebook_player);
+        mYoutubePlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player);
         mMoreVideoList = (RecyclerView) findViewById(R.id.recyclerView_moreVideoList);
         mAdapter = new MoreVideoListAdapter(VideoActivity.this, mDataset);
         mMoreVideoList.setAdapter(mAdapter);
 
-        RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(VideoActivity.this);
-        mMoreVideoList.setLayoutManager(layoutmanager);
-
-//        mPlayerView = (YouTubePlayerView) findViewById(R.id.youtube_player);
-//        mPlayerView.initialize(getString(R.string.google_api_key), this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(VideoActivity.this);
+        mMoreVideoList.setLayoutManager(layoutManager);
     }
 
     private void initData() {
 
         mFavoTokenManager = FavoTokenManager.getInstance();
 
-        FavoFeedData originVideo = (FavoFeedData) getIntent().getSerializableExtra("FEED_DATA");
-        mDataset.add(originVideo);
+        mOriginVideo = (FavoFeedData) getIntent().getSerializableExtra("FEED_DATA");
+        mDataset.add(mOriginVideo);
         mAdapter.notifyDataSetChanged();
 
-        searchRelatedVideoList(originVideo);
+        searchRelatedVideoList(mOriginVideo);
+
+        if(mOriginVideo.getPlatformType().equals(PLATFORM_FACEBOOK)){
+            mFacebookPlayerView.setVisibility(VISIBLE);
+        } else if (mOriginVideo.getPlatformType().equals(PLATFORM_TWITCH)){
+            mTwitchPlayerView.setVisibility(VISIBLE);
+        } else {
+            mYoutubePlayerView.initialize(getString(R.string.google_api_key), this);
+        }
     }
 
     private void searchRelatedVideoList(FavoFeedData target) {
@@ -152,42 +171,11 @@ public class VideoActivity extends AppCompatActivity implements YouTubePlayer.On
 
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-//        youTubePlayer.loadVideo(mVideoData.getVideoUrl());
+        youTubePlayer.loadVideo(mOriginVideo.getVideoUrl());
     }
 
     @Override
     public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-
-    }
-
-
-    @Override
-    public void onLoading() {
-
-    }
-
-    @Override
-    public void onLoaded(String s) {
-
-    }
-
-    @Override
-    public void onAdStarted() {
-
-    }
-
-    @Override
-    public void onVideoStarted() {
-
-    }
-
-    @Override
-    public void onVideoEnded() {
-
-    }
-
-    @Override
-    public void onError(YouTubePlayer.ErrorReason errorReason) {
 
     }
 }

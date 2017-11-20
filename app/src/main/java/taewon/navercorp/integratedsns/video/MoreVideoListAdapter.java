@@ -1,24 +1,20 @@
 package taewon.navercorp.integratedsns.video;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubePlayer;
-import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
 import java.util.ArrayList;
 
@@ -49,13 +45,11 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public class HeaderViewHolder extends RecyclerView.ViewHolder {
+    public class HeaderViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView mUserName, mDescription, mUploadTime;
         private ImageView mProfile, mPlatformType, mThumbnail;
-        private ImageButton mPlay;
-        private VideoView mFacebookPlayer;
-        private WebView mTwitchPlayer;
+        private FrameLayout mPageDetail;
 
         public HeaderViewHolder(View itemView) {
             super(itemView);
@@ -66,35 +60,43 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
             mThumbnail = (ImageView) itemView.findViewById(R.id.imageView_thumbnail);
-            mPlay = (ImageButton) itemView.findViewById(R.id.imageButton_play);
-            mFacebookPlayer = (VideoView) itemView.findViewById(R.id.facebook_player);
-            mTwitchPlayer = (WebView) itemView.findViewById(R.id.twitch_player);
+            mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
+            mPageDetail.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch(v.getId()){
+
+                case R.id.layout_page_detail:
+
+                    break;
+            }
         }
     }
 
     public class BodyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private TextView mUserName, mDescription, mUploadTime;
-        private ImageView mProfile, mPlatformType, mThumbnail;
-        private ImageButton mPlay;
-        private FrameLayout mContainer;
+        // common ui components
+        private ImageView mThumbnail;
+        private TextView mTitle, mUserName;
+        private LinearLayout mVideoItem;
+
+        // facebook ui components
+        private ImageView mPlay;
+
+        // youtube ui components
+        private TextView mVideoCount;
 
         public BodyViewHolder(View itemView) {
             super(itemView);
 
-            mContainer = (FrameLayout) itemView.findViewById(R.id.layout_container);
-
-            mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
-            mDescription = (TextView) itemView.findViewById(R.id.textView_description);
-            mUploadTime = (TextView) itemView.findViewById(R.id.textView_uploadTime);
-            mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
-            mProfile.setOnClickListener(this);
             mThumbnail = (ImageView) itemView.findViewById(R.id.imageView_thumbnail);
-            mPlay = (ImageButton) itemView.findViewById(R.id.imageButton_play);
-            mPlay.setOnClickListener(this);
-
-            mThumbnail.setVisibility(View.VISIBLE);
-            mPlay.setVisibility(View.VISIBLE);
+            mThumbnail.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
+            mTitle = (TextView) itemView.findViewById(R.id.textView_title);
+            mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
+            mVideoItem = (LinearLayout) itemView.findViewById(R.id.linearLayout_item);
+            mVideoItem.setOnClickListener(this);
         }
 
         @Override
@@ -104,7 +106,6 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 case R.id.imageButton_play:
 
-                    setYoutubePlayerFragment(position);
                     break;
 
                 case R.id.imageView_profile:
@@ -112,33 +113,8 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
                     break;
             }
         }
-
-        private void setYoutubePlayerFragment(final int position) {
-
-            mThumbnail.setVisibility(View.GONE);
-            mPlay.setVisibility(View.GONE);
-
-            YouTubePlayerSupportFragment youTubePlayerFragment = YouTubePlayerSupportFragment.newInstance();
-            youTubePlayerFragment.initialize(mContext.getString(R.string.google_api_key), new YouTubePlayer.OnInitializedListener() {
-                @Override
-                public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-                    youTubePlayer.loadVideo(mDataset.get(position).getVideoUrl());
-                }
-
-                @Override
-                public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-                    Log.e("ERROR_YOUTUBE_PLAYER", "MoreVideoListAdapter >>>>> " + youTubeInitializationResult.toString());
-                }
-            });
-
-            ((VideoActivity) mContext).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(mContainer.getId(), youTubePlayerFragment)
-                    .commit();
-        }
     }
 
-    // header 여부 체크 메소드
     private boolean isPositionHeader(int position) {
         return position == 0;
     }
@@ -181,15 +157,9 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
         FavoFeedData data = mDataset.get(0);
 
         holder.mUserName.setText(data.getUserName());
-//        holder.mDescription.setText(data.getDescription());
+        holder.mDescription.setText(data.getDescription());
         holder.mUploadTime.setText(data.getCreatedTime());
         Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
-        Glide.with(mContext.getApplicationContext()).load(data.getPicture())
-                .apply(new RequestOptions().override(864, 486))
-                .apply(new RequestOptions().centerCrop())
-                .transition(new DrawableTransitionOptions().crossFade())
-                .into(holder.mThumbnail);
-
         switch (data.getPlatformType()) {
 
             case PLATFORM_FACEBOOK:
@@ -211,9 +181,7 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
         FavoFeedData data = mDataset.get(position);
 
         holder.mUserName.setText(data.getUserName());
-//        holder.mDescription.setText(data.getDescription());
-        holder.mUploadTime.setText(data.getCreatedTime());
-        Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
+        holder.mTitle.setText(data.getDescription());
         Glide.with(mContext.getApplicationContext()).load(data.getPicture())
                 .apply(new RequestOptions().override(864, 486))
                 .apply(new RequestOptions().centerCrop())
