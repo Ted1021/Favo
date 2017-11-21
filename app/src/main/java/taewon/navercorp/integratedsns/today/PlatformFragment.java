@@ -24,6 +24,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.customview.VerticalCardStackViewPager;
 import taewon.navercorp.integratedsns.interfaces.GiphyService;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;

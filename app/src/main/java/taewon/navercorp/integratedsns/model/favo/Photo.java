@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.util;
+package taewon.navercorp.integratedsns.model.favo;
 
 import java.io.Serializable;
 

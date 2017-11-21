@@ -41,6 +41,7 @@ import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.search.more.SearchDetailActivity;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;

@@ -14,7 +14,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
-import taewon.navercorp.integratedsns.util.Photo;
+import taewon.navercorp.integratedsns.model.favo.Photo;
 
 /**
  * Created by USER on 2017-11-21.

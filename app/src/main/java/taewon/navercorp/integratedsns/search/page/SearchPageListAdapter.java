@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.search;
+package taewon.navercorp.integratedsns.search.page;
 
 import android.content.Context;
 import android.content.Intent;

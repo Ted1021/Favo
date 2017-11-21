@@ -4,9 +4,9 @@
     android:layout_height="match_parent"
     tools:context="taewon.navercorp.integratedsns.today.TodayFragment">
 
-    <taewon.navercorp.integratedsns.today.ParallaxViewPager
+    <taewon.navercorp.integratedsns.customview.ParallaxViewPager
         android:id="@+id/viewPager_parent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></taewon.navercorp.integratedsns.today.ParallaxViewPager>
+        android:layout_height="match_parent"></taewon.navercorp.integratedsns.customview.ParallaxViewPager>
 
 </FrameLayout>

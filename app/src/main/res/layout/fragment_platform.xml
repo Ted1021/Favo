@@ -17,13 +17,13 @@
         android:textSize="30sp"
         android:textStyle="bold" />
 
-    <taewon.navercorp.integratedsns.today.VerticalCardStackViewPager
+    <taewon.navercorp.integratedsns.customview.VerticalCardStackViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:layout_gravity="bottom|center_horizontal">
 
-    </taewon.navercorp.integratedsns.today.VerticalCardStackViewPager>
+    </taewon.navercorp.integratedsns.customview.VerticalCardStackViewPager>
 
 </FrameLayout>

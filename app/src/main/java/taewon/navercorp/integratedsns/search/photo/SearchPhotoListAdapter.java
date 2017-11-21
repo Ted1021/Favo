@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.search;
+package taewon.navercorp.integratedsns.search.photo;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

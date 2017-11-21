@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.search;
+package taewon.navercorp.integratedsns.search.video;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.video.VideoActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
-import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
+import taewon.navercorp.integratedsns.util.TwitchLoginActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -85,7 +85,7 @@ public class SearchVideoListAdapter extends RecyclerView.Adapter<SearchVideoList
 
                 case PLATFORM_TWITCH:
                     String twitchUrl = String.format("http://player.twitch.tv?channel=%s", mDataset.get(position).getUserName());
-                    intent = new Intent(mContext, TwitchWebViewActivity.class);
+                    intent = new Intent(mContext, TwitchLoginActivity.class);
                     intent.putExtra("REQ_TYPE", "video");
                     intent.putExtra("REQ_URL", twitchUrl);
                     break;

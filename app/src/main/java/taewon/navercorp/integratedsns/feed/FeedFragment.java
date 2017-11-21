@@ -59,7 +59,7 @@ import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
-import taewon.navercorp.integratedsns.util.Photo;
+import taewon.navercorp.integratedsns.model.favo.Photo;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
@@ -148,7 +148,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         if (isInit) {
             isInit = false;
-            checkToken();
+            loadMore();
         }
         return view;
     }
@@ -198,7 +198,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mTokenUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                checkToken();
+                loadMore();
             }
         };
 
@@ -231,28 +231,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mAsyncFinishReceiver, new IntentFilter(getString(R.string.async_finish_status)));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mScrollToTopReceiver, new IntentFilter(getString(R.string.scroll_to_top_status)));
-    }
-
-    private void checkToken() {
-
-        mAsyncCount = 0;
-        mFeedDataset.clear();
-
-        if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
-            getFacebookUserPages();
-        }
-
-        if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
-            getYoutubeSubscriptionList();
-        }
-
-        if (mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
-            getPinterestFollowingBoards();
-        }
-
-        if (mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)) {
-            getTwitchUserInfo();
-        }
     }
 
     private void loadMore() {
@@ -802,6 +780,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mPlatformPagingInfo.clear();
         mFeedDataset.clear();
         mFeedAdapter.notifyDataSetChanged();
-        checkToken();
+        loadMore();
     }
 }

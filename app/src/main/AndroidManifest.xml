@@ -71,10 +71,10 @@
             android:name=".video.VideoActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
-            android:name=".util.TwitchWebViewActivity"
+            android:name=".util.TwitchLoginActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
-            android:name=".search.SearchDetailActivity"
+            android:name=".search.more.SearchDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity android:name=".feed.MultiViewActivity"></activity>
     </application>

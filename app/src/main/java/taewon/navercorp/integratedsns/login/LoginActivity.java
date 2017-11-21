@@ -52,7 +52,7 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
-import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
+import taewon.navercorp.integratedsns.util.TwitchLoginActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_GIPHY;
@@ -281,7 +281,7 @@ public class LoginActivity extends AppCompatActivity
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 String requestUrl = response.raw().request().url().toString();
-                Intent intent = new Intent(LoginActivity.this, TwitchWebViewActivity.class);
+                Intent intent = new Intent(LoginActivity.this, TwitchLoginActivity.class);
                 intent.putExtra("REQ_TYPE", "login");
                 intent.putExtra("REQ_URL", requestUrl);
                 startActivityForResult(intent, REQ_TWITCH_SIGN_IN);

@@ -112,12 +112,12 @@
                     android:background="@android:color/transparent"
                     android:orientation="vertical">
 
-                    <taewon.navercorp.integratedsns.util.GridImageView
+                    <taewon.navercorp.integratedsns.customview.GridImageView
                         android:id="@+id/layout_gridImageView"
                         android:layout_width="match_parent"
                         android:layout_height="350dp">
 
-                    </taewon.navercorp.integratedsns.util.GridImageView>
+                    </taewon.navercorp.integratedsns.customview.GridImageView>
 
                     <LinearLayout
                         android:layout_width="wrap_content"

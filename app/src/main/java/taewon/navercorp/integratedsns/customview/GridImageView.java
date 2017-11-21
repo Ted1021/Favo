@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.util;
+package taewon.navercorp.integratedsns.customview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,6 +9,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
+
+import taewon.navercorp.integratedsns.model.favo.Photo;
 
 import static android.view.Gravity.FILL_HORIZONTAL;
 import static android.view.Gravity.FILL_VERTICAL;

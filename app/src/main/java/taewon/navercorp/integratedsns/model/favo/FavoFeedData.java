@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-import taewon.navercorp.integratedsns.util.Photo;
-
 /**
  * Created by tedkim on 2017. 10. 15..
  */

@@ -111,6 +111,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
         mScrollListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                mRefreshLayout.setRefreshing(true);
                 switch (mPlatformType) {
 
                     case PLATFORM_FACEBOOK:

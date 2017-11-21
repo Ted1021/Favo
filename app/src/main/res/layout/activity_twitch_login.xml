@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/appColorDark"
-    tools:context="taewon.navercorp.integratedsns.util.TwitchWebViewActivity">
+    tools:context="taewon.navercorp.integratedsns.util.TwitchLoginActivity">
 
     <WebView
         android:id="@+id/webView"

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.customview.ParallaxViewPager;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;

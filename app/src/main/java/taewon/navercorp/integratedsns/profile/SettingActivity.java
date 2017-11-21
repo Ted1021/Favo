@@ -47,7 +47,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
-import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
+import taewon.navercorp.integratedsns.util.TwitchLoginActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_GIPHY;
@@ -313,7 +313,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
                 if (response.isSuccessful()) {
 
                     String requestUrl = response.raw().request().url().toString();
-                    Intent intent = new Intent(SettingActivity.this, TwitchWebViewActivity.class);
+                    Intent intent = new Intent(SettingActivity.this, TwitchLoginActivity.class);
                     intent.putExtra("REQ_TYPE", "login");
                     intent.putExtra("REQ_URL", requestUrl);
                     startActivityForResult(intent, REQ_TWITCH_SIGN_IN);

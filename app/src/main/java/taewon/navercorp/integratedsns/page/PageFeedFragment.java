@@ -151,6 +151,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
 
+                mRefreshLayout.setRefreshing(true);
                 if (page != 0) {
                     switch (mPlatformType) {
                         case PLATFORM_FACEBOOK:

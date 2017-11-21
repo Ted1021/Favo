@@ -12,13 +12,12 @@ import taewon.navercorp.integratedsns.R;
 
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_REDIRECT_URL;
 
-public class TwitchWebViewActivity extends AppCompatActivity {
+public class TwitchLoginActivity extends AppCompatActivity {
 
     private WebView webView;
     private String mReqType, mReqUrl;
 
     private static final String REQ_LOGIN = "login";
-    private static final String REQ_VIDEO = "video";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +42,6 @@ public class TwitchWebViewActivity extends AppCompatActivity {
             case REQ_LOGIN:
                 requestAccessToken();
                 break;
-
-            case REQ_VIDEO:
-                playVideo();
-                break;
         }
     }
 
@@ -63,14 +58,10 @@ public class TwitchWebViewActivity extends AppCompatActivity {
                 if(request.getUrl().toString().startsWith(TWITCH_REDIRECT_URL)){
                     Log.d("CHECK_TOKEN", request.getUrl().toString());
                     setResult(RESULT_OK, getIntent().putExtra("CALLBACK", request.getUrl().toString()));
-                    TwitchWebViewActivity.this.finish();
+                    TwitchLoginActivity.this.finish();
                 }
                 return true;
             }
         });
-    }
-
-    private void playVideo() {
-        webView.loadUrl(mReqUrl);
     }
 }

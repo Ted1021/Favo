@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.search;
+package taewon.navercorp.integratedsns.search.more;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

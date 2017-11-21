@@ -32,7 +32,7 @@ import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
-import taewon.navercorp.integratedsns.util.GridImageView;
+import taewon.navercorp.integratedsns.customview.GridImageView;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
 import taewon.navercorp.integratedsns.video.VideoActivity;
 
