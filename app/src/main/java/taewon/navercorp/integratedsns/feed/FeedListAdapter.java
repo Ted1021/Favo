@@ -34,7 +34,7 @@ import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
 import taewon.navercorp.integratedsns.customview.GridImageView;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
-import taewon.navercorp.integratedsns.video.VideoActivity;
+import taewon.navercorp.integratedsns.video.RecommendVideoActivity;
 
 import static taewon.navercorp.integratedsns.R.layout.item_image_article;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
@@ -152,7 +152,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         private void loadVideo(int position) {
 
             FavoFeedData videoData = mDataset.get(position);
-            Intent intent = new Intent(mContext, VideoActivity.class);
+            Intent intent = new Intent(mContext, RecommendVideoActivity.class);
             Bundle bundle = new Bundle();
             bundle.putSerializable("FEED_DATA", videoData);
             intent.putExtras(bundle);

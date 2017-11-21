@@ -36,16 +36,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".login.LoginActivity"
             android:configChanges="orientation|screenSize|keyboard"
             tools:node="replace">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="pdk4935189783155589539"/>
+
+                <data android:scheme="pdk4935189783155589539" />
                 <data
                     android:host="174.138.18.90"
                     android:path="/message"
@@ -66,7 +67,7 @@
             android:name=".page.PageDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
-            android:name=".video.VideoActivity"
+            android:name=".video.RecommendVideoActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
             android:name=".util.TwitchLoginActivity"
@@ -74,7 +75,8 @@
         <activity
             android:name=".search.more.SearchDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-        <activity android:name=".feed.MultiViewActivity"></activity>
+        <activity android:name=".feed.MultiViewActivity" />
+        <activity android:name=".video.VideoActivity"></activity>
     </application>
 
 </manifest>

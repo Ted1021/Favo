@@ -31,7 +31,7 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE
  * Created by tedkim on 2017. 11. 20..
  */
 
-public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class RecommendVideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context mContext;
     private ArrayList<FavoFeedData> mDataset = new ArrayList<>();
@@ -40,7 +40,7 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
-    public MoreVideoListAdapter(Context context, ArrayList<FavoFeedData> dataset) {
+    public RecommendVideoListAdapter(Context context, ArrayList<FavoFeedData> dataset) {
 
         mContext = context;
         mDataset = dataset;
@@ -104,7 +104,7 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
             switch (v.getId()) {
 
                 case R.id.linearLayout_item:
-                    Intent intent = new Intent(mContext, VideoActivity.class);
+                    Intent intent = new Intent(mContext, RecommendVideoActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("FEED_DATA", mDataset.get(position));
                     intent.putExtras(bundle);
@@ -151,7 +151,7 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    private void bindHeaderItem(MoreVideoListAdapter.HeaderViewHolder holder) {
+    private void bindHeaderItem(RecommendVideoListAdapter.HeaderViewHolder holder) {
 
         FavoFeedData data = mDataset.get(0);
 
@@ -175,7 +175,7 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    private void bindBodyItem(final MoreVideoListAdapter.BodyViewHolder holder, final int position) {
+    private void bindBodyItem(final RecommendVideoListAdapter.BodyViewHolder holder, final int position) {
 
         FavoFeedData data = mDataset.get(position);
 

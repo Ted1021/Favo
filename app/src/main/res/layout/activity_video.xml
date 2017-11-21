@@ -1,40 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
-    android:orientation="vertical"
     tools:context="taewon.navercorp.integratedsns.video.VideoActivity">
 
-    <FrameLayout
+    <com.google.android.youtube.player.YouTubePlayerView
+        android:id="@+id/youtube_player"
         android:layout_width="match_parent"
-        android:layout_height="250dp">
+        android:layout_height="match_parent"
+        android:visibility="visible" />
 
-        <com.google.android.youtube.player.YouTubePlayerView
-            android:id="@+id/youtube_player"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </com.google.android.youtube.player.YouTubePlayerView>
-
-        <WebView
-            android:id="@+id/twitch_player"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-        <VideoView
-            android:id="@+id/facebook_player"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-    </FrameLayout>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView_moreVideoList"
+    <WebView
+        android:id="@+id/twitch_player"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+</FrameLayout>

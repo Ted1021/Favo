@@ -2,7 +2,6 @@ package taewon.navercorp.integratedsns.live;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -19,10 +18,9 @@ import com.bumptech.glide.request.RequestOptions;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.video.VideoActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
-import taewon.navercorp.integratedsns.util.TwitchLoginActivity;
+import taewon.navercorp.integratedsns.video.VideoActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -88,25 +86,18 @@ public class LiveStreamingListAdapter extends RecyclerView.Adapter<LiveStreaming
 
             String videoUrl = mDataset.get(position).getVideoUrl();
             String platformType = mDataset.get(position).getPlatformType();
-            Intent intent = null;
+            Intent intent = new Intent(mContext, VideoActivity.class);
+            intent.putExtra("PLATFORM_TYPE", platformType);
+
             switch (platformType) {
 
-                case PLATFORM_FACEBOOK:
-                    Uri uri = Uri.parse(videoUrl);
-                    intent = new Intent(Intent.ACTION_VIEW, uri);
-                    intent.setDataAndType(uri, "video/*");
-                    break;
-
                 case PLATFORM_YOUTUBE:
-                    intent = new Intent(mContext, VideoActivity.class);
                     intent.putExtra("VIDEO_ID", videoUrl);
                     break;
 
                 case PLATFORM_TWITCH:
                     String twitchUrl = String.format("http://player.twitch.tv?channel=%s", mDataset.get(position).getUserName());
-                    intent = new Intent(mContext, TwitchLoginActivity.class);
-                    intent.putExtra("REQ_TYPE", "video");
-                    intent.putExtra("REQ_URL", twitchUrl);
+                    intent.putExtra("VIDEO_ID", twitchUrl);
                     break;
             }
             mContext.startActivity(intent);

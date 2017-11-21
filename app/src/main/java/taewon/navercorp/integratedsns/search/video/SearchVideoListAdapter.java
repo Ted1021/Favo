@@ -18,7 +18,7 @@ import com.bumptech.glide.request.RequestOptions;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.video.VideoActivity;
+import taewon.navercorp.integratedsns.video.RecommendVideoActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
 import taewon.navercorp.integratedsns.util.TwitchLoginActivity;
 
@@ -79,7 +79,7 @@ public class SearchVideoListAdapter extends RecyclerView.Adapter<SearchVideoList
                     break;
 
                 case PLATFORM_YOUTUBE:
-                    intent = new Intent(mContext, VideoActivity.class);
+                    intent = new Intent(mContext, RecommendVideoActivity.class);
                     intent.putExtra("VIDEO_ID", videoUrl);
                     break;
 
