@@ -1,10 +1,12 @@
 package taewon.navercorp.integratedsns.video;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.webkit.WebView;
+import android.widget.MediaController;
 import android.widget.VideoView;
 
 import com.google.android.youtube.player.YouTubeBaseActivity;
@@ -54,6 +56,7 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
 
         initView();
         initData();
+        loadVideo();
     }
 
     private void initView() {
@@ -78,13 +81,30 @@ public class VideoActivity extends YouTubeBaseActivity implements YouTubePlayer.
         mAdapter.notifyDataSetChanged();
 
         searchRelatedVideoList(mOriginVideo);
+    }
 
-        if(mOriginVideo.getPlatformType().equals(PLATFORM_FACEBOOK)){
-            mFacebookPlayerView.setVisibility(VISIBLE);
-        } else if (mOriginVideo.getPlatformType().equals(PLATFORM_TWITCH)){
-            mTwitchPlayerView.setVisibility(VISIBLE);
-        } else {
-            mYoutubePlayerView.initialize(getString(R.string.google_api_key), this);
+    private void loadVideo(){
+
+        switch(mOriginVideo.getPlatformType()){
+
+            case PLATFORM_FACEBOOK:
+                final MediaController mediaController = new MediaController(this);
+                mFacebookPlayerView.setVisibility(VISIBLE);
+                mFacebookPlayerView.setMediaController(mediaController);
+                mFacebookPlayerView.setVideoURI(Uri.parse(mOriginVideo.getVideoUrl()));
+                mFacebookPlayerView.start();
+                break;
+
+            case PLATFORM_YOUTUBE:
+                mYoutubePlayerView.initialize(getString(R.string.google_api_key), this);
+                break;
+
+            case PLATFORM_TWITCH:
+                mTwitchPlayerView.setVisibility(VISIBLE);
+                mTwitchPlayerView.getSettings().setJavaScriptEnabled(true);
+                mTwitchPlayerView.loadUrl(String.format("http://player.twitch.tv?video=%s", mOriginVideo.getVideoUrl()));
+                Log.d("CHECK_URL", mOriginVideo.getVideoUrl());
+                break;
         }
     }
 

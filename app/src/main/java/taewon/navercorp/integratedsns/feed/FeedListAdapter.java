@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -155,6 +156,9 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             Bundle bundle = new Bundle();
             bundle.putSerializable("FEED_DATA", videoData);
             intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            Log.d("CHECK_URL", mDataset.get(position).getVideoUrl());
+
             mContext.startActivity(intent);
 
 //            String videoUrl = mDataset.get(position).getVideoUrl();

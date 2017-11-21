@@ -1,8 +1,10 @@
 package taewon.navercorp.integratedsns.video;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,16 +79,10 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public class BodyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        // common ui components
         private ImageView mThumbnail;
         private TextView mTitle, mUserName;
         private LinearLayout mVideoItem;
-
-        // facebook ui components
         private ImageView mPlay;
-
-        // youtube ui components
-        private TextView mVideoCount;
 
         public BodyViewHolder(View itemView) {
             super(itemView);
@@ -97,6 +93,9 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
             mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
             mVideoItem = (LinearLayout) itemView.findViewById(R.id.linearLayout_item);
             mVideoItem.setOnClickListener(this);
+            mPlay = (ImageView) itemView.findViewById(R.id.imageView_play);
+            mVideoItem = (LinearLayout) itemView.findViewById(R.id.linearLayout_item);
+            mVideoItem.setOnClickListener(this);
         }
 
         @Override
@@ -104,12 +103,12 @@ public class MoreVideoListAdapter extends RecyclerView.Adapter<RecyclerView.View
             int position = getAdapterPosition();
             switch (v.getId()) {
 
-                case R.id.imageButton_play:
-
-                    break;
-
-                case R.id.imageView_profile:
-
+                case R.id.linearLayout_item:
+                    Intent intent = new Intent(mContext, VideoActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("FEED_DATA", mDataset.get(position));
+                    intent.putExtras(bundle);
+                    mContext.startActivity(intent);
                     break;
             }
         }

@@ -15,6 +15,13 @@
         android:text="description"
         android:textColor="@color/secondaryTextColor" />
 
+    <View
+        android:id="@+id/view3"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_above="@+id/tabLayout"
+        android:background="#535353" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -82,7 +89,6 @@
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_above="@+id/tabLayout"
-        android:layout_margin="8dp"
         android:background="#535353" />
 
 </LinearLayout>

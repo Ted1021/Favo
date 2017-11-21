@@ -13,16 +13,8 @@
         android:orientation="horizontal">
 
         <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/imageView_thumbnail"
-                android:layout_width="160dp"
-                android:layout_height="90dp"
-                android:adjustViewBounds="true"
-                android:cropToPadding="false"
-                android:scaleType="centerCrop" />
+            android:layout_width="160dp"
+            android:layout_height="90dp">
 
             <ImageView
                 android:id="@+id/imageView_play"
@@ -30,7 +22,17 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical|center_horizontal"
                 android:adjustViewBounds="false"
+                android:scaleType="center"
                 app:srcCompat="@android:drawable/ic_media_play" />
+
+            <ImageView
+                android:id="@+id/imageView_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:cropToPadding="false"
+                android:scaleType="centerCrop" />
+
         </FrameLayout>
 
         <FrameLayout
