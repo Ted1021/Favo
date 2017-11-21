@@ -5,12 +5,14 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchUserFollowingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
 
 public interface TwitchService {
@@ -37,6 +39,12 @@ public interface TwitchService {
                                                           @Header("Client-ID") String clientId,
                                                           @Header("Authorization") String auth,
                                                           @Query("limit") int limit);
+
+    @GET("kraken/users/{userId}/follows/channels")
+    Call<TwitchUserFollowingData> getTwitchFollowingUser(@Header("Accept") String accept,
+                                                         @Header("Client-ID") String clientId,
+                                                         @Path("userId") String userId,
+                                                         @Query("limit") int limit);
 
     @GET("kraken/search/streams")
     Call<TwitchStreamingDataV5> searchTwitchStreams(@Header("Accept") String accept,

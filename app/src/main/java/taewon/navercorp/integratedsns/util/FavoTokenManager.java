@@ -66,4 +66,13 @@ public class FavoTokenManager {
     public boolean isTokenVaild(String platformType){
         return !getCurrentToken(platformType).equals("");
     }
+
+    public void saveUserId(String plaformType, String userId){
+        mEditor.putString(plaformType+"_id", userId);
+        mEditor.commit();
+    }
+
+    public String getUserId(String platformType){
+        return mPref.getString(platformType+"_id", "");
+    }
 }
