@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -105,6 +104,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
                 case CONTENTS_MULTI_IMAGE:
                     mGridImageView = (GridImageView) itemView.findViewById(R.id.layout_gridImageView);
+                    mGridImageView.setOnClickListener(this);
+
                     break;
 
                 case CONTENTS_VIDEO:
@@ -141,15 +142,14 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 case R.id.button_more:
                     loadPopupMenu(position);
                     break;
+
+                case R.id.layout_gridImageView:
+                    loadMultiImageDetail(position);
+                    break;
             }
         }
 
         private void loadVideo(int position) {
-
-            if (TextUtils.isEmpty(mDataset.get(position).getVideoUrl())) {
-                loadLink(position);
-                return;
-            }
 
             FavoFeedData videoData = mDataset.get(position);
             Intent intent = new Intent(mContext, VideoActivity.class);
@@ -160,30 +160,6 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             Log.d("CHECK_URL", mDataset.get(position).getVideoUrl());
 
             mContext.startActivity(intent);
-
-//            String videoUrl = mDataset.get(position).getVideoUrl();
-//            String platformType = mDataset.get(position).getPlatformType();
-//            Intent intent = null;
-//            switch (platformType) {
-//
-//                case PLATFORM_FACEBOOK:
-//                    Uri uri = Uri.parse(videoUrl);
-//                    intent = new Intent(Intent.ACTION_VIEW, uri);
-//                    intent.setDataAndType(uri, "video/*");
-//                    break;
-//
-//                case PLATFORM_YOUTUBE:
-//                    intent = new Intent(mContext, VideoActivity.class);
-//                    intent.putExtra("VIDEO_ID", videoUrl);
-//                    break;
-//
-//                case PLATFORM_TWITCH:
-//                    String twitchUrl = String.format("http://player.twitch.tv?video=%s", mDataset.get(position).getVideoUrl());
-//                    intent = new Intent(mContext, TwitchWebViewActivity.class);
-//                    intent.putExtra("REQ_TYPE", "video");
-//                    intent.putExtra("REQ_URL", twitchUrl);
-//                    break;
-//            }
         }
 
         private void loadComments(int position) {
@@ -265,6 +241,15 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 }
             });
             popupMenu.show();
+        }
+
+        private void loadMultiImageDetail(int position){
+
+            Intent intent = new Intent(mContext, MultiViewActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("FEED_DATA", mDataset.get(position));
+            intent.putExtras(bundle);
+            mContext.startActivity(intent);
         }
     }
 

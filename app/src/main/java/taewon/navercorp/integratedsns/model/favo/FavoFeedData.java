@@ -25,7 +25,7 @@ public class FavoFeedData implements Serializable{
     private String link;
     private String videoUrl;
     private String description;
-    private ArrayList<Photo> subAttatchments;
+    private ArrayList<Photo> subAttatchments = new ArrayList<>();
     private int likeCount;
     private int commentCount;
     private String nextCursor, beforeCursor;

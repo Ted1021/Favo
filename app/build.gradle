@@ -46,19 +46,18 @@ dependencies {
     }
 
     // facebook apis
-    
 
     // pinterest apis
     compile project(':pdk')
 
     // retrofit
-    
+
     // glide
-    
+
     // realm
-    
+
     // stetho
-    
+
     compile 'com.google.android.gms:play-services-auth:10.2.1'
     compile 'pub.devrel:easypermissions:0.3.0'
     compile 'com.facebook.android:facebook-login:4.27.0'

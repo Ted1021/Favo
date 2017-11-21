@@ -62,8 +62,8 @@
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
             android:name=".feed.comment.CommentActivity"
-            android:theme="@style/Theme.AppCompat.Translucent"
-            android:configChanges="orientation|screenSize|keyboard" />
+            android:configChanges="orientation|screenSize|keyboard"
+            android:theme="@style/Theme.AppCompat.Translucent" />
         <activity
             android:name=".page.PageDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
@@ -73,9 +73,10 @@
         <activity
             android:name=".util.TwitchWebViewActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-
-        <activity android:name=".search.SearchDetailActivity"
-            android:configChanges="orientation|screenSize|keyboard"/>
+        <activity
+            android:name=".search.SearchDetailActivity"
+            android:configChanges="orientation|screenSize|keyboard" />
+        <activity android:name=".feed.MultiViewActivity"></activity>
     </application>
 
 </manifest>

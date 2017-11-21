@@ -2,7 +2,6 @@ package taewon.navercorp.integratedsns.util;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
@@ -55,7 +54,6 @@ public class GridImageView extends GridLayout {
             this.setOrientation(VERTICAL);
         }
 
-        Log.e("CHECK_SPAN", "before - row : " + getRowCount() + " // column : " + getColumnCount());
         if (imageCount == 2 || imageCount == 3) {
 
             this.setColumnCount(2);
@@ -65,7 +63,6 @@ public class GridImageView extends GridLayout {
             this.setColumnCount(3);
             this.setRowCount(3);
         }
-        Log.e("CHECK_SPAN", "after - row : " + getRowCount() + "// column : " + getColumnCount());
 
         initHeaderImageFrame(imageCount, orientation);
         initBodyImageFrame(imageCount, orientation);

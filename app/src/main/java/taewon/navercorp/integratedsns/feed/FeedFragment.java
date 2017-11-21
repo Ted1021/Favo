@@ -171,10 +171,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mPagingListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) mFeedLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//
-//                Log.d("CHECK_PAGE", page+"");
-//
-//                loadMore();
+
+                Log.d("CHECK_PAGE", "page : "+page+"");
+                Log.d("CHECK_PAGE", "totalItemCount : "+totalItemsCount+"");
+                Log.d("CHECK_PAGE", "VisibleItemCount : "+view.getChildCount()+"");
+
+                loadMore();
             }
         };
         mFeedList.addOnScrollListener(mPagingListener);
@@ -275,6 +277,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void refreshDataset() {
 
+        mFeedAdapter.notifyDataSetChanged();
         if (mLastPosition > mFeedDataset.size() - 1) {
             mLastPosition = mFeedDataset.size() - 1;
         }
@@ -283,11 +286,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void scrollToTopPosition(int position) {
 
-        if (position > 5) {
-            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
-            mFeedLayoutManager.scrollToPosition(5);
-        }
-        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+//        if (position > 5) {
+//            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
+//            mFeedLayoutManager.scrollToPosition(5);
+//        }
+//        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+        mFeedLayoutManager.scrollToPosition(0);
     }
 
     private void scrollToLastPosition(int position) {
@@ -296,11 +300,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             return;
         }
 
-        if (position > 5) {
-            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position - 5);
-            mFeedLayoutManager.scrollToPosition(position - 5);
-        }
-        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
+//        if (position > 5) {
+//            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position - 5);
+//            mFeedLayoutManager.scrollToPosition(position - 5);
+//        }
+//        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
+        mFeedLayoutManager.scrollToPosition(position);
     }
 
     // send status of asyncTasks
@@ -407,7 +412,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     data.setCommentCount(article.getComments().getSummary().getTotalCount());
 
                                     mFeedDataset.add(data);
-                                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+//                                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                                 }
                             } catch (ParseException e) {
                                 e.printStackTrace();
@@ -426,6 +431,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         Bundle parameters = new Bundle();
         if (mPlatformPagingInfo.get(PLATFORM_FACEBOOK + pageId) != null) {
+//            Log.d("CHECK_PAGING", "facebook page id : "+mPlatformPagingInfo.get(PLATFORM_FACEBOOK + pageId));
             parameters.putString("after", mPlatformPagingInfo.get(PLATFORM_FACEBOOK + pageId));
         }
         parameters.putString("fields", "link,created_time,message,full_picture,likes.limit(0).summary(true),comments.limit(0).summary(true),from{name, picture.height(2048){url}},attachments{subattachments},source");
@@ -539,14 +545,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                     mAsyncCount = mAsyncCount + response.body().getItems().size();
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
-
-                        String[] params = {item.getSnippet().getResourceId().getChannelId(), item.getSnippet().getThumbnails().getHigh().getUrl()};
-                        new GetYoutubeChannelVideos().executeOnExecutor(THREAD_POOL_EXECUTOR, params);
+                        getYoutubeChannelVideos(item.getSnippet().getResourceId().getChannelId(), item.getSnippet().getThumbnails().getHigh().getUrl());
                     }
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
                     mFavoTokenManager.createToken(PLATFORM_YOUTUBE, "");
-//                    checkToken();
                 }
             }
 
@@ -558,80 +561,82 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         });
     }
 
-    private class GetYoutubeChannelVideos extends AsyncTask<String, Void, Void> {
+    private void getYoutubeChannelVideos(final String channelId, final String profileUrl) {
 
-        @Override
-        protected Void doInBackground(final String... params) {
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
+        Log.d("CHECK_PAGING", "youtube page id : "+channelId+" / "+mPlatformPagingInfo.get(PLATFORM_YOUTUBE+channelId));
 
-            String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
-            final String profileUrl = params[1];
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(YOUTUBE_BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 1, channelId, mPlatformPagingInfo.get(PLATFORM_YOUTUBE+channelId), null, null, "date", "video", null, null, null);
+        call.enqueue(new Callback<YoutubeSearchVideoData>() {
+            @Override
+            public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
+                if (response.isSuccessful()) {
 
-            YoutubeService service = retrofit.create(YoutubeService.class);
-            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 1, params[0], null, null, null, "date", "video", null, null, null);
-            call.enqueue(new Callback<YoutubeSearchVideoData>() {
-                @Override
-                public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
-                    if (response.isSuccessful()) {
-
-                        for (YoutubeSearchVideoData.Item item : response.body().getItems()) {
-
-                            FavoFeedData data = new FavoFeedData();
-                            Date date = null;
-
-                            data.setPlatformType(PLATFORM_YOUTUBE);
-                            data.setContentsType(CONTENTS_VIDEO);
-
-                            try {
-                                date = mDateFormat.parse(item.getSnippet().getPublishedAt());
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                            data.setPubDate(date);
-
-                            data.setPageId(item.getSnippet().getChannelId());
-                            data.setFeedId(item.getId().getVideoId());
-                            data.setProfileImage(profileUrl);
-                            data.setUserName(item.getSnippet().getChannelTitle());
-                            data.setCreatedTime(mStringFormat.format(date));
-                            data.setPicture(item.getSnippet().getThumbnails().getHigh().getUrl());
-                            data.setVideoUrl(item.getId().getVideoId());
-                            data.setDescription(item.getSnippet().getTitle());
-
-                            mFeedDataset.add(data);
-                            mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
-                        }
+                    YoutubeSearchVideoData result = response.body();
+                    if(result.getNextPageToken() == null){
+                        return;
                     } else {
-                        Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
+                        mPlatformPagingInfo.put(PLATFORM_YOUTUBE+channelId, result.getNextPageToken());
                     }
+                    for (YoutubeSearchVideoData.Item item : result.getItems()) {
 
-                    synchronized ((Integer) mAsyncCount) {
-                        mAsyncCount = mAsyncCount - 1;
+                        FavoFeedData data = new FavoFeedData();
+                        Date date = null;
+
+                        data.setPlatformType(PLATFORM_YOUTUBE);
+                        data.setContentsType(CONTENTS_VIDEO);
+
+                        try {
+                            date = mDateFormat.parse(item.getSnippet().getPublishedAt());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        data.setPubDate(date);
+
+                        data.setPageId(item.getSnippet().getChannelId());
+                        data.setFeedId(item.getId().getVideoId());
+                        data.setProfileImage(profileUrl);
+                        data.setUserName(item.getSnippet().getChannelTitle());
+                        data.setCreatedTime(mStringFormat.format(date));
+                        data.setPicture(item.getSnippet().getThumbnails().getHigh().getUrl());
+                        data.setVideoUrl(item.getId().getVideoId());
+                        data.setDescription(item.getSnippet().getTitle());
+
+                        mFeedDataset.add(data);
+//                        mFeedAdapter.notifyDataSetChanged();
+//                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                     }
-                    if (mAsyncCount == 0) {
-                        sendAsyncStatus();
-                    }
+                } else {
+                    Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
                 }
 
-                @Override
-                public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
-                    t.printStackTrace();
-                    Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
-
-                    synchronized ((Integer) mAsyncCount) {
-                        mAsyncCount = mAsyncCount - 1;
-                    }
-                    if (mAsyncCount == 0) {
-                        sendAsyncStatus();
-                    }
+                synchronized ((Integer) mAsyncCount) {
+                    mAsyncCount = mAsyncCount - 1;
                 }
-            });
-            return null;
-        }
+                if (mAsyncCount == 0) {
+                    sendAsyncStatus();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
+
+                synchronized ((Integer) mAsyncCount) {
+                    mAsyncCount = mAsyncCount - 1;
+                }
+                if (mAsyncCount == 0) {
+                    sendAsyncStatus();
+                }
+            }
+        });
     }
 
     private void getTwitchUserInfo() {
@@ -793,6 +798,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     @Override
     public void onRefresh() {
 
+        mPagingListener.resetState();
         mPlatformPagingInfo.clear();
         mFeedDataset.clear();
         mFeedAdapter.notifyDataSetChanged();

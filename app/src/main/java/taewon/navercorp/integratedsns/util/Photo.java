@@ -1,9 +1,12 @@
 package taewon.navercorp.integratedsns.util;
 
+import java.io.Serializable;
+
 /**
  * Created by tedkim on 2017. 11. 19..
  */
-public class Photo {
+@SuppressWarnings("serial")
+public class Photo implements Serializable {
 
     private Integer height;
     private String src;
