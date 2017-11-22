@@ -64,7 +64,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
-    private static final int MAX_COUNTS = 10;
+    private static final int MAX_COUNTS = 20;
 
     private static final String ARG_PARAM1 = "PAGE_ID";
     private static final String ARG_PARAM2 = "PLATFORM_TYPE";

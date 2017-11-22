@@ -113,7 +113,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
     private static final int MAX_PAGE_COUNT = 10;
-    private static final int MAX_ARTICLE_COUNT = 2;
+    private static final int MAX_ARTICLE_COUNT = 3;
 
     private static boolean isInit;
 
@@ -153,37 +153,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             loadMore();
         }
         return view;
-    }
-
-    private void initView(View view) {
-
-        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
-        mRefreshLayout.setOnRefreshListener(this);
-
-        // view for disconnection
-//        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
-
-        // set feed recyclerView
-        mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
-        mFeedAdapter = new FeedListAdapter(getContext(), mFeedDataset, mRealm);
-        mFeedList.setAdapter(mFeedAdapter);
-        mFeedLayoutManager = new LinearLayoutManager(getContext());
-        mFeedList.setLayoutManager(mFeedLayoutManager);
-
-        mPagingListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) mFeedLayoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-
-                Log.d("CHECK_PAGE", "page : " + page + "");
-                Log.d("CHECK_PAGE", "totalItemCount : " + totalItemsCount + "");
-                Log.d("CHECK_PAGE", "VisibleItemCount : " + view.getChildCount() + "");
-
-                loadMore();
-                Glide.get(getContext()).clearMemory();
-//                Glide.get(getContext()).clearDiskCache();
-            }
-        };
-        mFeedList.addOnScrollListener(mPagingListener);
     }
 
     private void initData() {
@@ -235,6 +204,37 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mAsyncFinishReceiver, new IntentFilter(getString(R.string.async_finish_status)));
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mScrollToTopReceiver, new IntentFilter(getString(R.string.scroll_to_top_status)));
+    }
+
+    private void initView(View view) {
+
+        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
+        mRefreshLayout.setOnRefreshListener(this);
+
+        // view for disconnection
+//        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
+
+        // set feed recyclerView
+        mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
+        mFeedAdapter = new FeedListAdapter(getContext(), mFeedDataset, mRealm);
+        mFeedList.setAdapter(mFeedAdapter);
+        mFeedLayoutManager = new LinearLayoutManager(getContext());
+        mFeedList.setLayoutManager(mFeedLayoutManager);
+
+        mPagingListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) mFeedLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+
+                Log.d("CHECK_PAGE", "page : " + page + "");
+                Log.d("CHECK_PAGE", "totalItemCount : " + totalItemsCount + "");
+                Log.d("CHECK_PAGE", "VisibleItemCount : " + view.getChildCount() + "");
+
+                loadMore();
+                Glide.get(getContext()).clearMemory();
+//                Glide.get(getContext()).clearDiskCache();
+            }
+        };
+        mFeedList.addOnScrollListener(mPagingListener);
     }
 
     private void loadMore() {

@@ -20,12 +20,12 @@
     <color name="transparent_dark">#8e8e8e</color>
 
     <!--<color name="deepGray">#212121</color>-->
-    <!--<color name="darkGray">#303030</color>-->
+    <!--<color name="darkGray">#2e3037</color>-->
     <!--<color name="lightGray">#2C2C2C</color>-->
 
     <color name="deepGray">#000000</color>
     <color name="darkGray">#212121</color>
-    <color name="lightGray">#232123</color>
+    <color name="lightGray">#302d30</color>
     <color name="midNightBlack">#1B191B</color>
 
     <color name="primaryTextColor">#FFFFFFFF</color>

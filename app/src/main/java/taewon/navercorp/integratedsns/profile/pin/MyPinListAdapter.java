@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +35,7 @@ import taewon.navercorp.integratedsns.feed.MultiViewActivity;
 import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
-import taewon.navercorp.integratedsns.video.RecommendVideoActivity;
+import taewon.navercorp.integratedsns.video.VideoActivity;
 
 import static taewon.navercorp.integratedsns.R.layout.item_image_article;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
@@ -138,14 +139,31 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
 
         private void loadVideo(int position) {
 
-            FavoMyPinData videoData = getItem(position);
-            Intent intent = new Intent(mContext, RecommendVideoActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("FEED_DATA", videoData);
-            intent.putExtras(bundle);
-            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            Log.d("CHECK_URL", getItem(position).getVideoUrl());
+            if (TextUtils.isEmpty(getItem(position).getVideoUrl())) {
+                return;
+            }
 
+            String videoUrl = getItem(position).getVideoUrl();
+            String platformType = getItem(position).getPlatformType();
+            Intent intent = new Intent(mContext, VideoActivity.class);
+            intent.putExtra("PLATFORM_TYPE", platformType);
+
+            switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(videoUrl), "video/*");
+                    break;
+
+                case PLATFORM_YOUTUBE:
+                    intent.putExtra("VIDEO_ID", videoUrl);
+                    break;
+
+                case PLATFORM_TWITCH:
+                    String twitchUrl = String.format("http://player.twitch.tv?channel=%s", getItem(position).getUserName());
+                    intent.putExtra("VIDEO_ID", twitchUrl);
+                    break;
+            }
             mContext.startActivity(intent);
         }
 
@@ -273,11 +291,12 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
                 break;
 
             case CONTENTS_MULTI_IMAGE:
-                Glide.with(mContext).load(data.getPicture())
-                        .apply(new RequestOptions().override(holder.mPicture.getMaxWidth()))
-                        .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
-                        .transition(new DrawableTransitionOptions().crossFade())
-                        .into(holder.mPicture);
+                Log.d("CHECK_PICTURE", data.getPicture());
+//                Glide.with(mContext).load(data.getPicture())
+////                        .apply(new RequestOptions().override(holder.mPicture.getMaxWidth()))
+//                        .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
+//                        .transition(new DrawableTransitionOptions().crossFade())
+//                        .into(holder.mPicture);
                 break;
 
             case CONTENTS_VIDEO:

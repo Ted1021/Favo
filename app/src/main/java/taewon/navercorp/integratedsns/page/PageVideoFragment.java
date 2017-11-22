@@ -56,7 +56,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
     private static final String ARG_PARAM1 = "PAGE_ID";
     private static final String ARG_PARAM2 = "PLATFORM_TYPE";
-    private static final int MAX_COUNT = 10;
+    private static final int MAX_COUNT = 20;
 
     public PageVideoFragment() {
     }

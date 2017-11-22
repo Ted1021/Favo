@@ -2,6 +2,7 @@ package taewon.navercorp.integratedsns.live;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -90,6 +91,11 @@ public class LiveStreamingListAdapter extends RecyclerView.Adapter<LiveStreaming
             intent.putExtra("PLATFORM_TYPE", platformType);
 
             switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse("http://www.yourvideo.mp4"), "video/mp4");
+                    break;
 
                 case PLATFORM_YOUTUBE:
                     intent.putExtra("VIDEO_ID", videoUrl);
