@@ -12,7 +12,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.favo.FavoCommentData;
@@ -26,6 +29,9 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
     private Context mContext;
     private ArrayList<FavoCommentData> mDataset = new ArrayList<>();
     private LayoutInflater mLayoutInflater;
+
+    private SimpleDateFormat mStringFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
+    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     public CommentListAdapter(Context context, ArrayList<FavoCommentData> dataset) {
 
@@ -63,13 +69,18 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
 
         holder.mCommentUserName.setText(data.getUserName());
         holder.mCommentText.setText(data.getMessage());
-        holder.mUploadTime.setText(data.getCreatedTime());
+
+        try {
+            String date = mStringFormat.format(mDateFormat.parse(data.getCreatedTime()));
+            holder.mUploadTime.setText(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         Glide.with(mContext.getApplicationContext())
                 .load(data.getProfileImage())
                 .apply(new RequestOptions().circleCropTransform())
                 .transition(new DrawableTransitionOptions().crossFade())
                 .into(holder.mCommentProfile);
-
     }
 
     @Override

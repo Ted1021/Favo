@@ -28,7 +28,8 @@ public interface YoutubeService {
     Call<YoutubeSubscriptionData> getSubscriptionList(@Header("Authorization") String auth,
                                                       @Query("part") String part,
                                                       @Query("maxResults") int maxResults,
-                                                      @Query("mine") boolean mine);
+                                                      @Query("mine") boolean mine,
+                                                      @Query("forChannelId") String channelId);
 
     @GET("youtube/v3/search")
     Call<YoutubeSearchVideoData> getVideoList(@Header("Authorization") String auth,

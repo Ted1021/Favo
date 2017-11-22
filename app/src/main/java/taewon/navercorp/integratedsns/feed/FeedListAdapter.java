@@ -99,7 +99,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
 
-            switch(viewType){
+            switch (viewType) {
                 case CONTENTS_IMAGE:
                     mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
                     mPicture.setOnClickListener(this);
@@ -183,7 +183,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                     break;
             }
             mContext.startActivity(intent);
-            ((Activity)mContext).overridePendingTransition(0, 0);
+            ((Activity) mContext).overridePendingTransition(0, 0);
         }
 
         private void loadPageDetail(int position) {
@@ -246,7 +246,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             popupMenu.show();
         }
 
-        private void loadMultiImageDetail(int position){
+        private void loadMultiImageDetail(int position) {
 
             Intent intent = new Intent(mContext, MultiViewActivity.class);
             Bundle bundle = new Bundle();
@@ -303,7 +303,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
         holder.mDescription.setText(data.getDescription());
         Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
 
-        switch(data.getContentsType()){
+        switch (data.getContentsType()) {
             case CONTENTS_IMAGE:
                 Glide.with(mContext).load(data.getPicture())
                         .apply(new RequestOptions().override(holder.mPicture.getMaxWidth()))

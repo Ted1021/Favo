@@ -88,8 +88,8 @@ public class FavoTokenManager {
         return !getCurrentToken(platformType).equals("");
     }
 
-    public void saveUserId(String plaformType, String userId){
-        mEditor.putString(plaformType+"_id", userId);
+    public void saveUserId(String platformType, String userId){
+        mEditor.putString(platformType+"_id", userId);
         mEditor.commit();
     }
 

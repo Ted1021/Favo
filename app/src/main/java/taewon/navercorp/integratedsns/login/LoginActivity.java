@@ -384,7 +384,7 @@ public class LoginActivity extends AppCompatActivity
             public void onResponse(Call<TwitchUserData> call, Response<TwitchUserData> response) {
                 if (response.isSuccessful()) {
 
-                    mFavoTokenManager.saveUserId(PLATFORM_TWITCH, response.body().getData().get(0).getId());
+                    mFavoTokenManager.saveUserId(PLATFORM_TWITCH+"_id", response.body().getData().get(0).getId());
                     Log.d("ID", response.body().getData().get(0).getId());
 
                 } else {

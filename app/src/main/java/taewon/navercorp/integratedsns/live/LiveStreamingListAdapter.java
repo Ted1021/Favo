@@ -94,7 +94,7 @@ public class LiveStreamingListAdapter extends RecyclerView.Adapter<LiveStreaming
 
                 case PLATFORM_FACEBOOK:
                     intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse("http://www.yourvideo.mp4"), "video/mp4");
+                    intent.setDataAndType(Uri.parse(videoUrl), "video/mp4");
                     break;
 
                 case PLATFORM_YOUTUBE:
@@ -129,6 +129,7 @@ public class LiveStreamingListAdapter extends RecyclerView.Adapter<LiveStreaming
                 case PLATFORM_TWITCH:
                     intent.putExtra("USER_ID", mDataset.get(position).getPageId());
                     intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
+                    intent.putExtra("USER_NAME", mDataset.get(position).getUserName());
                     break;
             }
             mContext.startActivity(intent);

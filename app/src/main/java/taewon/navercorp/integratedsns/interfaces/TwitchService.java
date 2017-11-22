@@ -58,9 +58,9 @@ public interface TwitchService {
                                            @Query("id") String userId);
 
     @GET("helix/users/follows")
-    Call<TwitchFollowingData> getTwitchFollowingInfo(@Header("Client-ID") String clientId,
-                                                     @Query("from_id") String id,
-                                                     @Query("first") int limit);
+    Call<TwitchFollowingData> checkUserFollowingStatus(@Header("Client-ID") String clientId,
+                                                     @Query("from_id") String fromId,
+                                                     @Query("to_id") String toId);
 
     @GET("helix/videos")
     Call<TwitchVideoData> getTwitchVideoInfo(@Header("Client-ID") String clientId,

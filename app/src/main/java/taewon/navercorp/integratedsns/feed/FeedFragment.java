@@ -522,7 +522,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         // get 'subscriptions' from youtube data api v3
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_PAGE_COUNT, true);
+        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_PAGE_COUNT, true, null);
         call.enqueue(new Callback<YoutubeSubscriptionData>() {
             @Override
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
@@ -626,14 +626,14 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     // twitch api v5
     private void getTwitchFollowingUserInfo() {
-        Log.d("CHECK_ID", mFavoTokenManager.getUserId(PLATFORM_TWITCH));
+        Log.d("CHECK_ID", mFavoTokenManager.getUserId(PLATFORM_TWITCH+"_id"));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
-        Call<TwitchUserFollowingData> call = service.getTwitchFollowingUser(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mFavoTokenManager.getUserId(PLATFORM_TWITCH), MAX_PAGE_COUNT);
+        Call<TwitchUserFollowingData> call = service.getTwitchFollowingUser(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mFavoTokenManager.getUserId(PLATFORM_TWITCH+"_id"), MAX_PAGE_COUNT);
         call.enqueue(new Callback<TwitchUserFollowingData>() {
             @Override
             public void onResponse(Call<TwitchUserFollowingData> call, Response<TwitchUserFollowingData> response) {

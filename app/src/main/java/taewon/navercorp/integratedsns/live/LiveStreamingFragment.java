@@ -141,7 +141,7 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
 
         // get 'subscriptions' from youtube data api v3
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_COUNTS, true);
+        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_COUNTS, true, null);
         call.enqueue(new Callback<YoutubeSubscriptionData>() {
             @Override
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
@@ -258,7 +258,7 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                         FavoFeedData data = new FavoFeedData();
 
                         data.setPlatformType(PLATFORM_TWITCH);
-                        data.setUserName(item.getChannel().getName());
+                        data.setUserName(item.getChannel().getDisplayName());
                         data.setDescription(item.getChannel().getStatus());
                         data.setPicture(item.getPreview().getLarge());
                         data.setProfileImage(item.getChannel().getLogo());

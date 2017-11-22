@@ -265,6 +265,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
                         data.setPlatformType(PLATFORM_YOUTUBE);
                         data.setPageId(item.getSnippet().getChannelId());
+                        Log.d("CHECK_CHANNEL_ID", data.getPageId());
                         data.setProfileImage(item.getSnippet().getThumbnails().getHigh().getUrl());
                         data.setUserName(item.getSnippet().getChannelTitle());
                         data.setDescription(item.getSnippet().getDescription());

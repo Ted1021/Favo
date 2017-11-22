@@ -39,10 +39,13 @@ import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.facebook.FacebookPageInfoData;
 import taewon.navercorp.integratedsns.model.favo.FavoPageInfoData;
+import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelInfoData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
+import static android.view.View.VISIBLE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
@@ -59,13 +62,15 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
     private TextView mTitle, mTitleToolbar;
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
-    private LikeView mPageLikeButton;
-    private Button mSubscribe;
+    private LikeView mFacebookPageLikeButton;
+    private Button mFollow, mUnfollow;
     private AppBarLayout mAppbar;
 
     // page data
     private String mPageId, mUserName, mPlatformType, mProfileImage;
     private FavoPageInfoData mPageData = new FavoPageInfoData();
+
+    private boolean isFollowing = false;
 
     // fragment index
     private static final int TAB_FEED = 0;
@@ -100,6 +105,7 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
                 mPageId = intent.getStringExtra("CHANNEL_ID");
                 mProfileImage = intent.getStringExtra("PROFILE_URL");
                 getYoutubeChannelInfo();
+                checkYoutubeFollowing();
                 break;
 
             case PLATFORM_TWITCH:
@@ -107,6 +113,7 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
                 mProfileImage = intent.getStringExtra("PROFILE_URL");
                 mUserName = intent.getStringExtra("USER_NAME");
                 getTwitchStreamerInfo();
+                checkTwitchFollowing();
                 break;
         }
     }
@@ -120,11 +127,49 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
         mTitleToolbar = (TextView) findViewById(R.id.textView_pageName_toolbar);
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        mPageLikeButton = (LikeView) findViewById(R.id.button_pageLike);
-        mPageLikeButton.setObjectIdAndType(mPageId, LikeView.ObjectType.PAGE);
         mAppbar = (AppBarLayout) findViewById(R.id.appBar);
+
+        mFacebookPageLikeButton = (LikeView) findViewById(R.id.button_pageLike);
+        mFacebookPageLikeButton.setObjectIdAndType(mPageId, LikeView.ObjectType.PAGE);
+        if(mPlatformType.equals(PLATFORM_FACEBOOK)){
+            mFacebookPageLikeButton.setVisibility(VISIBLE);
+        }
+
         mBack = (ImageButton) findViewById(R.id.button_back);
         mBack.setOnClickListener(this);
+
+        mFollow = (Button) findViewById(R.id.button_follow);
+        mFollow.setOnClickListener(this);
+
+        mUnfollow = (Button) findViewById(R.id.button_unFollow);
+        mUnfollow.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+
+            case R.id.button_back:
+                Glide.get(this).clearMemory();
+                this.finish();
+                break;
+
+            case R.id.button_follow:
+                if (mPlatformType.equals(PLATFORM_YOUTUBE)) {
+                    followYoutubeChannel();
+                } else {
+                    followTwitchStream();
+                }
+                break;
+
+            case R.id.button_unFollow:
+                if (mPlatformType.equals(PLATFORM_YOUTUBE)) {
+                    unFollowYoutubeChannel();
+                } else {
+                    unFollowTwitchStream();
+                }
+                break;
+        }
     }
 
     private void setAction() {
@@ -141,7 +186,7 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
         mAppbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                float percentage = ((float)Math.abs(verticalOffset)/appBarLayout.getTotalScrollRange());
+                float percentage = ((float) Math.abs(verticalOffset) / appBarLayout.getTotalScrollRange());
                 mTitleToolbar.setAlpha(percentage);
             }
         });
@@ -270,15 +315,84 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
-    @Override
-    public void onClick(View v) {
-        switch(v.getId()){
+    private void checkYoutubeFollowing() {
 
-            case R.id.button_back:
-                Glide.get(this).clearMemory();
-                this.finish();
-                break;
-        }
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", 1, true, mPageId);
+        call.enqueue(new Callback<YoutubeSubscriptionData>() {
+            @Override
+            public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getItems().isEmpty()){
+                        isFollowing = false;
+                        mFollow.setVisibility(VISIBLE);
+                    } else {
+                        isFollowing = true;
+                        mUnfollow.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<YoutubeSubscriptionData> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
+    }
+
+    private void followYoutubeChannel() {
+
+    }
+
+    private void unFollowYoutubeChannel() {
+
+    }
+
+    private void checkTwitchFollowing() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
+
+        Call<TwitchFollowingData> call = service.checkUserFollowingStatus(getString(R.string.twitch_client_id), mFavoTokenManager.getUserId(PLATFORM_TWITCH+"_id"), mPageId);
+        call.enqueue(new Callback<TwitchFollowingData>() {
+            @Override
+            public void onResponse(Call<TwitchFollowingData> call, Response<TwitchFollowingData> response) {
+                if(response.isSuccessful()){
+                    if(response.body().getData().isEmpty()){
+                        isFollowing = false;
+                        mFollow.setVisibility(VISIBLE);
+                    } else {
+                        isFollowing = true;
+                        mUnfollow.setVisibility(VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TwitchFollowingData> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void followTwitchStream() {
+
+
+    }
+
+    private void unFollowTwitchStream() {
+
+
     }
 
     private class ViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -307,5 +421,11 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
         public int getCount() {
             return 2;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Glide.get(this).clearMemory();
+        super.onDestroy();
     }
 }
