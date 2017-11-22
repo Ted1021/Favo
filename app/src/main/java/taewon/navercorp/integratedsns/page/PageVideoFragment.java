@@ -56,7 +56,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
     private static final String ARG_PARAM1 = "PAGE_ID";
     private static final String ARG_PARAM2 = "PLATFORM_TYPE";
-    private static final int MAX_COUNT = 20;
+    private static final int MAX_COUNT = 10;
 
     public PageVideoFragment() {
     }
@@ -123,6 +123,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
                         break;
 
                     case PLATFORM_TWITCH:
+                        mRefreshLayout.setRefreshing(false);
 //                        getTwitchVideoList();
                         break;
                 }
@@ -214,6 +215,8 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
                     YoutubeChannelPlaylistData result = response.body();
                     if(result.getNextPageToken() == null){
+                        mRefreshLayout.setRefreshing(false);
+
                         return;
                     } else {
                         mNext = result.getNextPageToken();

@@ -119,7 +119,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
     private static final int MAX_PAGE_COUNT = 10;
-    private static final int MAX_ARTICLE_COUNT = 3;
+    private static final int MAX_ARTICLE_COUNT = 2;
 
     private static boolean isInit;
 

@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -28,6 +30,7 @@ import com.google.gson.Gson;
 
 import java.util.Locale;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,6 +45,7 @@ import taewon.navercorp.integratedsns.model.favo.FavoPageInfoData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelInfoData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubePostSubscriptionData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
@@ -65,9 +69,10 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
     private LikeView mFacebookPageLikeButton;
     private Button mFollow, mUnfollow;
     private AppBarLayout mAppbar;
+    private CoordinatorLayout mActivityLayout;
 
     // page data
-    private String mPageId, mUserName, mPlatformType, mProfileImage;
+    private String mPageId, mUserName, mPlatformType, mProfileImage, mYoutubeSubscriptionId;
     private FavoPageInfoData mPageData = new FavoPageInfoData();
 
     private boolean isFollowing = false;
@@ -120,6 +125,7 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
 
     private void initView() {
 
+        mActivityLayout = (CoordinatorLayout) findViewById(R.id.main_content);
         mProfile = (ImageView) findViewById(R.id.imageView_pageProfile);
         mCover = (ImageView) findViewById(R.id.imageView_pageCover);
         mCover.setColorFilter(Color.parseColor("#FF3B3B3B"), PorterDuff.Mode.MULTIPLY);
@@ -334,6 +340,7 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
                         isFollowing = false;
                         mFollow.setVisibility(VISIBLE);
                     } else {
+                        mYoutubeSubscriptionId = response.body().getItems().get(0).getId();
                         isFollowing = true;
                         mUnfollow.setVisibility(View.VISIBLE);
                     }
@@ -350,10 +357,67 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
 
     private void followYoutubeChannel() {
 
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
+
+        YoutubePostSubscriptionData requestData = new YoutubePostSubscriptionData();
+        requestData.getSnippet().getResource().setChannelId(mPageId);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<ResponseBody> call = service.insertSubscription(accessToken, "snippet", requestData);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                Snackbar snackbar;
+                if(response.isSuccessful()){
+                    snackbar = Snackbar.make(mActivityLayout, "Successfully following", Snackbar.LENGTH_SHORT);
+                } else {
+                    snackbar = Snackbar.make(mActivityLayout, "fail to follow", Snackbar.LENGTH_SHORT);
+                }
+                snackbar.show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     private void unFollowYoutubeChannel() {
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        Log.d("CHECK_ID", mPageId);
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<ResponseBody> call = service.deleteSubscription(accessToken, mYoutubeSubscriptionId);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                Snackbar snackbar;
+                if(response.isSuccessful()){
+                    snackbar = Snackbar.make(mActivityLayout, "Successfully unFollowing", Snackbar.LENGTH_SHORT);
+                } else {
+                    snackbar = Snackbar.make(mActivityLayout, "fail to unFollow", Snackbar.LENGTH_SHORT);
+                }
+                snackbar.show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
     }
 
     private void checkTwitchFollowing() {

@@ -1,7 +1,9 @@
 package taewon.navercorp.integratedsns.interfaces;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -10,6 +12,7 @@ import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelInfoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeChannelPlaylistData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeCommentData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubePostCommentData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubePostSubscriptionData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
@@ -30,6 +33,15 @@ public interface YoutubeService {
                                                       @Query("maxResults") int maxResults,
                                                       @Query("mine") boolean mine,
                                                       @Query("forChannelId") String channelId);
+
+    @POST("/youtube/v3/subscriptions")
+    Call<ResponseBody> insertSubscription(@Header("Authorization") String auth,
+                                          @Query("part") String part,
+                                          @Body YoutubePostSubscriptionData channelId);
+
+    @DELETE("/youtube/v3/subscriptions")
+    Call<ResponseBody> deleteSubscription(@Header("Authorization") String auth,
+                                          @Query("id") String channelId);
 
     @GET("youtube/v3/search")
     Call<YoutubeSearchVideoData> getVideoList(@Header("Authorization") String auth,
