@@ -356,7 +356,5 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
 
         return mDataset.size();
     }
-
-
 }
 

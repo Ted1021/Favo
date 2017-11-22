@@ -1,16 +1,18 @@
 package taewon.navercorp.integratedsns.model.favo;
 
+import java.io.Serializable;
 import java.util.Date;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
-import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by USER on 2017-10-30.
  */
 
-public class FavoMyPinData extends RealmObject {
+@SuppressWarnings("serial")
+public class FavoMyPinData extends RealmObject implements Serializable{
 
     @PrimaryKey
     private String feedId;
@@ -25,10 +27,17 @@ public class FavoMyPinData extends RealmObject {
     private String link;
     private String videoUrl;
     private String description;
-    @Ignore
-    private String[] subattachments;
+    private RealmList<RealmPhoto> subattachments;
     private int likeCount;
     private int commentCount;
+
+    public String getFeedId() {
+        return feedId;
+    }
+
+    public void setFeedId(String feedId) {
+        this.feedId = feedId;
+    }
 
     public String getPlatformType() {
         return platformType;
@@ -54,6 +63,14 @@ public class FavoMyPinData extends RealmObject {
         this.pubDate = pubDate;
     }
 
+    public String getPageId() {
+        return pageId;
+    }
+
+    public void setPageId(String pageId) {
+        this.pageId = pageId;
+    }
+
     public String getProfileImage() {
         return profileImage;
     }
@@ -68,6 +85,14 @@ public class FavoMyPinData extends RealmObject {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(String createdTime) {
+        this.createdTime = createdTime;
     }
 
     public String getPicture() {
@@ -86,6 +111,30 @@ public class FavoMyPinData extends RealmObject {
         this.link = link;
     }
 
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public RealmList<RealmPhoto> getSubattachments() {
+        return subattachments;
+    }
+
+    public void setSubattachments(RealmList<RealmPhoto> subattachments) {
+        this.subattachments = subattachments;
+    }
+
     public int getLikeCount() {
         return likeCount;
     }
@@ -100,61 +149,5 @@ public class FavoMyPinData extends RealmObject {
 
     public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
-    }
-
-    public String getVideoUrl() {
-        return videoUrl;
-    }
-
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
-    }
-
-    public String[] getSubattatchments() {
-        return subattachments;
-    }
-
-    public void setSubattatchments(String[] subattatchments) {
-        this.subattachments = subattatchments;
-    }
-
-    public String getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(String createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPageId() {
-        return pageId;
-    }
-
-    public void setPageId(String pageId) {
-        this.pageId = pageId;
-    }
-
-    public String getFeedId() {
-        return feedId;
-    }
-
-    public void setFeedId(String feedId) {
-        this.feedId = feedId;
-    }
-
-    public String[] getSubattachments() {
-        return subattachments;
-    }
-
-    public void setSubattachments(String[] subattachments) {
-        this.subattachments = subattachments;
     }
 }

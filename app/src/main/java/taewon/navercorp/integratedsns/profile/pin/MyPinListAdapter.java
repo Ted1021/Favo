@@ -1,14 +1,21 @@
 package taewon.navercorp.integratedsns.profile.pin;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -22,13 +29,20 @@ import com.bumptech.glide.request.RequestOptions;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmRecyclerViewAdapter;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.customview.GridImageView;
+import taewon.navercorp.integratedsns.feed.MultiViewActivity;
+import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
+import taewon.navercorp.integratedsns.page.PageDetailActivity;
+import taewon.navercorp.integratedsns.video.RecommendVideoActivity;
 
+import static taewon.navercorp.integratedsns.R.layout.item_image_article;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_MULTI_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 
@@ -36,8 +50,6 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
 
     private Context mContext;
     private LayoutInflater mLayoutInflater;
-
-    private int speed;
 
     public MyPinListAdapter(@Nullable OrderedRealmCollection<FavoMyPinData> data, boolean autoUpdate, Context context) {
         super(data, autoUpdate);
@@ -51,13 +63,14 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
         // common components
         private TextView mUserName, mUploadTime, mDescription;
         private ImageView mProfile, mPicture, mPlatformType;
-        private Button mLike, mComment, mShare, mMore;
+        private Button mComment, mShare, mMore;
         private FrameLayout mPageDetail;
 
         // video component
         private ImageButton mPlay;
 
         // multi image component
+        private GridImageView mGridImageView;
 
         public ViewHolder(View itemView, int viewType) {
             super(itemView);
@@ -65,51 +78,142 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
             mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
             mUploadTime = (TextView) itemView.findViewById(R.id.textView_uploadTime);
             mDescription = (TextView) itemView.findViewById(R.id.textView_description);
-
             mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
             mPlatformType = (ImageView) itemView.findViewById(R.id.imageView_platformType);
-            mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
-
-            mLike = (Button) itemView.findViewById(R.id.button_like);
-            mLike.setOnClickListener(this);
-
-            mComment = (Button) itemView.findViewById(R.id.button_comment);
-            mComment.setOnClickListener(this);
-
             mMore = (Button) itemView.findViewById(R.id.button_more);
             mMore.setOnClickListener(this);
-
+            mComment = (Button) itemView.findViewById(R.id.button_comment);
+            mComment.setOnClickListener(this);
             mPageDetail = (FrameLayout) itemView.findViewById(R.id.layout_page_detail);
             mPageDetail.setOnClickListener(this);
 
-            if (viewType == CONTENTS_VIDEO) {
+            switch(viewType){
+                case CONTENTS_IMAGE:
+                    mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
+                    mPicture.setOnClickListener(this);
+                    break;
 
-                mPicture.setColorFilter(Color.parseColor("#618e8e8e"), PorterDuff.Mode.MULTIPLY);
-                mPlay = (ImageButton) itemView.findViewById(R.id.imageButton_play);
-                mPlay.setOnClickListener(this);
-            } else {
-                mPicture.setOnClickListener(this);
+                case CONTENTS_MULTI_IMAGE:
+//                    mGridImageView = (GridImageView) itemView.findViewById(R.id.layout_gridImageView);
+//                    mGridImageView.setOnClickListener(this);
+
+                    break;
+
+                case CONTENTS_VIDEO:
+                    mPicture = (ImageView) itemView.findViewById(R.id.imageView_picture);
+                    mPicture.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
+                    mPlay = (ImageButton) itemView.findViewById(R.id.imageButton_play);
+                    mPlay.setOnClickListener(this);
+                    break;
             }
         }
 
         @Override
         public void onClick(View v) {
 
-        }
-    }
+            int position = getLayoutPosition();
+            switch (v.getId()) {
 
-    @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
+                case R.id.imageButton_play:
+                    loadVideo(position);
+                    break;
 
-        recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
-            @Override
-            public boolean onFling(int velocityX, int velocityY) {
+                case R.id.button_comment:
+                    loadComments(position);
+                    break;
 
-                speed = velocityY;
-                return false;
+                case R.id.layout_page_detail:
+                    loadPageDetail(position);
+                    break;
+
+                case R.id.imageView_picture:
+//                    loadVideo(position);
+                    break;
+
+                case R.id.layout_gridImageView:
+                    loadMultiImageDetail(position);
+                    break;
             }
-        });
+        }
+
+        private void loadVideo(int position) {
+
+            FavoMyPinData videoData = getItem(position);
+            Intent intent = new Intent(mContext, RecommendVideoActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("FEED_DATA", videoData);
+            intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            Log.d("CHECK_URL", getItem(position).getVideoUrl());
+
+            mContext.startActivity(intent);
+        }
+
+        private void loadComments(int position) {
+
+            String platformType = getItem(position).getPlatformType();
+
+            Intent intent = new Intent(mContext, CommentActivity.class);
+            intent.putExtra("PLATFORM_TYPE", platformType);
+
+            switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    intent.putExtra("ARTICLE_ID", getItem(position).getFeedId());
+                    break;
+
+                case PLATFORM_YOUTUBE:
+                    intent.putExtra("VIDEO_ID", getItem(position).getFeedId());
+                    break;
+            }
+            mContext.startActivity(intent);
+            ((Activity)mContext).overridePendingTransition(0, 0);
+        }
+
+        private void loadPageDetail(int position) {
+
+            Intent intent = new Intent(mContext, PageDetailActivity.class);
+            String platformType = getItem(position).getPlatformType();
+            intent.putExtra("PLATFORM_TYPE", platformType);
+
+            switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    intent.putExtra("PAGE_ID", getItem(position).getPageId());
+                    break;
+
+                case PLATFORM_YOUTUBE:
+                    intent.putExtra("CHANNEL_ID", getItem(position).getPageId());
+                    intent.putExtra("PROFILE_URL", getItem(position).getProfileImage());
+                    break;
+
+                case PLATFORM_TWITCH:
+                    intent.putExtra("USER_ID", getItem(position).getPageId());
+                    intent.putExtra("PROFILE_URL", getItem(position).getProfileImage());
+                    intent.putExtra("USER_NAME", getItem(position).getUserName());
+                    break;
+            }
+            mContext.startActivity(intent);
+        }
+
+        private void loadLink(int position) {
+
+            Intent intent;
+            String url = getItem(position).getLink();
+            if (url != null) {
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                mContext.startActivity(intent);
+            }
+        }
+
+        private void loadMultiImageDetail(int position){
+
+            Intent intent = new Intent(mContext, MultiViewActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("FEED_DATA", getItem(position));
+            intent.putExtras(bundle);
+            mContext.startActivity(intent);
+        }
     }
 
     @Override
@@ -126,7 +230,6 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
             case CONTENTS_MULTI_IMAGE:
                 return CONTENTS_MULTI_IMAGE;
         }
-
         return -1;
     }
 
@@ -136,7 +239,7 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
         View itemView;
         switch (viewType) {
             case CONTENTS_IMAGE:
-                itemView = mLayoutInflater.inflate(R.layout.item_image_article, parent, false);
+                itemView = mLayoutInflater.inflate(item_image_article, parent, false);
                 return new ViewHolder(itemView, viewType);
 
             case CONTENTS_VIDEO:
@@ -144,7 +247,7 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
                 return new ViewHolder(itemView, viewType);
 
             case CONTENTS_MULTI_IMAGE:
-                itemView = mLayoutInflater.inflate(R.layout.item_multi_image_article, parent, false);
+                itemView = mLayoutInflater.inflate(R.layout.item_image_article, parent, false);
                 return new ViewHolder(itemView, viewType);
         }
         return null;
@@ -158,20 +261,38 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
         holder.mUploadTime.setText(data.getCreatedTime());
         holder.mUserName.setText(data.getUserName());
         holder.mDescription.setText(data.getDescription());
-        holder.mLike.setText(data.getLikeCount() + "");
-        holder.mComment.setText(data.getCommentCount() + "");
-
-        if (data.getContentsType() == CONTENTS_VIDEO) {
-            Glide.with(mContext.getApplicationContext()).load(data.getPicture())
-                    .apply(new RequestOptions().override(864, 486))
-                    .apply(new RequestOptions().centerCrop())
-//                .thumbnail(0.5f)
-                    .transition(new DrawableTransitionOptions().crossFade())
-                    .into(holder.mPicture);
-        } else {
-            Glide.with(mContext).load(data.getPicture()).apply(new RequestOptions().override(holder.mPicture.getMaxWidth())).into(holder.mPicture);
-        }
         Glide.with(mContext).load(data.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
+
+        switch(data.getContentsType()){
+            case CONTENTS_IMAGE:
+                Glide.with(mContext).load(data.getPicture())
+                        .apply(new RequestOptions().override(holder.mPicture.getMaxWidth()))
+                        .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
+                        .transition(new DrawableTransitionOptions().crossFade())
+                        .into(holder.mPicture);
+                break;
+
+            case CONTENTS_MULTI_IMAGE:
+                Glide.with(mContext).load(data.getPicture())
+                        .apply(new RequestOptions().override(holder.mPicture.getMaxWidth()))
+                        .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
+                        .transition(new DrawableTransitionOptions().crossFade())
+                        .into(holder.mPicture);
+                break;
+
+            case CONTENTS_VIDEO:
+
+                Animation fadeInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fade_in);
+                holder.mPlay.startAnimation(fadeInAnimation);
+
+                Glide.with(mContext.getApplicationContext()).load(data.getPicture())
+                        .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
+                        .apply(new RequestOptions().override(864, 486))
+                        .apply(new RequestOptions().centerCrop())
+                        .transition(new DrawableTransitionOptions().crossFade())
+                        .into(holder.mPicture);
+                break;
+        }
 
         switch (data.getPlatformType()) {
 
@@ -186,12 +307,11 @@ public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, My
             case PLATFORM_PINTEREST:
                 Glide.with(mContext).load(R.drawable.icon_pinterest_small).into(holder.mPlatformType);
                 break;
+
+            case PLATFORM_TWITCH:
+                Glide.with(mContext).load(R.drawable.twitch_icon_small).into(holder.mPlatformType);
+                break;
         }
-
-        Log.d("CHECK_SPEED", speed+"");
-
     }
-
-
 }
 
