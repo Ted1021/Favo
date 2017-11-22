@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -111,7 +112,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
-    private static final int MAX_COUNTS = 10;
+    private static final int MAX_PAGE_COUNT = 10;
+    private static final int MAX_ARTICLE_COUNT = 2;
 
     private static boolean isInit;
 
@@ -177,6 +179,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 Log.d("CHECK_PAGE", "VisibleItemCount : " + view.getChildCount() + "");
 
                 loadMore();
+                Glide.get(getContext()).clearMemory();
+//                Glide.get(getContext()).clearDiskCache();
             }
         };
         mFeedList.addOnScrollListener(mPagingListener);
@@ -236,6 +240,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private void loadMore() {
 
         mAsyncCount = 0;
+        mRefreshLayout.setRefreshing(true);
         if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
             getFacebookUserPages();
         }
@@ -255,7 +260,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void refreshDataset() {
 
-        mFeedAdapter.notifyDataSetChanged();
+//        mFeedAdapter.notifyDataSetChanged();
         if (mLastPosition > mFeedDataset.size() - 1) {
             mLastPosition = mFeedDataset.size() - 1;
         }
@@ -264,11 +269,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void scrollToTopPosition(int position) {
 
-//        if (position > 5) {
-//            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
-//            mFeedLayoutManager.scrollToPosition(5);
-//        }
-//        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+        if (position > 5) {
+            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
+            mFeedLayoutManager.scrollToPosition(5);
+        }
+        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
         mFeedLayoutManager.scrollToPosition(0);
     }
 
@@ -278,11 +283,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             return;
         }
 
-//        if (position > 5) {
-//            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position - 5);
-//            mFeedLayoutManager.scrollToPosition(position - 5);
-//        }
-//        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
+        if (position > 5) {
+            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position - 5);
+            mFeedLayoutManager.scrollToPosition(position - 5);
+        }
+        mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
         mFeedLayoutManager.scrollToPosition(position);
     }
 
@@ -295,7 +300,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     // Facebook API Call
     private void getFacebookUserPages() {
 
-        mRefreshLayout.setRefreshing(true);
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newGraphPathRequest(
                 accessToken,
@@ -325,7 +329,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("limit", MAX_COUNTS + "");
+        parameters.putString("limit", MAX_PAGE_COUNT + "");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -401,7 +405,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                             mAsyncCount = mAsyncCount - 1;
                         }
 
-                        if (mAsyncCount == 0) {
+                        if (mAsyncCount <= 0) {
                             sendAsyncStatus();
                         }
                     }
@@ -409,11 +413,10 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         Bundle parameters = new Bundle();
         if (mPlatformPagingInfo.get(PLATFORM_FACEBOOK + pageId) != null) {
-//            Log.d("CHECK_PAGING", "facebook page id : "+mPlatformPagingInfo.get(PLATFORM_FACEBOOK + pageId));
             parameters.putString("after", mPlatformPagingInfo.get(PLATFORM_FACEBOOK + pageId));
         }
         parameters.putString("fields", "link,created_time,message,full_picture,likes.limit(0).summary(true),comments.limit(0).summary(true),from{name, picture.height(2048){url}},attachments{subattachments},source");
-        parameters.putString("limit", "1");
+        parameters.putString("limit", MAX_ARTICLE_COUNT+"");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -421,7 +424,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     // Pinterest API Call
     private void getPinterestFollowingBoards() {
 
-        mRefreshLayout.setRefreshing(true);
         mPinterestClient.getMyFollowedBoards(BOARD_FIELDS, new PDKCallback() {
             @Override
             public void onSuccess(PDKResponse response) {
@@ -472,7 +474,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
                     }
-                    if (mAsyncCount == 0) {
+                    if (mAsyncCount <= 0) {
                         sendAsyncStatus();
                     }
                 }
@@ -484,7 +486,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
                     }
-                    if (mAsyncCount == 0) {
+                    if (mAsyncCount <= 0) {
                         sendAsyncStatus();
                     }
                 }
@@ -502,8 +504,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     // Youtube API Call
     private void getYoutubeSubscriptionList() {
 
-        mRefreshLayout.setRefreshing(true);
-
         // get google credential access token
         String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
@@ -515,7 +515,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         // get 'subscriptions' from youtube data api v3
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_COUNTS, true);
+        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_PAGE_COUNT, true);
         call.enqueue(new Callback<YoutubeSubscriptionData>() {
             @Override
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
@@ -527,7 +527,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     }
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
-                    mFavoTokenManager.createToken(PLATFORM_YOUTUBE, "");
+                    mFavoTokenManager.removeToken(PLATFORM_YOUTUBE);
                 }
             }
 
@@ -550,7 +550,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 1, channelId, mPlatformPagingInfo.get(PLATFORM_YOUTUBE + channelId), null, null, "date", "video", null, null, null);
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_ARTICLE_COUNT, channelId, mPlatformPagingInfo.get(PLATFORM_YOUTUBE + channelId), null, null, "date", "video", null, null, null);
         call.enqueue(new Callback<YoutubeSearchVideoData>() {
             @Override
             public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
@@ -588,7 +588,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                         mFeedDataset.add(data);
 //                        mFeedAdapter.notifyDataSetChanged();
-//                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                     }
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
@@ -597,7 +597,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 synchronized ((Integer) mAsyncCount) {
                     mAsyncCount = mAsyncCount - 1;
                 }
-                if (mAsyncCount == 0) {
+                if (mAsyncCount <= 0) {
                     sendAsyncStatus();
                 }
             }
@@ -610,7 +610,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 synchronized ((Integer) mAsyncCount) {
                     mAsyncCount = mAsyncCount - 1;
                 }
-                if (mAsyncCount == 0) {
+                if (mAsyncCount <= 0) {
                     sendAsyncStatus();
                 }
             }
@@ -626,16 +626,17 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
-        Call<TwitchUserFollowingData> call = service.getTwitchFollowingUser(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mFavoTokenManager.getUserId(PLATFORM_TWITCH), MAX_COUNTS);
+        Call<TwitchUserFollowingData> call = service.getTwitchFollowingUser(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mFavoTokenManager.getUserId(PLATFORM_TWITCH), MAX_PAGE_COUNT);
         call.enqueue(new Callback<TwitchUserFollowingData>() {
             @Override
             public void onResponse(Call<TwitchUserFollowingData> call, Response<TwitchUserFollowingData> response) {
 
                 if (response.isSuccessful()) {
                     String userName, userProfile, userId;
+                    mAsyncCount = mAsyncCount + response.body().getFollows().size();
                     for (TwitchUserFollowingData.Follow data : response.body().getFollows()) {
 
-                        userName = data.getChannel().getName();
+                        userName = data.getChannel().getDisplayName();
                         userProfile = data.getChannel().getLogo();
                         userId = data.getChannel().getId();
                         getTwitchVideoList(userProfile, userName, userId);
@@ -657,7 +658,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
 
-        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), userId, 1, mPlatformPagingInfo.get(PLATFORM_TWITCH + userId));
+        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), userId, MAX_ARTICLE_COUNT, mPlatformPagingInfo.get(PLATFORM_TWITCH + userId));
         call.enqueue(new Callback<TwitchVideoData>() {
             @Override
             public void onResponse(Call<TwitchVideoData> call, Response<TwitchVideoData> response) {
@@ -702,7 +703,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     mAsyncCount = mAsyncCount - 1;
                 }
 
-                if (mAsyncCount == 0) {
+                if (mAsyncCount <= 0) {
                     sendAsyncStatus();
                 }
             }
@@ -716,7 +717,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     mAsyncCount = mAsyncCount - 1;
                 }
 
-                if (mAsyncCount == 0) {
+                if (mAsyncCount <= 0) {
                     sendAsyncStatus();
                 }
             }
@@ -725,7 +726,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     @Override
     public void onRefresh() {
-
+        Glide.get(getContext()).clearMemory();
         mPagingListener.resetState();
         mPlatformPagingInfo.clear();
         mFeedDataset.clear();

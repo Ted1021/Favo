@@ -75,6 +75,8 @@ public class VerticalCardStackViewPager extends ViewPager {
         }
     }
 
+
+
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         return super.onTouchEvent(swapXY(ev));
