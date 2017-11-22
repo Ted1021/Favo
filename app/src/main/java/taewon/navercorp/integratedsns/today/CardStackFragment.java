@@ -3,7 +3,9 @@ package taewon.navercorp.integratedsns.today;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,9 +29,11 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CardStackFragment extends Fragment implements View.OnClickListener{
+public class CardStackFragment extends Fragment implements View.OnClickListener {
 
     private FavoFeedData data;
+
+    private GestureDetector mGestureDetector;
 
     // common components
     private TextView mUserName, mUploadTime, mDescription, mComment;
@@ -40,7 +44,7 @@ public class CardStackFragment extends Fragment implements View.OnClickListener{
 
     private static String ARG_PARM1 = "FAVO_DATA";
 
-    public static CardStackFragment newInstance(FavoFeedData data){
+    public static CardStackFragment newInstance(FavoFeedData data) {
 
         CardStackFragment fragment = new CardStackFragment();
         Bundle bundle = new Bundle();
@@ -48,6 +52,7 @@ public class CardStackFragment extends Fragment implements View.OnClickListener{
         fragment.setArguments(bundle);
         return fragment;
     }
+
     public CardStackFragment() {
         // Required empty public constructor
     }
@@ -59,7 +64,7 @@ public class CardStackFragment extends Fragment implements View.OnClickListener{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_card_stack, container, false);
 
-        if(getArguments() != null){
+        if (getArguments() != null) {
             data = (FavoFeedData) getArguments().getSerializable(ARG_PARM1);
         }
 
@@ -69,7 +74,7 @@ public class CardStackFragment extends Fragment implements View.OnClickListener{
         return view;
     }
 
-    private void initView(View view){
+    private void initView(View view) {
 
         mUserName = (TextView) view.findViewById(R.id.textView_userName);
         mUploadTime = (TextView) view.findViewById(R.id.textView_uploadTime);
@@ -87,7 +92,7 @@ public class CardStackFragment extends Fragment implements View.OnClickListener{
         mCommentDetail.setOnClickListener(this);
     }
 
-    private void initData(){
+    private void initData() {
 
         mUploadTime.setText(data.getCreatedTime());
         mUserName.setText(data.getUserName());
@@ -126,13 +131,61 @@ public class CardStackFragment extends Fragment implements View.OnClickListener{
         }
     }
 
+
     @Override
     public void onClick(View v) {
 
-        switch(v.getId()){
+        switch (v.getId()) {
 
 
         }
 
     }
+
+
+    private GestureDetector.SimpleOnGestureListener mOnSimpleOnGestureListener = new GestureDetector.SimpleOnGestureListener() {
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent e) {
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            return false;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            return false;
+        }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            return super.onDoubleTap(e);
+        }
+
+        @Override
+        public boolean onDoubleTapEvent(MotionEvent e) {
+            return super.onDoubleTapEvent(e);
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            return super.onSingleTapConfirmed(e);
+        }
+    };
+
 }
