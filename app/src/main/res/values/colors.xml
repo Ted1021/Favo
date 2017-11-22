@@ -32,6 +32,6 @@
     <color name="secondaryTextColor">#b3ffffff</color>
     <color name="hintTextColor">#80FFFFFF</color>
     <color name="divider">#1FFFFFFF</color>
-    <color name="darkFilter">#DE8e8e8e</color>
+    <color name="darkFilter">#8e8e8e</color>
 
 </resources>

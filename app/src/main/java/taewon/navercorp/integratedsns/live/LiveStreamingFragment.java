@@ -102,6 +102,7 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
 
     private void loadData() {
 
+        mRefreshLayout.setRefreshing(true);
         mFavoTokenManager = FavoTokenManager.getInstance();
 
         String facebookToken = mFavoTokenManager.getCurrentToken(PLATFORM_FACEBOOK);
@@ -152,10 +153,8 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                         new GetYoutubeChannelStreams().executeOnExecutor(THREAD_POOL_EXECUTOR, params);
                     }
 
-                    mRefreshLayout.setRefreshing(false);
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
-                    mRefreshLayout.setRefreshing(false);
                 }
             }
 
@@ -163,7 +162,6 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
             public void onFailure(Call<YoutubeSubscriptionData> call, Throwable t) {
                 Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to access youtube api server");
                 Toast.makeText(getContext(), "Fail to access youtube server", Toast.LENGTH_SHORT).show();
-                mRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -218,12 +216,14 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                     } else {
                         Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
                     }
+                    mRefreshLayout.setRefreshing(false);
                 }
 
                 @Override
                 public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
                     t.printStackTrace();
                     Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
+                    mRefreshLayout.setRefreshing(false);
                 }
             });
             return null;
@@ -274,17 +274,23 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                 } else {
                     Log.e("ERROR_SEARCH", response.raw().toString());
                 }
+                mRefreshLayout.setRefreshing(false);
+
             }
 
             @Override
             public void onFailure(Call<TwitchStreamingDataV5> call, Throwable t) {
                 t.printStackTrace();
+                mRefreshLayout.setRefreshing(false);
             }
         });
     }
 
     @Override
     public void onRefresh() {
+
+        mDataset.clear();
+        mAdapter.notifyDataSetChanged();
         loadData();
     }
 }

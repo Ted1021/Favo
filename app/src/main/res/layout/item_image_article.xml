@@ -92,6 +92,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
+                android:elevation="4dp"
                 android:scaleType="fitXY"
                 app:srcCompat="@drawable/ic_arrow" />
 
@@ -116,6 +117,7 @@
                         android:id="@+id/imageView_picture"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_marginTop="16dp"
                         android:layout_weight="1"
                         android:adjustViewBounds="true"
                         android:scaleType="fitXY"

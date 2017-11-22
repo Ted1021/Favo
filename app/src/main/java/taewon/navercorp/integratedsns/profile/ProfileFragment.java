@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -53,10 +54,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private PDKClient mPinterestClient;
 
     private ImageView mProfile;
-    private TextView mUserName, mId;
+    private TextView mUserName, mId, mTitle;
     private ImageButton mSetting;
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
+    private AppBarLayout mAppbar;
 
     private static boolean isInit;
 
@@ -117,11 +119,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         mProfile = (ImageView) view.findViewById(R.id.imageView_profile);
         mUserName = (TextView) view.findViewById(R.id.textView_userName);
-        mSetting = (ImageButton) view.findViewById(R.id.button_setting);
-        mSetting.setOnClickListener(this);
-
         mViewPager = (ViewPager) view.findViewById(R.id.viewPager);
         mTabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
+        mAppbar = (AppBarLayout) view.findViewById(R.id.appBar);
+        mTitle = (TextView) view.findViewById(R.id.textView_title);
+        mSetting = (ImageButton) view.findViewById(R.id.button_setting);
+        mSetting.setOnClickListener(this);
     }
 
     private void setProfileInfo() {
@@ -147,6 +150,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // set interaction between viewPager & tabLayout
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
+        mAppbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                float percentage = ((float)Math.abs(verticalOffset)/appBarLayout.getTotalScrollRange());
+                mTitle.setAlpha(percentage);
+            }
+        });
     }
 
     private void getFacebookUserInfo() {

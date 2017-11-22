@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,11 +12,14 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -45,17 +49,19 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
-public class PageDetailActivity extends AppCompatActivity {
+public class PageDetailActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FavoTokenManager mFavoTokenManager;
 
     // ui components
     private ImageView mCover, mProfile;
+    private ImageButton mBack;
     private TextView mTitle, mTitleToolbar;
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
     private LikeView mPageLikeButton;
     private Button mSubscribe;
+    private AppBarLayout mAppbar;
 
     // page data
     private String mPageId, mUserName, mPlatformType, mProfileImage;
@@ -109,13 +115,16 @@ public class PageDetailActivity extends AppCompatActivity {
 
         mProfile = (ImageView) findViewById(R.id.imageView_pageProfile);
         mCover = (ImageView) findViewById(R.id.imageView_pageCover);
-        mCover.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
+        mCover.setColorFilter(Color.parseColor("#FF3B3B3B"), PorterDuff.Mode.MULTIPLY);
         mTitle = (TextView) findViewById(R.id.textView_pageName);
         mTitleToolbar = (TextView) findViewById(R.id.textView_pageName_toolbar);
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
         mPageLikeButton = (LikeView) findViewById(R.id.button_pageLike);
         mPageLikeButton.setObjectIdAndType(mPageId, LikeView.ObjectType.PAGE);
+        mAppbar = (AppBarLayout) findViewById(R.id.appBar);
+        mBack = (ImageButton) findViewById(R.id.button_back);
+        mBack.setOnClickListener(this);
     }
 
     private void setAction() {
@@ -128,6 +137,14 @@ public class PageDetailActivity extends AppCompatActivity {
         // set interaction between viewPager & tabLayout
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
+        mAppbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                float percentage = ((float)Math.abs(verticalOffset)/appBarLayout.getTotalScrollRange());
+                mTitleToolbar.setAlpha(percentage);
+            }
+        });
     }
 
     private void bindItem() {
@@ -135,8 +152,11 @@ public class PageDetailActivity extends AppCompatActivity {
         mTitle.setText(mPageData.getPageName());
         mTitleToolbar.setText(mPageData.getPageName());
 
-        Glide.with(PageDetailActivity.this).load(mPageData.getProfileImage()).into(mProfile);
-        Glide.with(PageDetailActivity.this).load(mPageData.getCoverImage()).into(mCover);
+        Glide.with(PageDetailActivity.this).load(mPageData.getProfileImage())
+                .transition(new DrawableTransitionOptions().crossFade()).into(mProfile);
+
+        Glide.with(PageDetailActivity.this).load(mPageData.getCoverImage())
+                .transition(new DrawableTransitionOptions().crossFade()).into(mCover);
     }
 
     private void getFacebookPageInfo() {
@@ -248,6 +268,17 @@ public class PageDetailActivity extends AppCompatActivity {
                 Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to get user ");
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+
+            case R.id.button_back:
+                Glide.get(this).clearMemory();
+                this.finish();
+                break;
+        }
     }
 
     private class ViewPagerAdapter extends FragmentStatePagerAdapter {

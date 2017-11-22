@@ -91,6 +91,7 @@ public class RecommendVideoActivity extends YouTubeBaseActivity implements YouTu
                 final MediaController mediaController = new MediaController(this);
                 mFacebookPlayerView.setVisibility(VISIBLE);
                 mFacebookPlayerView.setMediaController(mediaController);
+                Log.e("CHECK_VIDEO_URL", mOriginVideo.getVideoUrl());
                 mFacebookPlayerView.setVideoURI(Uri.parse(mOriginVideo.getVideoUrl()));
                 mFacebookPlayerView.start();
                 break;

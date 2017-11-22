@@ -92,6 +92,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
+                android:elevation="4dp"
                 android:scaleType="fitXY"
                 app:srcCompat="@drawable/ic_arrow" />
 
@@ -115,7 +116,8 @@
                     <taewon.navercorp.integratedsns.customview.GridImageView
                         android:id="@+id/layout_gridImageView"
                         android:layout_width="match_parent"
-                        android:layout_height="350dp">
+                        android:layout_height="350dp"
+                        android:layout_marginTop="16dp">
 
                     </taewon.navercorp.integratedsns.customview.GridImageView>
 

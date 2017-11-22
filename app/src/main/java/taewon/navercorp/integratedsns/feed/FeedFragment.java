@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -102,6 +103,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private RecyclerView.LayoutManager mFeedLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
 //    private RelativeLayout mLayoutDisconnection;
+    private FrameLayout mLayoutTitle;
 
     private Realm mRealm;
     private SimpleDateFormat mStringFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
@@ -109,6 +111,10 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private int mAsyncCount = 0;
     private int mLastPosition = 0;
+
+    // recyclerView scroll state
+    public static final int SCROLL_UP = 0;
+    public static final int SCROLL_DOWN = 1;
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
@@ -189,7 +195,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onReceive(Context context, Intent intent) {
 
                 if (!mRefreshLayout.isRefreshing()) {
-                    int currentPosition = ((LinearLayoutManager) mFeedLayoutManager).findFirstCompletelyVisibleItemPosition();
+                    int currentPosition = ((LinearLayoutManager) mFeedLayoutManager).findFirstVisibleItemPosition();
                     if (currentPosition == 0) {
                         scrollToLastPosition(mLastPosition);
                         mLastPosition = 0;
@@ -211,6 +217,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
         mRefreshLayout.setOnRefreshListener(this);
 
+        mLayoutTitle = (FrameLayout) view.findViewById(R.id.layout_title);
+
         // view for disconnection
 //        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
 
@@ -231,7 +239,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                 loadMore();
                 Glide.get(getContext()).clearMemory();
-//                Glide.get(getContext()).clearDiskCache();
             }
         };
         mFeedList.addOnScrollListener(mPagingListener);
@@ -274,11 +281,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             mFeedLayoutManager.scrollToPosition(5);
         }
         mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
-        mFeedLayoutManager.scrollToPosition(0);
+//        mFeedLayoutManager.scrollToPosition(1);
     }
 
     private void scrollToLastPosition(int position) {
 
+        Log.d("POSITION", String.valueOf(position));
         if (position < 0) {
             return;
         }
@@ -288,7 +296,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             mFeedLayoutManager.scrollToPosition(position - 5);
         }
         mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
-        mFeedLayoutManager.scrollToPosition(position);
     }
 
     // send status of asyncTasks
