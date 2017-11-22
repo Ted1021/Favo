@@ -21,13 +21,12 @@
 
     <!--<color name="deepGray">#212121</color>-->
     <!--<color name="darkGray">#303030</color>-->
-    <color name="lightGray">#2d2d2e</color>
+    <!--<color name="lightGray">#2C2C2C</color>-->
 
     <color name="deepGray">#000000</color>
     <color name="darkGray">#212121</color>
-    <!--<color name="lightGray">#2C2C2C</color>-->
-    <color name="midNightBlack">#16171A</color>
-
+    <color name="lightGray">#232123</color>
+    <color name="midNightBlack">#1B191B</color>
 
     <color name="primaryTextColor">#FFFFFFFF</color>
     <color name="secondaryTextColor">#b3ffffff</color>

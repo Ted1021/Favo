@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
@@ -14,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -28,11 +31,11 @@ import java.util.Vector;
 
 import io.realm.Realm;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.customview.GridImageView;
 import taewon.navercorp.integratedsns.feed.comment.CommentActivity;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 import taewon.navercorp.integratedsns.page.PageDetailActivity;
-import taewon.navercorp.integratedsns.customview.GridImageView;
 import taewon.navercorp.integratedsns.util.RealmDataConvertingHelper;
 import taewon.navercorp.integratedsns.video.RecommendVideoActivity;
 
@@ -304,6 +307,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
             case CONTENTS_IMAGE:
                 Glide.with(mContext).load(data.getPicture())
                         .apply(new RequestOptions().override(holder.mPicture.getMaxWidth()))
+                        .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
                         .transition(new DrawableTransitionOptions().crossFade())
                         .into(holder.mPicture);
                 break;
@@ -314,7 +318,12 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.ViewHo
                 break;
 
             case CONTENTS_VIDEO:
+
+                Animation fadeInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fade_in);
+                holder.mPlay.startAnimation(fadeInAnimation);
+
                 Glide.with(mContext.getApplicationContext()).load(data.getPicture())
+                        .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
                         .apply(new RequestOptions().override(864, 486))
                         .apply(new RequestOptions().centerCrop())
                         .transition(new DrawableTransitionOptions().crossFade())

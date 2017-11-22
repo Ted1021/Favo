@@ -28,7 +28,6 @@ import com.pinterest.android.pdk.PDKCallback;
 import com.pinterest.android.pdk.PDKClient;
 import com.pinterest.android.pdk.PDKException;
 import com.pinterest.android.pdk.PDKResponse;
-import com.yayandroid.parallaxrecyclerview.ParallaxRecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,7 +63,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     private BroadcastReceiver mTokenUpdateReceiver;
 
     private Spinner mSpinner;
-    private ParallaxRecyclerView mFollowingList;
+    private RecyclerView mFollowingList;
     private FollowingListAdapter mAdapter;
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
@@ -142,8 +141,7 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         // view for disconnection
         mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
 
-        mFollowingList = (ParallaxRecyclerView) view.findViewById(R.id.recyclerView_following);
-        mFollowingList.setHasFixedSize(true);
+        mFollowingList = (RecyclerView) view.findViewById(R.id.recyclerView_following);
 
         mAdapter = new FollowingListAdapter(getContext(), mDataset);
         mFollowingList.setAdapter(mAdapter);

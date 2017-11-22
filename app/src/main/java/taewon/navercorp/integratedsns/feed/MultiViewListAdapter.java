@@ -1,6 +1,8 @@
 package taewon.navercorp.integratedsns.feed;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +67,7 @@ public class MultiViewListAdapter extends RecyclerView.Adapter<MultiViewListAdap
         Glide.with(mContext).load(mDataset.getProfileImage()).apply(new RequestOptions().circleCropTransform()).into(holder.mProfile);
         Glide.with(mContext).load(data.getSrc())
                 .apply(new RequestOptions().override(data.getWidth(), data.getHeight()))
+                .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
                 .transition(new DrawableTransitionOptions().crossFade())
                 .into(holder.mImage);
     }

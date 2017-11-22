@@ -1,12 +1,15 @@
 package taewon.navercorp.integratedsns.customview;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 
@@ -156,7 +159,6 @@ public class GridImageView extends GridLayout {
         for (int i = 0; i < spanCount; i++) {
 
             ImageView imageView = new ImageView(getContext());
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(4, 4, 4, 4);
 
             if (i == 0) {
@@ -169,6 +171,8 @@ public class GridImageView extends GridLayout {
 
             Glide.with(getContext())
                     .load(imageset.get(i).getSrc())
+                    .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
+                    .apply(new RequestOptions().centerCrop())
                     .transition(new DrawableTransitionOptions().crossFade())
                     .into(imageView);
         }
