@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
@@ -158,8 +160,11 @@ public class GridImageView extends GridLayout {
         int spanCount = (imageCount <= 4) ? imageCount : 4;
         for (int i = 0; i < spanCount; i++) {
 
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             ImageView imageView = new ImageView(getContext());
             imageView.setPadding(4, 4, 4, 4);
+            imageView.setLayoutParams(layoutParams);
+
 
             if (i == 0) {
                 imageView.setLayoutParams(mHeaderItemParam);

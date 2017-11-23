@@ -102,10 +102,11 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_gravity="right|center_vertical"
+                        android:adjustViewBounds="true"
                         android:background="?android:attr/selectableItemBackground"
                         android:foreground="@android:color/transparent"
-                        android:scaleType="center"
-                        app:srcCompat="@drawable/ic_action_search" />
+                        android:scaleType="centerInside"
+                        app:srcCompat="@drawable/ic_action_setting" />
                 </FrameLayout>
 
             </android.support.v7.widget.Toolbar>
@@ -121,18 +122,30 @@
             android:background="@android:color/black"
             app:tabIndicatorColor="@android:color/transparent"
             app:tabSelectedTextColor="@android:color/white"
-            app:tabTextAppearance="@style/CustomTabItemTextSize"
+            app:tabTextAppearance="@style/TextAppearance.AppCompat"
             app:tabTextColor="@color/lightGray">
 
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="following" />
+                android:text="FACEBOOK" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/tabItem2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="YOUTUBE" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/tabItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PINTEREST" />
 
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="my pin" />
+                android:text="TWITCH" />
 
         </android.support.design.widget.TabLayout>
 

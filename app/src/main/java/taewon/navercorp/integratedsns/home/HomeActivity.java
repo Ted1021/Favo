@@ -26,7 +26,7 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.live.LiveStreamingFragment;
 import taewon.navercorp.integratedsns.profile.ProfileFragment;
-import taewon.navercorp.integratedsns.search.SearchFragment;
+import taewon.navercorp.integratedsns.profile.pin.LibraryFragment;
 import taewon.navercorp.integratedsns.today.TodayFragment;
 
 /**
@@ -38,7 +38,10 @@ import taewon.navercorp.integratedsns.today.TodayFragment;
 
 public class HomeActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
-    private Fragment[] mFragmentList = new Fragment[MAX_FRAGMENT];
+    private Fragment[] mFragmentList;
+    private int[] mSelectedIconList = new int[MAX_FRAGMENT];
+    private int[] mUnSelectedIconList = new int[MAX_FRAGMENT];
+
     private TabLayout mTabLayout;
     private FragmentManager mFragmentManager;
     private LinearLayout mTabStrip;
@@ -51,8 +54,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
     // fragment index
     private static final int TAB_TODAY = 0;
     private static final int TAB_FEED = 1;
-    private static final int TAB_SEARCH = 2;
-    private static final int TAB_LIVE = 3;
+    private static final int TAB_LIVE = 2;
+    private static final int TAB_LIBRARY = 3;
     private static final int TAB_PROFILE = 4;
     private static final int MAX_FRAGMENT = 5;
 
@@ -128,10 +131,10 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
                         }
                         break;
 
-                    case TAB_SEARCH:
-                        if (mFragmentList[TAB_SEARCH] == null) {
-                            fragment = SearchFragment.newInstance();
-                            mFragmentList[TAB_SEARCH] = fragment;
+                    case TAB_LIBRARY:
+                        if (mFragmentList[TAB_LIBRARY] == null) {
+                            fragment = LibraryFragment.newInstance();
+                            mFragmentList[TAB_LIBRARY] = fragment;
                         }
                         break;
 

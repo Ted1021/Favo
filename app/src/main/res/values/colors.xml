@@ -25,13 +25,23 @@
 
     <color name="deepGray">#000000</color>
     <color name="darkGray">#212121</color>
-    <color name="lightGray">#302d30</color>
+    <!--<color name="lightGray">#302d30</color>    -->
+    <color name="lightGray">#424242</color>
+
     <color name="midNightBlack">#1B191B</color>
 
     <color name="primaryTextColor">#FFFFFFFF</color>
     <color name="secondaryTextColor">#b3ffffff</color>
-    <color name="hintTextColor">#80FFFFFF</color>
-    <color name="divider">#1FFFFFFF</color>
+    <color name="hintTextColor">#80ffffff</color>
+    <color name="divider">#1fffffff</color>
     <color name="darkFilter">#8e8e8e</color>
+
+    <!--<color name="primaryTextColor">#d9000000</color>-->
+    <!--<color name="secondaryTextColor">#8c000000</color>-->
+    <!--<color name="hintTextColor">#66000000</color>-->
+    <!--<color name="divider">#1FFFFFFF</color>-->
+    <!--<color name="darkFilter">#8e8e8e</color>-->
+
+    <color name="colorAppTheme">#41a6e7</color>
 
 </resources>

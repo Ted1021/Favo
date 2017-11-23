@@ -1,10 +1,11 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="bottom"
-    android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context="taewon.navercorp.integratedsns.profile.pin.LibraryFragment">
+
 
     <FrameLayout
         android:id="@+id/layout_title"
@@ -19,36 +20,32 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical|center_horizontal"
             android:gravity="center_vertical|center_horizontal"
-            android:text="FEED"
+            android:text="LIBRARY"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
 
         <ImageButton
             android:id="@+id/button_search"
+            app:srcCompat="@drawable/ic_action_search"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="right|center_vertical"
             android:background="?android:attr/selectableItemBackground"
             android:foreground="@android:color/transparent"
-            android:scaleType="center"
-            app:srcCompat="@drawable/ic_action_search" />
+            android:scaleType="center" />
     </FrameLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible">
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView_feed"
+            android:id="@+id/recyclerView_myFeed"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/black"
-            android:overScrollMode="always" />
+            android:background="@color/deepGray" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
-
-
 
 </LinearLayout>

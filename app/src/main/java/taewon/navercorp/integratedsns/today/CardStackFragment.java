@@ -9,9 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -20,11 +18,6 @@ import com.bumptech.glide.request.RequestOptions;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
-
-import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
-import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
-import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
-import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,11 +29,9 @@ public class CardStackFragment extends Fragment implements View.OnClickListener 
     private GestureDetector mGestureDetector;
 
     // common components
-    private TextView mUserName, mUploadTime, mDescription, mComment;
-    private ImageView mProfile, mPicture, mPlatformType;
+    private TextView mUserName, mDescription;
+    private ImageView mPicture;
     private Button mShare, mMore;
-    private FrameLayout mPageDetail;
-    private LinearLayout mCommentDetail;
 
     private static String ARG_PARM1 = "FAVO_DATA";
 
@@ -77,32 +68,14 @@ public class CardStackFragment extends Fragment implements View.OnClickListener 
     private void initView(View view) {
 
         mUserName = (TextView) view.findViewById(R.id.textView_userName);
-        mUploadTime = (TextView) view.findViewById(R.id.textView_uploadTime);
         mDescription = (TextView) view.findViewById(R.id.textView_description);
-
-        mProfile = (ImageView) view.findViewById(R.id.imageView_profile);
-        mPlatformType = (ImageView) view.findViewById(R.id.imageView_platformType);
         mPicture = (ImageView) view.findViewById(R.id.imageView_picture);
-//        mPicture.setOnClickListener(this);
-        mComment = (TextView) view.findViewById(R.id.textView_comment);
-        mComment.setOnClickListener(this);
-        mPageDetail = (FrameLayout) view.findViewById(R.id.layout_page_detail);
-        mPageDetail.setOnClickListener(this);
-        mCommentDetail = (LinearLayout) view.findViewById(R.id.layout_comment);
-        mCommentDetail.setOnClickListener(this);
     }
 
     private void initData() {
 
-        mUploadTime.setText(data.getCreatedTime());
         mUserName.setText(data.getUserName());
         mDescription.setText(data.getDescription());
-        mComment.setText(data.getCommentCount() + "");
-
-        Glide.with(getContext().getApplicationContext()).load(data.getProfileImage())
-                .apply(new RequestOptions().circleCropTransform())
-                .transition(new DrawableTransitionOptions().crossFade())
-                .into(mProfile);
 
         Glide.with(getContext().getApplicationContext()).load(data.getPicture())
                 .apply(new RequestOptions().override(864, 486))
@@ -110,27 +83,7 @@ public class CardStackFragment extends Fragment implements View.OnClickListener 
 //                .thumbnail(0.5f)
                 .transition(new DrawableTransitionOptions().crossFade())
                 .into(mPicture);
-
-        switch (data.getPlatformType()) {
-
-            case PLATFORM_FACEBOOK:
-                Glide.with(getContext().getApplicationContext()).load(R.drawable.icon_facebook_small).into(mPlatformType);
-                break;
-
-            case PLATFORM_YOUTUBE:
-                Glide.with(getContext().getApplicationContext()).load(R.drawable.icon_youtube_small).into(mPlatformType);
-                break;
-
-            case PLATFORM_PINTEREST:
-                Glide.with(getContext().getApplicationContext()).load(R.drawable.icon_pinterest_small).into(mPlatformType);
-                break;
-
-            case PLATFORM_TWITCH:
-                Glide.with(getContext().getApplicationContext()).load(R.drawable.twitch_icon_small).into(mPlatformType);
-                break;
-        }
     }
-
 
     @Override
     public void onClick(View v) {

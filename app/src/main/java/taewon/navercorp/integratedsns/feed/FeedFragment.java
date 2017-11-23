@@ -267,7 +267,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void refreshDataset() {
 
-//        mFeedAdapter.notifyDataSetChanged();
+        mFeedAdapter.notifyDataSetChanged();
         if (mLastPosition > mFeedDataset.size() - 1) {
             mLastPosition = mFeedDataset.size() - 1;
         }
@@ -476,7 +476,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     data.setDescription(pin.getNote());
 
                     mFeedDataset.add(data);
-                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+//                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
 
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
@@ -594,8 +594,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setDescription(item.getSnippet().getTitle());
 
                         mFeedDataset.add(data);
-//                        mFeedAdapter.notifyDataSetChanged();
-                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+//                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                     }
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
@@ -699,7 +698,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                         data.setDescription(item.getTitle());
 
                         mFeedDataset.add(data);
-                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+//                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                     }
 
                 } else {

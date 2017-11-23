@@ -19,24 +19,34 @@ import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MyPinFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class LibraryFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private Realm mRealm;
     private RecyclerView mSaveFeedList;
-    private MyPinListAdapter mAdapter;
+    private LibraryListAdapter mAdapter;
     private RealmResults<FavoMyPinData> mDataset;
+
+    private static boolean isInit;
 
     private SwipeRefreshLayout mRefreshLayout;
 
-    public MyPinFragment() {
+    public static LibraryFragment newInstance() {
+        LibraryFragment fragment = new LibraryFragment();
+        isInit = true;
+        return fragment;
+    }
+
+    public LibraryFragment() {
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_my_pin, container, false);
+        View view = inflater.inflate(R.layout.fragment_library, container, false);
 
+        if(isInit == true){
+        }
         initData();
         initView(view);
 
@@ -65,7 +75,7 @@ public class MyPinFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mRefreshLayout.setOnRefreshListener(this);
 
         mSaveFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_myFeed);
-        mAdapter = new MyPinListAdapter(mDataset, true, getContext());
+        mAdapter = new LibraryListAdapter(mDataset, true, getContext());
         mSaveFeedList.setAdapter(mAdapter);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());

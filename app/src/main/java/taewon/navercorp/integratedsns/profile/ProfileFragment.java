@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,9 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.profile.following.FollowingListFragment;
-import taewon.navercorp.integratedsns.profile.pin.MyPinFragment;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
@@ -49,6 +48,8 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE
  */
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
+    private Fragment[] mFragmentList = new Fragment[MAX_FRAGMENT];
+
     private FavoTokenManager mFavoTokenManager;
     private BroadcastReceiver mTokenUpdateReceiver;
     private PDKClient mPinterestClient;
@@ -62,9 +63,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private static boolean isInit;
 
-    private static final int TAB_COUNT = 2;
-    private static final int TAB_FOLLOWING = 0;
-    private static final int TAB_MY_PIN = 1;
+    // fragment index
+    private static final int TAB_FACEBOOK = 0;
+    private static final int TAB_YOUTUBE = 1;
+    private static final int TAB_PINTEREST = 2;
+    private static final int TAB_TWITCH = 3;
+    private static final int MAX_FRAGMENT = 4;
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
@@ -145,7 +149,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // set viewPager action
         mViewPager.setAdapter(new ViewPagerAdapter(getChildFragmentManager()));
         mViewPager.setCurrentItem(0);
-        mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setOffscreenPageLimit(4);
 
         // set interaction between viewPager & tabLayout
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
@@ -211,16 +215,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public Fragment getItem(int position) {
-
-            Fragment fragment = new FeedFragment();
+            Log.e("CHECK_POSITION", position+"");
+            Fragment fragment=FollowingListFragment.newInstance(PLATFORM_FACEBOOK);
             switch (position) {
 
-                case TAB_FOLLOWING:
-                    fragment = new FollowingListFragment();
+                case TAB_FACEBOOK:
+                    fragment = FollowingListFragment.newInstance(PLATFORM_FACEBOOK);
                     break;
 
-                case TAB_MY_PIN:
-                    fragment = new MyPinFragment();
+                case TAB_YOUTUBE:
+                    fragment = FollowingListFragment.newInstance(PLATFORM_YOUTUBE);
+                    break;
+
+                case TAB_PINTEREST:
+                    fragment = FollowingListFragment.newInstance(PLATFORM_PINTEREST);
+                    break;
+
+                case TAB_TWITCH:
+                    fragment = FollowingListFragment.newInstance(PLATFORM_TWITCH);
                     break;
             }
             return fragment;
@@ -228,7 +240,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public int getCount() {
-            return TAB_COUNT;
+            return MAX_FRAGMENT;
         }
     }
 }

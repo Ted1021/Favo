@@ -7,20 +7,12 @@
     android:orientation="vertical"
     tools:context="taewon.navercorp.integratedsns.profile.following.FollowingListFragment">
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginBottom="8dp"
-        android:entries="@array/platform"
-        android:textColor="#ffffffff" />
-
     <RelativeLayout
         android:id="@+id/layout_disconnection"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/deepGray">
+        android:background="@color/deepGray"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/imageView"
@@ -38,7 +30,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:text="No data"
-            android:textColor="@android:color/white"
+            android:textColor="@color/secondaryTextColor"
             android:textSize="20sp" />
 
         <TextView
@@ -49,7 +41,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="12dp"
             android:text="Please connect to SNS"
-            android:textColor="@color/colorCremeWhite" />
+            android:textColor="@color/hintTextColor" />
 
     </RelativeLayout>
 

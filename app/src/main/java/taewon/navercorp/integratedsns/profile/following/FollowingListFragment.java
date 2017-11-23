@@ -15,9 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -48,6 +46,7 @@ import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
@@ -57,25 +56,30 @@ import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL
 public class FollowingListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private FavoTokenManager mFavoTokenManager;
-
     private PDKClient mPinterestClient;
-
     private BroadcastReceiver mTokenUpdateReceiver;
-
-    private Spinner mSpinner;
     private RecyclerView mFollowingList;
     private FollowingListAdapter mAdapter;
     private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mLayoutDisconnection;
-
     private ArrayList<FavoFollowingInfoData> mDataset = new ArrayList<>();
-
-    private String mCurrentPlatform = PLATFORM_FACEBOOK;
 
     private static final String BOARD_FIELDS = "id,name, created_at, creator, image, url";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
     private static final int MAX_COUNTS = 10;
+    private static final String ARG_PARAM1 = "PLATFORM_TYPE";
 
+    private static String mPlatformType;
+
+    public static FollowingListFragment newInstance(String platformType){
+
+        FollowingListFragment fragment = new FollowingListFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, platformType);
+        fragment.setArguments(args);
+        mPlatformType = platformType;
+        return fragment;
+    }
     public FollowingListFragment() {
 
     }
@@ -93,20 +97,25 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_following_list, container, false);
-
         initData();
         initView(view);
+        setFollowingList(mPlatformType);
 
         return view;
     }
 
     private void initData() {
 
+        // init page data
+        if (getArguments() != null) {
+            mPlatformType = getArguments().getString(ARG_PARAM1);
+        }
+
         // init update token status receiver
         mTokenUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                setFollowingList(mCurrentPlatform);
+                setFollowingList(mPlatformType);
             }
         };
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mTokenUpdateReceiver, new IntentFilter(getString(R.string.update_token_status)));
@@ -124,20 +133,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
         mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
         mRefreshLayout.setOnRefreshListener(this);
 
-        mSpinner = (Spinner) view.findViewById(R.id.spinner);
-        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mCurrentPlatform = parent.getSelectedItem().toString();
-                setFollowingList(mCurrentPlatform);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
         // view for disconnection
         mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
 
@@ -153,30 +148,28 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
     private void setFollowingList(String platformType) {
 
-        mDataset.clear();
-        mAdapter.notifyDataSetChanged();
-        mLayoutDisconnection.setVisibility(View.VISIBLE);
         switch (platformType) {
-
             case PLATFORM_FACEBOOK:
+                Log.e("CHECK_INIT", ">>>>>>>>>>>>>" + platformType);
                 if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
-                    mLayoutDisconnection.setVisibility(View.GONE);
                     getFacebookUserPages();
                 }
                 break;
 
             case PLATFORM_YOUTUBE:
                 if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
-                    mLayoutDisconnection.setVisibility(View.GONE);
                     getYoutubeSubscriptionList();
                 }
                 break;
 
             case PLATFORM_PINTEREST:
                 if (mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
-                    mLayoutDisconnection.setVisibility(View.GONE);
                     getPinterestFollowingBoards();
                 }
+                break;
+
+            case PLATFORM_TWITCH:
+
                 break;
         }
     }
@@ -312,6 +305,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
         mDataset.clear();
         mAdapter.notifyDataSetChanged();
-        setFollowingList(mCurrentPlatform);
+        setFollowingList(mPlatformType);
     }
 }

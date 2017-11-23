@@ -47,12 +47,12 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 
-public class MyPinListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, MyPinListAdapter.ViewHolder> {
+public class LibraryListAdapter extends RealmRecyclerViewAdapter<FavoMyPinData, LibraryListAdapter.ViewHolder> {
 
     private Context mContext;
     private LayoutInflater mLayoutInflater;
 
-    public MyPinListAdapter(@Nullable OrderedRealmCollection<FavoMyPinData> data, boolean autoUpdate, Context context) {
+    public LibraryListAdapter(@Nullable OrderedRealmCollection<FavoMyPinData> data, boolean autoUpdate, Context context) {
         super(data, autoUpdate);
 
         mContext = context;

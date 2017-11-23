@@ -5,41 +5,210 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="8dp"
+    android:background="@android:color/black"
     tools:context="taewon.navercorp.integratedsns.profile.SettingActivity">
 
-    <Switch
-        android:id="@+id/switch_facebook"
+    <FrameLayout
+        android:id="@+id/layout_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="Connect to Facebook" />
+        android:layout_height="50dp"
+        android:background="@android:color/black"
+        android:elevation="2dp">
 
-    <Switch
-        android:id="@+id/switch_youtube"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="Connect to Youtube" />
+        <TextView
+            android:id="@+id/textView_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="SETTINGS"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
 
-    <Switch
-        android:id="@+id/switch_pinterest"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="Connect to Pinterest" />
+        <ImageButton
+            android:id="@+id/button_back"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="left|center_vertical"
+            android:background="?android:attr/selectableItemBackground"
+            android:foreground="@android:color/transparent"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_action_back" />
+    </FrameLayout>
 
-    <Switch
-        android:id="@+id/switch_giphy"
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="Connect to Giphy" />
+        android:layout_margin="16dp"
+        android:text="ACCOUNTS"
+        android:textColor="@color/secondaryTextColor"
+        android:textStyle="bold" />
 
-    <Switch
-        android:id="@+id/switch_twitch"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Connect to Twitch" />
+        android:background="@color/darkGray">
+
+        <View
+            android:id="@+id/view5"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_above="@+id/tabLayout"
+            android:layout_gravity="top"
+            android:background="@color/hintTextColor" />
+
+        <Switch
+            android:id="@+id/switch_facebook"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp"
+            android:text="FACEBOOK"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/view6"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_above="@+id/tabLayout"
+            android:layout_gravity="bottom"
+            android:background="@color/hintTextColor" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darkGray">
+
+        <View
+            android:id="@+id/view8"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_above="@+id/tabLayout"
+            android:layout_gravity="bottom"
+            android:background="@color/hintTextColor" />
+
+        <Switch
+            android:id="@+id/switch_youtube"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="YOUTUBE"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darkGray">
+
+        <View
+            android:id="@+id/view10"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_above="@+id/tabLayout"
+            android:layout_gravity="bottom"
+            android:background="@color/hintTextColor" />
+
+        <Switch
+            android:id="@+id/switch_pinterest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="PINTEREST"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darkGray">
+
+        <View
+            android:id="@+id/view12"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_above="@+id/tabLayout"
+            android:layout_gravity="bottom"
+            android:background="@color/hintTextColor" />
+
+        <Switch
+            android:id="@+id/switch_twitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="TWITCH"
+            android:textStyle="bold" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darkGray">
+
+        <View
+            android:id="@+id/view14"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_above="@+id/tabLayout"
+            android:layout_gravity="bottom"
+            android:background="@color/hintTextColor" />
+
+        <Switch
+            android:id="@+id/switch_giphy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="GIPHY"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="32dp"
+        android:text="CACHE"
+        android:textColor="@color/secondaryTextColor"
+        android:textStyle="bold" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darkGray">
+
+        <View
+            android:id="@+id/view13"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_above="@+id/tabLayout"
+            android:layout_gravity="top"
+            android:background="@color/hintTextColor" />
+
+        <View
+            android:id="@+id/view15"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_above="@+id/tabLayout"
+            android:layout_gravity="bottom"
+            android:background="@color/hintTextColor" />
+
+        <Switch
+            android:id="@+id/switch_cache"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="REMOVE CACHE"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
+    </FrameLayout>
 
 </LinearLayout>
