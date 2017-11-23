@@ -2,9 +2,11 @@ package taewon.navercorp.integratedsns.interfaces;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
@@ -40,6 +42,20 @@ public interface TwitchService {
                                                           @Header("Authorization") String auth,
                                                           @Query("limit") int limit);
 
+    @PUT("/kraken/users/{user_id}/follows/channels/{channel_id}")
+    Call<ResponseBody> insertTwitchFollow(@Header("Accept") String accept,
+                                          @Header("Client-ID") String clientId,
+                                          @Header("Authorization") String auth,
+                                          @Path("user_id") String userId,
+                                          @Path("channel_id") String channelId);
+
+    @DELETE("/kraken/users/{user_id}/follows/channels/{channel_id}")
+    Call<ResponseBody> deleteTwitchFollow(@Header("Accept") String accept,
+                                          @Header("Authorization") String auth,
+                                          @Header("Client-ID") String clientId,
+                                          @Path("user_id") String userId,
+                                          @Path("channel_id") String channelId);
+
     @GET("kraken/users/{userId}/follows/channels")
     Call<TwitchUserFollowingData> getTwitchFollowingUser(@Header("Accept") String accept,
                                                          @Header("Client-ID") String clientId,
@@ -59,8 +75,8 @@ public interface TwitchService {
 
     @GET("helix/users/follows")
     Call<TwitchFollowingData> checkUserFollowingStatus(@Header("Client-ID") String clientId,
-                                                     @Query("from_id") String fromId,
-                                                     @Query("to_id") String toId);
+                                                       @Query("from_id") String fromId,
+                                                       @Query("to_id") String toId);
 
     @GET("helix/videos")
     Call<TwitchVideoData> getTwitchVideoInfo(@Header("Client-ID") String clientId,

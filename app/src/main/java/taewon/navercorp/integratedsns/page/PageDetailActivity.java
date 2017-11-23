@@ -53,6 +53,7 @@ import static android.view.View.VISIBLE;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_ACCEPT_CODE;
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
@@ -137,7 +138,7 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
 
         mFacebookPageLikeButton = (LikeView) findViewById(R.id.button_pageLike);
         mFacebookPageLikeButton.setObjectIdAndType(mPageId, LikeView.ObjectType.PAGE);
-        if(mPlatformType.equals(PLATFORM_FACEBOOK)){
+        if (mPlatformType.equals(PLATFORM_FACEBOOK)) {
             mFacebookPageLikeButton.setVisibility(VISIBLE);
         }
 
@@ -335,8 +336,8 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
         call.enqueue(new Callback<YoutubeSubscriptionData>() {
             @Override
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getItems().isEmpty()){
+                if (response.isSuccessful()) {
+                    if (response.body().getItems().isEmpty()) {
                         isFollowing = false;
                         mFollow.setVisibility(VISIBLE);
                     } else {
@@ -374,7 +375,7 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 Snackbar snackbar;
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     snackbar = Snackbar.make(mActivityLayout, "Successfully following", Snackbar.LENGTH_SHORT);
                 } else {
                     snackbar = Snackbar.make(mActivityLayout, "fail to follow", Snackbar.LENGTH_SHORT);
@@ -397,7 +398,6 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        Log.d("CHECK_ID", mPageId);
         YoutubeService service = retrofit.create(YoutubeService.class);
         Call<ResponseBody> call = service.deleteSubscription(accessToken, mYoutubeSubscriptionId);
         call.enqueue(new Callback<ResponseBody>() {
@@ -405,7 +405,7 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 Snackbar snackbar;
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     snackbar = Snackbar.make(mActivityLayout, "Successfully unFollowing", Snackbar.LENGTH_SHORT);
                 } else {
                     snackbar = Snackbar.make(mActivityLayout, "fail to unFollow", Snackbar.LENGTH_SHORT);
@@ -427,12 +427,13 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
 
-        Call<TwitchFollowingData> call = service.checkUserFollowingStatus(getString(R.string.twitch_client_id), mFavoTokenManager.getUserId(PLATFORM_TWITCH+"_id"), mPageId);
+        Call<TwitchFollowingData> call = service.checkUserFollowingStatus(getString(R.string.twitch_client_id),
+                mFavoTokenManager.getUserId(PLATFORM_TWITCH + "_id"), mPageId);
         call.enqueue(new Callback<TwitchFollowingData>() {
             @Override
             public void onResponse(Call<TwitchFollowingData> call, Response<TwitchFollowingData> response) {
-                if(response.isSuccessful()){
-                    if(response.body().getData().isEmpty()){
+                if (response.isSuccessful()) {
+                    if (response.body().getData().isEmpty()) {
                         isFollowing = false;
                         mFollow.setVisibility(VISIBLE);
                     } else {
@@ -451,12 +452,76 @@ public class PageDetailActivity extends AppCompatActivity implements View.OnClic
 
     private void followTwitchStream() {
 
+        String currentToken = "OAuth " + mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
+
+        Call<ResponseBody> call = service.insertTwitchFollow(TWITCH_ACCEPT_CODE,
+                getString(R.string.twitch_client_id),
+                currentToken,
+                mFavoTokenManager.getUserId(PLATFORM_TWITCH + "_id"),
+                mPageId);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Snackbar snackbar;
+                    if (response.isSuccessful()) {
+                        snackbar = Snackbar.make(mActivityLayout, "Successfully Following", Snackbar.LENGTH_SHORT);
+                    } else {
+                        snackbar = Snackbar.make(mActivityLayout, "fail to Follow", Snackbar.LENGTH_SHORT);
+                    }
+                    snackbar.show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
 
     }
 
     private void unFollowTwitchStream() {
+        String currentToken = "OAuth " + mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
 
+        Call<ResponseBody> call = service.deleteTwitchFollow(TWITCH_ACCEPT_CODE,
+                currentToken,
+                getString(R.string.twitch_client_id),
+                mFavoTokenManager.getUserId(PLATFORM_TWITCH + "_id"),
+                mPageId);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Snackbar snackbar;
+                    if (response.isSuccessful()) {
+                        snackbar = Snackbar.make(mActivityLayout, "Successfully Following", Snackbar.LENGTH_SHORT);
+                    } else {
+                        snackbar = Snackbar.make(mActivityLayout, "fail to Follow", Snackbar.LENGTH_SHORT);
+                    }
+                    snackbar.show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     private class ViewPagerAdapter extends FragmentStatePagerAdapter {
