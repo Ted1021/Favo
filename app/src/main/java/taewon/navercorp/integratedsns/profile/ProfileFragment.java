@@ -171,7 +171,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-
                         try {
                             mUserName.setText(response.getJSONObject().getString("name"));
                             Glide.with(getContext().getApplicationContext())
@@ -202,7 +201,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                 Intent intent = new Intent(getActivity(), SettingActivity.class);
                 startActivity(intent);
-
                 break;
         }
     }
@@ -215,27 +213,22 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public Fragment getItem(int position) {
-            Log.e("CHECK_POSITION", position+"");
-            Fragment fragment=FollowingListFragment.newInstance(PLATFORM_FACEBOOK);
+            Log.e("CHECK_", position+"");
             switch (position) {
 
                 case TAB_FACEBOOK:
-                    fragment = FollowingListFragment.newInstance(PLATFORM_FACEBOOK);
-                    break;
+                    return FollowingListFragment.newInstance(PLATFORM_FACEBOOK);
 
                 case TAB_YOUTUBE:
-                    fragment = FollowingListFragment.newInstance(PLATFORM_YOUTUBE);
-                    break;
+                    return FollowingListFragment.newInstance(PLATFORM_YOUTUBE);
 
                 case TAB_PINTEREST:
-                    fragment = FollowingListFragment.newInstance(PLATFORM_PINTEREST);
-                    break;
+                    return FollowingListFragment.newInstance(PLATFORM_PINTEREST);
 
                 case TAB_TWITCH:
-                    fragment = FollowingListFragment.newInstance(PLATFORM_TWITCH);
-                    break;
+                    return FollowingListFragment.newInstance(PLATFORM_TWITCH);
             }
-            return fragment;
+            return null;
         }
 
         @Override

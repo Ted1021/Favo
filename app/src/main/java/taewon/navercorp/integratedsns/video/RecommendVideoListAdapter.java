@@ -1,5 +1,6 @@
 package taewon.navercorp.integratedsns.video;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -68,7 +69,7 @@ public class RecommendVideoListAdapter extends RecyclerView.Adapter<RecyclerView
 
         @Override
         public void onClick(View v) {
-            switch(v.getId()){
+            switch (v.getId()) {
 
                 case R.id.layout_page_detail:
 
@@ -109,6 +110,9 @@ public class RecommendVideoListAdapter extends RecyclerView.Adapter<RecyclerView
                     bundle.putSerializable("FEED_DATA", mDataset.get(position));
                     intent.putExtras(bundle);
                     mContext.startActivity(intent);
+                    if (mContext instanceof Activity) {
+                        ((Activity) mContext).finish();
+                    }
                     break;
             }
         }

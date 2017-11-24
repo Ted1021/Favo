@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.profile.pin;
+package taewon.navercorp.integratedsns.library;
 
 import android.app.Activity;
 import android.content.Context;

@@ -147,10 +147,9 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     }
 
     private void setFollowingList(String platformType) {
-
+        mRefreshLayout.setRefreshing(true);
         switch (platformType) {
             case PLATFORM_FACEBOOK:
-                Log.e("CHECK_INIT", ">>>>>>>>>>>>>" + platformType);
                 if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
                     getFacebookUserPages();
                 }
@@ -177,7 +176,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
     // Facebook API Call
     private void getFacebookUserPages() {
 
-        mRefreshLayout.setRefreshing(true);
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newGraphPathRequest(
                 accessToken,
@@ -223,8 +221,6 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
     // Youtube API Call
     private void getYoutubeSubscriptionList() {
-
-        mRefreshLayout.setRefreshing(true);
 
         // get google credential access token
         String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
@@ -305,6 +301,8 @@ public class FollowingListFragment extends Fragment implements SwipeRefreshLayou
 
         mDataset.clear();
         mAdapter.notifyDataSetChanged();
-        setFollowingList(mPlatformType);
+//        setFollowingList(mPlatformType);
+
+        getFacebookUserPages();
     }
 }

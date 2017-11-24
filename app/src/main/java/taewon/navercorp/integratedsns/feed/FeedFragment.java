@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -59,6 +60,7 @@ import taewon.navercorp.integratedsns.model.twitch.TwitchUserFollowingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.search.SearchActivity;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
@@ -104,6 +106,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private SwipeRefreshLayout mRefreshLayout;
 //    private RelativeLayout mLayoutDisconnection;
     private FrameLayout mLayoutTitle;
+    private ImageButton mSearch;
 
     private Realm mRealm;
     private SimpleDateFormat mStringFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
@@ -214,6 +217,14 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     private void initView(View view) {
 
+        mSearch = (ImageButton) view.findViewById(R.id.button_search);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
         mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
         mRefreshLayout.setOnRefreshListener(this);
 
@@ -227,6 +238,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mFeedAdapter = new FeedListAdapter(getContext(), mFeedDataset, mRealm);
         mFeedList.setAdapter(mFeedAdapter);
         mFeedLayoutManager = new LinearLayoutManager(getContext());
+        mFeedLayoutManager.setItemPrefetchEnabled(true);
         mFeedList.setLayoutManager(mFeedLayoutManager);
 
         mPagingListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) mFeedLayoutManager) {

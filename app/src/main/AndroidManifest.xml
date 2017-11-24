@@ -76,7 +76,8 @@
             android:name=".search.more.SearchDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity android:name=".feed.MultiViewActivity" />
-        <activity android:name=".video.VideoActivity"></activity>
+        <activity android:name=".video.VideoActivity" />
+        <activity android:name=".search.SearchActivity"></activity>
     </application>
 
 </manifest>

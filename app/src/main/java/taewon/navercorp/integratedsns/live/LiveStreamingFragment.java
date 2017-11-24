@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.live;
 
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
@@ -34,6 +36,7 @@ import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.search.SearchActivity;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
@@ -53,6 +56,8 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
     private RecyclerView mLiveStreamingList;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutmanager;
+
+    private ImageButton mSearch;
 
     private SwipeRefreshLayout mRefreshLayout;
 
@@ -88,6 +93,15 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
     }
 
     private void initView(View view) {
+
+        mSearch = (ImageButton) view.findViewById(R.id.button_search);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
 
         mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
         mRefreshLayout.setOnRefreshListener(this);

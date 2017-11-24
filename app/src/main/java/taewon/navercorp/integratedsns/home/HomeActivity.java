@@ -26,7 +26,7 @@ import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.live.LiveStreamingFragment;
 import taewon.navercorp.integratedsns.profile.ProfileFragment;
-import taewon.navercorp.integratedsns.profile.pin.LibraryFragment;
+import taewon.navercorp.integratedsns.library.LibraryFragment;
 import taewon.navercorp.integratedsns.today.TodayFragment;
 
 /**

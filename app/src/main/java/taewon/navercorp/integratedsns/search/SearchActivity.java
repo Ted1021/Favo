@@ -1,13 +1,19 @@
-package taewon.navercorp.integratedsns.search.more;
+package taewon.navercorp.integratedsns.search;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -33,104 +39,130 @@ import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.search.more.SearchDetailActivity;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
-import static taewon.navercorp.integratedsns.util.AppController.RESULT_PAGE;
-import static taewon.navercorp.integratedsns.util.AppController.RESULT_PHOTO;
-import static taewon.navercorp.integratedsns.util.AppController.RESULT_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_ACCEPT_CODE;
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
-public class SearchDetailActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements EditText.OnEditorActionListener {
 
     private FavoTokenManager mFavoTokenManager;
 
-    private RecyclerView mSearchDetailList;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private ArrayList<FavoSearchResultData> mDataset = new ArrayList<>();
+    private EditText mSearch;
+    private SearchResultLayout mPageResult, mVideoResult;
     private ImageButton mBack;
 
-    private int mResultType;
-    private String mQuery;
+    private ArrayList<FavoSearchResultData> mPageDataset = new ArrayList<>();
+    private ArrayList<FavoSearchResultData> mVideoDataset = new ArrayList<>();
+    private ArrayList<FavoSearchResultData> mPhotoDataset = new ArrayList<>();
 
-    private static final int MAX_COUNT = 20;
+    private String mQuery;
+    private BroadcastReceiver mSearchDetailReceiver;
+
+    private static boolean isInit;
+    private static final int RESULT_PAGE = 0;
+    private static final int RESULT_VIDEO = 1;
+    private static final int RESULT_PHOTO = 2;
+    private static final int MAX_PAGE_COUNT = 6;
+    private static final int MAX_VIDEO_COUNT = 3;
+    private static final int MAX_PHOTO_COUNT = 4;
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(SearchActivity.this).unregisterReceiver(mSearchDetailReceiver);
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_detail);
+        setContentView(R.layout.activity_search);
 
-        initData();
         initView();
-        getSearchResult();
+        initData();
+    }
+
+    private void initView() {
+
+        mPageResult = (SearchResultLayout) findViewById(R.id.layout_resultPage);
+        mVideoResult = (SearchResultLayout) findViewById(R.id.layout_resultVideo);
+
+        mPageResult.setView(RESULT_PAGE, SearchActivity.this, mPageDataset);
+        mVideoResult.setView(RESULT_VIDEO, SearchActivity.this, mVideoDataset);
+
+        mSearch = (EditText) findViewById(R.id.editText_search);
+        mSearch.setOnEditorActionListener(this);
+
+        mBack = (ImageButton) findViewById(R.id.button_back);
+        mBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchActivity.this.finish();
+            }
+        });
     }
 
     private void initData() {
 
         mFavoTokenManager = FavoTokenManager.getInstance();
 
-        mResultType = getIntent().getIntExtra("RESULT_TYPE", 0);
-        mQuery = getIntent().getStringExtra("QUERY");
-    }
-
-    private void getSearchResult() {
-
-        mDataset.clear();
-        mAdapter.notifyDataSetChanged();
-
-        switch (mResultType) {
-
-            case RESULT_PAGE:
-                loadPageSearchResult();
-                break;
-
-            case RESULT_VIDEO:
-                loadVideoSearchResult();
-                break;
-
-            case RESULT_PHOTO:
-                break;
-        }
-    }
-
-    private void initView() {
-
-        mBack = (ImageButton) findViewById(R.id.button_back);
-        mBack.setOnClickListener(new View.OnClickListener() {
+        // request search detail receiver
+        mSearchDetailReceiver = new BroadcastReceiver() {
             @Override
-            public void onClick(View v) {
-                SearchDetailActivity.this.finish();
+            public void onReceive(Context context, Intent intent) {
+                if (mQuery != null ) {
+                    requestSearchDetail(intent.getIntExtra("RESULT_TYPE", 0));
+                }
             }
-        });
-
-        switch (mResultType) {
-
-            case RESULT_PAGE:
-                mAdapter = new SearchDetailListAdapter(this, mDataset, RESULT_PAGE);
-                mLayoutManager = new LinearLayoutManager(this);
-                break;
-
-            case RESULT_VIDEO:
-                mAdapter = new SearchDetailListAdapter(this, mDataset, RESULT_VIDEO);
-                mLayoutManager = new LinearLayoutManager(this);
-                break;
-
-            case RESULT_PHOTO:
-                mAdapter = new SearchDetailListAdapter(this, mDataset, RESULT_PHOTO);
-                mLayoutManager = new GridLayoutManager(this, 2);
-                break;
-        }
-        mSearchDetailList = (RecyclerView) findViewById(R.id.recyclerView_searchDetail);
-        mSearchDetailList.setAdapter(mAdapter);
-        mSearchDetailList.setLayoutManager(mLayoutManager);
+        };
+        LocalBroadcastManager.getInstance(SearchActivity.this).registerReceiver(mSearchDetailReceiver, new IntentFilter(getString(R.string.search_detail_request)));
     }
 
+    private void requestSearchDetail(int resultType) {
+        Intent intent = new Intent(SearchActivity.this, SearchDetailActivity.class);
+        intent.putExtra("RESULT_TYPE", resultType);
+        intent.putExtra("QUERY", mQuery);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+        if (event == null) {
+            return false;
+        }
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            return true;
+        } else if (event.getAction() == KeyEvent.ACTION_UP) {
+
+            switch (actionId) {
+                case EditorInfo.IME_ACTION_UNSPECIFIED:
+                case EditorInfo.IME_ACTION_DONE:
+                case EditorInfo.IME_ACTION_SEARCH:
+                case EditorInfo.IME_ACTION_GO:
+                case EditorInfo.IME_ACTION_NEXT:
+
+                    mQuery = mSearch.getText().toString();
+
+                    loadPageSearchResult();
+                    loadVideoSearchResult();
+
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    // TODO - have to implement checking token logic
     private void loadPageSearchResult() {
+
+        mPageDataset.clear();
+        mPageResult.getAdapter().notifyDataSetChanged();
 
         searchFacebookPage();
         getYoutubeChannel();
@@ -139,9 +171,13 @@ public class SearchDetailActivity extends AppCompatActivity {
 
     private void loadVideoSearchResult() {
 
+        mVideoDataset.clear();
+        mVideoResult.getAdapter().notifyDataSetChanged();
+
         getYoutubeVideo();
         getTwitchVideo();
     }
+
 
     private void searchFacebookPage() {
 
@@ -166,9 +202,10 @@ public class SearchDetailActivity extends AppCompatActivity {
                                     data.setUserName(temp.getName());
                                     data.setDescription(temp.getAbout());
 
-                                    mDataset.add(data);
+                                    mPageDataset.add(data);
                                 }
-                                mAdapter.notifyDataSetChanged();
+                                mPageResult.getAdapter().notifyDataSetChanged();
+                                mPageResult.getLayoutManager().scrollToPosition(mPageDataset.size() - 1);
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -183,7 +220,7 @@ public class SearchDetailActivity extends AppCompatActivity {
         Bundle parameters = new Bundle();
         parameters.putString("q", mQuery);
         parameters.putString("type", "page");
-        parameters.putString("limit", MAX_COUNT + "");
+        parameters.putString("limit", MAX_PAGE_COUNT + "");
         parameters.putString("fields", "name,about,picture.height(1024){url},cover.height(1024){source},fan_count,description");
         request.setParameters(parameters);
         request.executeAsync();
@@ -199,7 +236,7 @@ public class SearchDetailActivity extends AppCompatActivity {
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSearchChannelData> call = service.searchChannelList(accessToken, "Snippet", MAX_COUNT, "viewCount", "channel", mQuery);
+        Call<YoutubeSearchChannelData> call = service.searchChannelList(accessToken, "Snippet", MAX_PAGE_COUNT, "viewCount", "channel", mQuery);
         call.enqueue(new Callback<YoutubeSearchChannelData>() {
             @Override
             public void onResponse(Call<YoutubeSearchChannelData> call, Response<YoutubeSearchChannelData> response) {
@@ -210,14 +247,16 @@ public class SearchDetailActivity extends AppCompatActivity {
 
                         data.setPlatformType(PLATFORM_YOUTUBE);
                         data.setPageId(item.getSnippet().getChannelId());
+                        Log.d("CHECK_CHANNEL_ID", data.getPageId());
                         data.setProfileImage(item.getSnippet().getThumbnails().getHigh().getUrl());
                         data.setUserName(item.getSnippet().getChannelTitle());
                         data.setDescription(item.getSnippet().getDescription());
 
-                        mDataset.add(data);
+                        mPageDataset.add(data);
                     }
-                    mAdapter.notifyDataSetChanged();
 
+                    mPageResult.getAdapter().notifyDataSetChanged();
+                    mPageResult.getLayoutManager().scrollToPosition(mPageDataset.size() - 1);
                 } else {
                     Log.e("ERROR_SEARCH", response.raw().toString());
                 }
@@ -238,7 +277,7 @@ public class SearchDetailActivity extends AppCompatActivity {
                 .build();
 
         TwitchService service = retrofit.create(TwitchService.class);
-        Call<TwitchSearchChannelData> call = service.searchTwitchChannel(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mQuery, MAX_COUNT);
+        Call<TwitchSearchChannelData> call = service.searchTwitchChannel(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mQuery, MAX_PAGE_COUNT);
         call.enqueue(new Callback<TwitchSearchChannelData>() {
             @Override
             public void onResponse(Call<TwitchSearchChannelData> call, Response<TwitchSearchChannelData> response) {
@@ -254,9 +293,10 @@ public class SearchDetailActivity extends AppCompatActivity {
                         data.setUserName(item.getName());
                         data.setDescription(item.getDescription());
 
-                        mDataset.add(data);
+                        mPageDataset.add(data);
                     }
-                    mAdapter.notifyDataSetChanged();
+                    mPageResult.getAdapter().notifyDataSetChanged();
+                    mPageResult.getLayoutManager().scrollToPosition(mPageDataset.size() - 1);
 
                 } else {
                     Log.e("ERROR_SEARCH", response.raw().toString());
@@ -280,7 +320,7 @@ public class SearchDetailActivity extends AppCompatActivity {
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNT, null, null, null, mQuery, "viewCount", "video", null, "KR", null);
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_VIDEO_COUNT, null, null, null, mQuery, "viewCount", "video", null, "KR", null);
         call.enqueue(new Callback<YoutubeSearchVideoData>() {
             @Override
             public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
@@ -299,9 +339,10 @@ public class SearchDetailActivity extends AppCompatActivity {
                         data.setPageId(item.getSnippet().getChannelId());
                         data.setVideoUrl(item.getId().getVideoId());
 
-                        mDataset.add(data);
+                        mVideoDataset.add(data);
                     }
-                    mAdapter.notifyDataSetChanged();
+                    mVideoResult.getAdapter().notifyDataSetChanged();
+
                 } else {
                     Log.e("ERROR_SEARCH", response.raw().toString());
                 }
@@ -319,32 +360,33 @@ public class SearchDetailActivity extends AppCompatActivity {
                 .baseUrl(TWITCH_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
         TwitchService service = retrofit.create(TwitchService.class);
-        Call<TwitchStreamingDataV5> call = service.searchTwitchStreams(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mQuery, MAX_COUNT);
+        Call<TwitchStreamingDataV5> call = service.searchTwitchStreams(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mQuery, MAX_VIDEO_COUNT);
         call.enqueue(new Callback<TwitchStreamingDataV5>() {
             @Override
             public void onResponse(Call<TwitchStreamingDataV5> call, Response<TwitchStreamingDataV5> response) {
-                Log.d("CHECK_SEARCH", " >>>>>>>>>>>> in");
                 if (response.isSuccessful()) {
                     TwitchStreamingDataV5 result = response.body();
 
-                    for (TwitchStreamingDataV5.Stream item : result.getStreams()) {
+                    if (result.getTotal() != 0) {
+                        for (TwitchStreamingDataV5.Stream item : result.getStreams()) {
 
-                        FavoSearchResultData data = new FavoSearchResultData();
+                            FavoSearchResultData data = new FavoSearchResultData();
 
-                        data.setPlatformType(PLATFORM_TWITCH);
-                        data.setUserName(item.getChannel().getName());
-                        data.setDescription(item.getChannel().getStatus());
-                        data.setPicture(item.getPreview().getLarge());
+                            data.setPlatformType(PLATFORM_TWITCH);
+                            data.setUserName(item.getChannel().getName());
+                            data.setDescription(item.getChannel().getStatus());
+                            data.setPicture(item.getPreview().getLarge());
 
-                        data.setFeedId(item.getChannel().getName());
-                        data.setPageId(item.getChannel().getId() + "");
-                        data.setVideoUrl(item.getChannel().getName());
+                            data.setFeedId(item.getChannel().getName());
+                            data.setPageId(item.getChannel().getId() + "");
+                            data.setVideoUrl(item.getChannel().getName());
 
-                        mDataset.add(data);
+                            mVideoDataset.add(data);
+                        }
+                        mVideoResult.getAdapter().notifyDataSetChanged();
                     }
-                    mAdapter.notifyDataSetChanged();
-
                 } else {
                     Log.e("ERROR_SEARCH", response.raw().toString());
                 }
@@ -353,6 +395,7 @@ public class SearchDetailActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<TwitchStreamingDataV5> call, Throwable t) {
                 t.printStackTrace();
+                Log.e("ERROR_SEARCH", call.toString());
             }
         });
     }
