@@ -8,6 +8,10 @@ import java.util.HashMap;
 import taewon.navercorp.integratedsns.R;
 
 import static android.content.Context.MODE_PRIVATE;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
+import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
 
 /**
  * Created by USER on 2017-11-14.
@@ -47,8 +51,25 @@ public class FavoTokenManager {
         return mPref.getString(platformType, "");
     }
 
-    public HashMap checkTokenStatus() {
-        return mFavoTokens;
+    public int getNumOfPlatforms() {
+
+        int count = 0;
+        if (isTokenVaild(PLATFORM_FACEBOOK)) {
+            count++;
+        }
+
+        if (isTokenVaild(PLATFORM_YOUTUBE)) {
+            count++;
+        }
+
+        if (isTokenVaild(PLATFORM_PINTEREST)) {
+            count++;
+        }
+
+        if (isTokenVaild(PLATFORM_TWITCH)) {
+            count++;
+        }
+        return count;
     }
 
     public void removeToken(String platFormType) {
@@ -65,5 +86,14 @@ public class FavoTokenManager {
 
     public boolean isTokenVaild(String platformType){
         return !getCurrentToken(platformType).equals("");
+    }
+
+    public void saveUserId(String platformType, String userId){
+        mEditor.putString(platformType+"_id", userId);
+        mEditor.commit();
+    }
+
+    public String getUserId(String platformType){
+        return mPref.getString(platformType+"_id", "");
     }
 }

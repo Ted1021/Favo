@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.customview.ParallaxViewPager;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
@@ -55,15 +56,17 @@ public class TodayFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_today, container, false);
 
         if(isInit){
-            checkToken();
+
             isInit = false;
         }
+        checkToken();
         initView(view);
         return view;
     }
 
     private void checkToken() {
 
+        mPlatformList.clear();
         // preference
         mFavoTokenManager = FavoTokenManager.getInstance();
 

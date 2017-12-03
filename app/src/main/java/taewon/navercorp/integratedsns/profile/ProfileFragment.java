@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import taewon.navercorp.integratedsns.R;
-import taewon.navercorp.integratedsns.feed.FeedFragment;
 import taewon.navercorp.integratedsns.profile.following.FollowingListFragment;
-import taewon.navercorp.integratedsns.profile.pin.MyPinFragment;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
@@ -48,21 +48,27 @@ import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE
  */
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
+    private Fragment[] mFragmentList = new Fragment[MAX_FRAGMENT];
+
     private FavoTokenManager mFavoTokenManager;
     private BroadcastReceiver mTokenUpdateReceiver;
     private PDKClient mPinterestClient;
 
     private ImageView mProfile;
-    private TextView mUserName, mId;
+    private TextView mUserName, mId, mTitle;
     private ImageButton mSetting;
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
+    private AppBarLayout mAppbar;
 
     private static boolean isInit;
 
-    private static final int TAB_COUNT = 2;
-    private static final int TAB_FOLLOWING = 0;
-    private static final int TAB_MY_PIN = 1;
+    // fragment index
+    private static final int TAB_FACEBOOK = 0;
+    private static final int TAB_YOUTUBE = 1;
+    private static final int TAB_PINTEREST = 2;
+    private static final int TAB_TWITCH = 3;
+    private static final int MAX_FRAGMENT = 4;
 
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "created_at,creator,id,image, media,note,original_link";
@@ -117,11 +123,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         mProfile = (ImageView) view.findViewById(R.id.imageView_profile);
         mUserName = (TextView) view.findViewById(R.id.textView_userName);
-        mSetting = (ImageButton) view.findViewById(R.id.button_setting);
-        mSetting.setOnClickListener(this);
-
         mViewPager = (ViewPager) view.findViewById(R.id.viewPager);
         mTabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
+        mAppbar = (AppBarLayout) view.findViewById(R.id.appBar);
+        mTitle = (TextView) view.findViewById(R.id.textView_title);
+        mSetting = (ImageButton) view.findViewById(R.id.button_setting);
+        mSetting.setOnClickListener(this);
     }
 
     private void setProfileInfo() {
@@ -142,11 +149,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         // set viewPager action
         mViewPager.setAdapter(new ViewPagerAdapter(getChildFragmentManager()));
         mViewPager.setCurrentItem(0);
-        mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setOffscreenPageLimit(4);
 
         // set interaction between viewPager & tabLayout
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
+        mAppbar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                float percentage = ((float)Math.abs(verticalOffset)/appBarLayout.getTotalScrollRange());
+                mTitle.setAlpha(percentage);
+            }
+        });
     }
 
     private void getFacebookUserInfo() {
@@ -156,7 +171,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-
                         try {
                             mUserName.setText(response.getJSONObject().getString("name"));
                             Glide.with(getContext().getApplicationContext())
@@ -187,7 +201,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                 Intent intent = new Intent(getActivity(), SettingActivity.class);
                 startActivity(intent);
-
                 break;
         }
     }
@@ -200,24 +213,27 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public Fragment getItem(int position) {
-
-            Fragment fragment = new FeedFragment();
+            Log.e("CHECK_", position+"");
             switch (position) {
 
-                case TAB_FOLLOWING:
-                    fragment = new FollowingListFragment();
-                    break;
+                case TAB_FACEBOOK:
+                    return FollowingListFragment.newInstance(PLATFORM_FACEBOOK);
 
-                case TAB_MY_PIN:
-                    fragment = new MyPinFragment();
-                    break;
+                case TAB_YOUTUBE:
+                    return FollowingListFragment.newInstance(PLATFORM_YOUTUBE);
+
+                case TAB_PINTEREST:
+                    return FollowingListFragment.newInstance(PLATFORM_PINTEREST);
+
+                case TAB_TWITCH:
+                    return FollowingListFragment.newInstance(PLATFORM_TWITCH);
             }
-            return fragment;
+            return null;
         }
 
         @Override
         public int getCount() {
-            return TAB_COUNT;
+            return MAX_FRAGMENT;
         }
     }
 }

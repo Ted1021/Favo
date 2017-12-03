@@ -4,16 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.yayandroid.parallaxrecyclerview.ParallaxViewHolder;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 
@@ -43,23 +46,18 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public class ViewHolder extends ParallaxViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView mProfile;
         TextView mUserName;
-
-        @Override
-        public int getParallaxImageId() {
-            return R.id.imageView_profile;
-        }
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             mUserName = (TextView) itemView.findViewById(R.id.textView_userName);
             mUserName.setOnClickListener(this);
-//            mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
-//            mProfile.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
+            mProfile = (ImageView) itemView.findViewById(R.id.imageView_profile);
+            mProfile.setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
         }
 
         @Override
@@ -112,12 +110,13 @@ public class FollowingListAdapter extends RecyclerView.Adapter<FollowingListAdap
         FavoFollowingInfoData data = mDataset.get(position);
 
         holder.mUserName.setText(data.getUserName());
-        holder.getBackgroundImage().setColorFilter(Color.parseColor("#8e8e8e"), PorterDuff.Mode.MULTIPLY);
-        Glide.with(mContext.getApplicationContext()).load(data.getProfile())
-                .transition(new DrawableTransitionOptions().crossFade())
-                .into(holder.getBackgroundImage());
+        Animation fadeInAnimation = AnimationUtils.loadAnimation(mContext, R.anim.fade_in);
+        holder.mUserName.startAnimation(fadeInAnimation);
 
-        holder.getBackgroundImage().reuse();
+        Glide.with(mContext.getApplicationContext()).load(data.getProfile())
+                .apply(new RequestOptions().placeholder(new ColorDrawable(Color.BLACK)))
+                .transition(new DrawableTransitionOptions().crossFade())
+                .into(holder.mProfile);
     }
 
     @Override

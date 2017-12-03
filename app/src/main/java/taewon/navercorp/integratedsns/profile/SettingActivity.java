@@ -8,7 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -47,7 +49,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
-import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
+import taewon.navercorp.integratedsns.util.TwitchLoginActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_GIPHY;
@@ -61,6 +63,8 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
     // Auth for facebook
     private CallbackManager mCallbackManager;
+
+    private ImageButton mBack;
 
     // Auth for google (Youtube)
     private GoogleApiClient mGoogleApiClient;
@@ -146,6 +150,14 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
 
         mGiphySwitch = (Switch) findViewById(R.id.switch_giphy);
         mGiphySwitch.setOnCheckedChangeListener(this);
+
+        mBack = (ImageButton) findViewById(R.id.button_back);
+        mBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SettingActivity.this.finish();
+            }
+        });
 
         checkTokens();
     }
@@ -313,7 +325,7 @@ public class SettingActivity extends AppCompatActivity implements GoogleApiClien
                 if (response.isSuccessful()) {
 
                     String requestUrl = response.raw().request().url().toString();
-                    Intent intent = new Intent(SettingActivity.this, TwitchWebViewActivity.class);
+                    Intent intent = new Intent(SettingActivity.this, TwitchLoginActivity.class);
                     intent.putExtra("REQ_TYPE", "login");
                     intent.putExtra("REQ_URL", requestUrl);
                     startActivityForResult(intent, REQ_TWITCH_SIGN_IN);

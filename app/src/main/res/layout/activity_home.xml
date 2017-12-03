@@ -43,22 +43,22 @@
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/icon_feed" />
+            android:icon="@drawable/icon_feed_unselected" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/icon_search" />
+            android:icon="@drawable/icon_live_unselected" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/icon_live" />
+            android:icon="@drawable/icon_bookmark_unselected" />
 
         <android.support.design.widget.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/icon_profile" />
+            android:icon="@drawable/icon_profile_unselected" />
 
     </android.support.design.widget.TabLayout>
 

@@ -4,11 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="taewon.navercorp.integratedsns.feed.VideoActivity">
+    tools:context="taewon.navercorp.integratedsns.video.VideoActivity">
 
     <com.google.android.youtube.player.YouTubePlayerView
-        android:id="@+id/youtube_player_view"
+        android:id="@+id/youtube_player"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="visible" />
+
+    <WebView
+        android:id="@+id/twitch_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 </FrameLayout>

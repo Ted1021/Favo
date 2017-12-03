@@ -1,6 +1,7 @@
-package taewon.navercorp.integratedsns.profile.pin;
+package taewon.navercorp.integratedsns.library;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,34 +10,46 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.favo.FavoMyPinData;
+import taewon.navercorp.integratedsns.search.SearchActivity;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MyPinFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class LibraryFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private Realm mRealm;
     private RecyclerView mSaveFeedList;
-    private MyPinListAdapter mAdapter;
+    private LibraryListAdapter mAdapter;
     private RealmResults<FavoMyPinData> mDataset;
-
+    private ImageButton mSearch;
     private SwipeRefreshLayout mRefreshLayout;
 
-    public MyPinFragment() {
+    private static boolean isInit;
+
+    public static LibraryFragment newInstance() {
+        LibraryFragment fragment = new LibraryFragment();
+        isInit = true;
+        return fragment;
+    }
+
+    public LibraryFragment() {
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_my_pin, container, false);
+        View view = inflater.inflate(R.layout.fragment_library, container, false);
 
+        if(isInit == true){
+        }
         initData();
         initView(view);
 
@@ -57,6 +70,9 @@ public class MyPinFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         // init myPin data
         RealmQuery<FavoMyPinData> query = mRealm.where(FavoMyPinData.class);
         mDataset = query.findAll();
+        if(mDataset.size() == 0){
+
+        }
     }
 
     private void initView(View view){
@@ -65,11 +81,20 @@ public class MyPinFragment extends Fragment implements SwipeRefreshLayout.OnRefr
         mRefreshLayout.setOnRefreshListener(this);
 
         mSaveFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_myFeed);
-        mAdapter = new MyPinListAdapter(mDataset, true, getContext());
+        mAdapter = new LibraryListAdapter(mDataset, true, getContext());
         mSaveFeedList.setAdapter(mAdapter);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mSaveFeedList.setLayoutManager(layoutManager);
+
+        mSearch = (ImageButton) view.findViewById(R.id.button_search);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

@@ -24,13 +24,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.customview.VerticalCardStackViewPager;
 import taewon.navercorp.integratedsns.interfaces.GiphyService;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.giphy.GiphyImageData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingData;
-import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.model.youtube.YoutubeTrendVideoData;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.R.id.viewPager;
@@ -150,13 +151,14 @@ public class PlatformFragment extends Fragment {
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, null, null, null, "date", null,  "video", "mostPopular", "KR");
-        call.enqueue(new Callback<YoutubeSearchVideoData>() {
+        Call<YoutubeTrendVideoData> call = service.getTrendVideoList(accessToken, "snippet", MAX_COUNTS, "mostPopular", "KR");
+        call.enqueue(new Callback<YoutubeTrendVideoData>() {
             @Override
-            public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
+            public void onResponse(Call<YoutubeTrendVideoData> call, Response<YoutubeTrendVideoData> response) {
+
                 if (response.isSuccessful()) {
 
-                    for (YoutubeSearchVideoData.Item item : response.body().getItems()) {
+                    for (YoutubeTrendVideoData.Item item : response.body().getItems()) {
 
                         FavoFeedData data = new FavoFeedData();
                         Date date = null;
@@ -172,12 +174,12 @@ public class PlatformFragment extends Fragment {
                         data.setPubDate(date);
 
                         data.setPageId(item.getSnippet().getChannelId());
-                        data.setFeedId(item.getId().getVideoId());
+//                        data.setFeedId(item.getId().getVideoId());
 //                        data.setProfileImage(profileUrl);
                         data.setUserName(item.getSnippet().getChannelTitle());
                         data.setCreatedTime(mStringFormat.format(date));
                         data.setPicture(item.getSnippet().getThumbnails().getHigh().getUrl());
-                        data.setVideoUrl(item.getId().getVideoId());
+//                        data.setVideoUrl(item.getId().getVideoId());
                         data.setDescription(item.getSnippet().getTitle());
 
                         mDataset.add(data);
@@ -188,15 +190,65 @@ public class PlatformFragment extends Fragment {
 
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
+                    mFavoTokenManager.createToken(PLATFORM_YOUTUBE, "");
                 }
+
             }
 
             @Override
-            public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
+            public void onFailure(Call<YoutubeTrendVideoData> call, Throwable t) {
                 t.printStackTrace();
                 Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
             }
         });
+
+//        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, null, null, null, "date", null,  "video", "mostPopular", "KR");
+//        call.enqueue(new Callback<YoutubeSearchVideoData>() {
+//            @Override
+//            public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
+//                if (response.isSuccessful()) {
+//
+//                    for (YoutubeSearchVideoData.Item item : response.body().getItems()) {
+//
+//                        FavoFeedData data = new FavoFeedData();
+//                        Date date = null;
+//
+//                        data.setPlatformType(PLATFORM_YOUTUBE);
+//                        data.setContentsType(CONTENTS_VIDEO);
+//
+//                        try {
+//                            date = mDateFormat.parse(item.getSnippet().getPublishedAt());
+//                        } catch (ParseException e) {
+//                            e.printStackTrace();
+//                        }
+//                        data.setPubDate(date);
+//
+//                        data.setPageId(item.getSnippet().getChannelId());
+//                        data.setFeedId(item.getId().getVideoId());
+////                        data.setProfileImage(profileUrl);
+//                        data.setUserName(item.getSnippet().getChannelTitle());
+//                        data.setCreatedTime(mStringFormat.format(date));
+//                        data.setPicture(item.getSnippet().getThumbnails().getHigh().getUrl());
+//                        data.setVideoUrl(item.getId().getVideoId());
+//                        data.setDescription(item.getSnippet().getTitle());
+//
+//                        mDataset.add(data);
+//                    }
+//
+//                    mAdapter = new CardStackAdapter(getChildFragmentManager());
+//                    mViewPager.setAdapter(mAdapter);
+//
+//                } else {
+//                    Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
+//                t.printStackTrace();
+//                Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
+//            }
+//        });
     }
 
     private void getGiphyTrendsGifs() {

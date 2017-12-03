@@ -18,7 +18,7 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:contentScrim="@color/deepGray"
+            app:contentScrim="@android:color/black"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <FrameLayout
@@ -29,10 +29,10 @@
                     android:id="@+id/imageView_pageCover"
                     android:layout_width="match_parent"
                     android:layout_height="232dp"
-                    android:layout_weight="1"
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
-                    app:layout_collapseMode="parallax" />
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="-0.7"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -40,7 +40,9 @@
                     android:layout_gravity="bottom"
                     android:layout_marginBottom="16dp"
                     android:layout_marginLeft="16dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    app:layout_collapseMode="parallax"
+                    app:layout_collapseParallaxMultiplier="-0.7">
 
                     <FrameLayout
                         android:layout_width="wrap_content"
@@ -79,13 +81,33 @@
                             android:textSize="24sp"
                             android:textStyle="bold" />
 
-                        <com.facebook.share.widget.LikeView
-                            android:id="@+id/button_pageLike"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:background="@color/appColor">
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
 
-                        </com.facebook.share.widget.LikeView>
+                            <Button
+                                android:id="@+id/button_follow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:text="FOLLOW"
+                                android:visibility="gone" />
+
+                            <Button
+                                android:id="@+id/button_unFollow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:text="UNFOLLOW"
+                                android:visibility="gone" />
+
+                            <com.facebook.share.widget.LikeView
+                                android:id="@+id/button_pageLike"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:background="@color/appColor"
+                                android:visibility="gone">
+
+                            </com.facebook.share.widget.LikeView>
+                        </FrameLayout>
 
                     </LinearLayout>
                 </LinearLayout>
@@ -95,11 +117,11 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/mToolbar"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="50dp"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Dark">
 
-                <LinearLayout
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -108,22 +130,22 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:background="@android:color/transparent"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:foreground="@android:color/transparent"
                         android:src="@drawable/ic_action_back" />
 
                     <TextView
                         android:id="@+id/textView_pageName_toolbar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="8dp"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
+                        android:gravity="center_vertical|center_horizontal"
                         android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                         android:textColor="@android:color/white"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
-                </LinearLayout>
+                </FrameLayout>
 
             </android.support.v7.widget.Toolbar>
 
@@ -135,8 +157,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
             android:layout_alignParentStart="false"
-            android:background="@color/deepGray"
-            app:tabIndicatorColor="@android:color/white"
+            android:background="@android:color/black"
+            app:tabIndicatorColor="@android:color/transparent"
             app:tabSelectedTextColor="@android:color/white"
             app:tabTextAppearance="@style/CustomTabItemTextSize"
             app:tabTextColor="@color/unselected_color">
@@ -159,6 +181,7 @@
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/deepGray"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </android.support.design.widget.CoordinatorLayout>

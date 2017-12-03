@@ -1,4 +1,4 @@
-package taewon.navercorp.integratedsns.today;
+package taewon.navercorp.integratedsns.customview;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
@@ -75,6 +75,7 @@ public class VerticalCardStackViewPager extends ViewPager {
         }
     }
 
+    
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         return super.onTouchEvent(swapXY(ev));

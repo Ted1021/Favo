@@ -1,7 +1,10 @@
-package taewon.navercorp.integratedsns.search;
+package taewon.navercorp.integratedsns.search.more;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,8 @@ import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.model.favo.FavoSearchResultData;
+import taewon.navercorp.integratedsns.page.PageDetailActivity;
+import taewon.navercorp.integratedsns.video.VideoActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
@@ -64,16 +69,22 @@ public class SearchDetailListAdapter extends RecyclerView.Adapter<SearchDetailLi
               case RESULT_VIDEO:
                   createVideoViewHolder(itemView);
                   break;
-
-              case RESULT_PHOTO:
-                  createPhotoViewHolder(itemView);
-                  break;
           }
         }
 
         @Override
         public void onClick(View v) {
+            int position = getLayoutPosition();
+            switch (v.getId()) {
 
+                case R.id.layout_pageDetail:
+                    loadPageDetail(position);
+                    break;
+
+                case R.id.imageView_picture:
+                    loadVideo(position);
+                    break;
+            }
         }
 
         private void createPageViewHolder(View itemView) {
@@ -93,8 +104,60 @@ public class SearchDetailListAdapter extends RecyclerView.Adapter<SearchDetailLi
             mPicture.setOnClickListener(this);
         }
 
-        private void createPhotoViewHolder(View itemView) {
+        private void loadVideo(int position) {
 
+            if (TextUtils.isEmpty(mDataset.get(position).getVideoUrl())) {
+                return;
+            }
+
+            String videoUrl = mDataset.get(position).getVideoUrl();
+            String platformType = mDataset.get(position).getPlatformType();
+            Intent intent = new Intent(mContext, VideoActivity.class);
+            intent.putExtra("PLATFORM_TYPE", platformType);
+
+            switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(videoUrl), "video/mp4");
+                    break;
+
+                case PLATFORM_YOUTUBE:
+                    intent.putExtra("VIDEO_ID", videoUrl);
+                    break;
+
+                case PLATFORM_TWITCH:
+                    String twitchUrl = String.format("http://player.twitch.tv?channel=%s", mDataset.get(position).getUserName());
+                    intent.putExtra("VIDEO_ID", twitchUrl);
+                    break;
+            }
+            mContext.startActivity(intent);
+        }
+
+        private void loadPageDetail(int position) {
+
+            Intent intent = new Intent(mContext, PageDetailActivity.class);
+            String platformType = mDataset.get(position).getPlatformType();
+            intent.putExtra("PLATFORM_TYPE", platformType);
+
+            switch (platformType) {
+
+                case PLATFORM_FACEBOOK:
+                    intent.putExtra("PAGE_ID", mDataset.get(position).getPageId());
+                    break;
+
+                case PLATFORM_YOUTUBE:
+                    intent.putExtra("CHANNEL_ID", mDataset.get(position).getPageId());
+                    intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
+                    break;
+
+                case PLATFORM_TWITCH:
+                    intent.putExtra("USER_ID", mDataset.get(position).getPageId());
+                    intent.putExtra("PROFILE_URL", mDataset.get(position).getProfileImage());
+                    intent.putExtra("USER_NAME", mDataset.get(position).getUserName());
+                    break;
+            }
+            mContext.startActivity(intent);
         }
     }
 

@@ -51,8 +51,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import taewon.navercorp.integratedsns.R;
 import taewon.navercorp.integratedsns.home.HomeActivity;
 import taewon.navercorp.integratedsns.interfaces.TwitchService;
+import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
-import taewon.navercorp.integratedsns.util.TwitchWebViewActivity;
+import taewon.navercorp.integratedsns.util.TwitchLoginActivity;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_GIPHY;
@@ -281,7 +282,7 @@ public class LoginActivity extends AppCompatActivity
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
 
                 String requestUrl = response.raw().request().url().toString();
-                Intent intent = new Intent(LoginActivity.this, TwitchWebViewActivity.class);
+                Intent intent = new Intent(LoginActivity.this, TwitchLoginActivity.class);
                 intent.putExtra("REQ_TYPE", "login");
                 intent.putExtra("REQ_URL", requestUrl);
                 startActivityForResult(intent, REQ_TWITCH_SIGN_IN);
@@ -363,7 +364,40 @@ public class LoginActivity extends AppCompatActivity
                     .load(R.drawable.icon_twitch_selected)
                     .transition(new DrawableTransitionOptions().crossFade())
                     .into(mTwitchLogin);
+            getTwitchUserInfo();
         }
+    }
+
+    private void getTwitchUserInfo() {
+
+        String currentToken = "Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
+        Log.d("CHECK_TWITCH", currentToken);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TWITCH_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TwitchService service = retrofit.create(TwitchService.class);
+
+        Call<TwitchUserData> call = service.getTwitchUserInfo(getString(R.string.twitch_client_id), currentToken, null);
+        call.enqueue(new Callback<TwitchUserData>() {
+            @Override
+            public void onResponse(Call<TwitchUserData> call, Response<TwitchUserData> response) {
+                if (response.isSuccessful()) {
+
+                    mFavoTokenManager.saveUserId(PLATFORM_TWITCH+"_id", response.body().getData().get(0).getId());
+                    Log.d("ID", response.body().getData().get(0).getId());
+
+                } else {
+                    Log.e("ERROR_TWITCH", "Login Activity >>>>> " + response.raw().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TwitchUserData> call, Throwable t) {
+                t.printStackTrace();
+                Log.e("ERROR_TWITCH", "Login Activity >>>>> Fail to get user ");
+            }
+        });
     }
 
     // jump to HomeActivity

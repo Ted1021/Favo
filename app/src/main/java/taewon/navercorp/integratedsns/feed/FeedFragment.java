@@ -16,8 +16,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -35,6 +38,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -51,21 +55,24 @@ import taewon.navercorp.integratedsns.interfaces.TwitchService;
 import taewon.navercorp.integratedsns.interfaces.YoutubeService;
 import taewon.navercorp.integratedsns.model.facebook.FacebookFeedData;
 import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
-import taewon.navercorp.integratedsns.model.twitch.TwitchFollowingData;
-import taewon.navercorp.integratedsns.model.twitch.TwitchUserData;
+import taewon.navercorp.integratedsns.model.favo.Photo;
+import taewon.navercorp.integratedsns.model.twitch.TwitchUserFollowingData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.search.SearchActivity;
 import taewon.navercorp.integratedsns.util.EndlessRecyclerViewScrollListener;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_IMAGE;
+import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_MULTI_IMAGE;
 import static taewon.navercorp.integratedsns.util.AppController.CONTENTS_VIDEO;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_PINTEREST;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_TWITCH;
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_YOUTUBE;
+import static taewon.navercorp.integratedsns.util.AppController.TWITCH_ACCEPT_CODE;
 import static taewon.navercorp.integratedsns.util.AppController.TWITCH_BASE_URL;
 import static taewon.navercorp.integratedsns.util.AppController.YOUTUBE_BASE_URL;
 
@@ -98,6 +105,8 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private RecyclerView.LayoutManager mFeedLayoutManager;
     private SwipeRefreshLayout mRefreshLayout;
 //    private RelativeLayout mLayoutDisconnection;
+    private FrameLayout mLayoutTitle;
+    private ImageButton mSearch;
 
     private Realm mRealm;
     private SimpleDateFormat mStringFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA);
@@ -106,9 +115,14 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     private int mAsyncCount = 0;
     private int mLastPosition = 0;
 
+    // recyclerView scroll state
+    public static final int SCROLL_UP = 0;
+    public static final int SCROLL_DOWN = 1;
+
     private static final String BOARD_FIELDS = "id,name";
     private static final String PIN_FIELDS = "board,created_at,creator,id,image,media,note,original_link";
-    private static final int MAX_COUNTS = 10;
+    private static final int MAX_PAGE_COUNT = 10;
+    private static final int MAX_ARTICLE_COUNT = 2;
 
     private static boolean isInit;
 
@@ -145,36 +159,9 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         if (isInit) {
             isInit = false;
-            checkToken();
+            loadMore();
         }
         return view;
-    }
-
-    private void initView(View view) {
-
-        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
-        mRefreshLayout.setOnRefreshListener(this);
-
-        // view for disconnection
-//        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
-
-        // set feed recyclerView
-        mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
-        mFeedAdapter = new FeedListAdapter(getContext(), mFeedDataset, mRealm);
-        mFeedList.setAdapter(mFeedAdapter);
-        mFeedLayoutManager = new LinearLayoutManager(getContext());
-        mFeedList.setLayoutManager(mFeedLayoutManager);
-
-        mPagingListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) mFeedLayoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//
-//                Log.d("CHECK_PAGE", page+"");
-//
-//                loadMore();
-            }
-        };
-        mFeedList.addOnScrollListener(mPagingListener);
     }
 
     private void initData() {
@@ -193,8 +180,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         mTokenUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.e("CHECK_REQUEST", ">>>>>>>>>>>>");
-                checkToken();
+                loadMore();
             }
         };
 
@@ -212,7 +198,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             public void onReceive(Context context, Intent intent) {
 
                 if (!mRefreshLayout.isRefreshing()) {
-                    int currentPosition = ((LinearLayoutManager) mFeedLayoutManager).findFirstCompletelyVisibleItemPosition();
+                    int currentPosition = ((LinearLayoutManager) mFeedLayoutManager).findFirstVisibleItemPosition();
                     if (currentPosition == 0) {
                         scrollToLastPosition(mLastPosition);
                         mLastPosition = 0;
@@ -229,31 +215,51 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mScrollToTopReceiver, new IntentFilter(getString(R.string.scroll_to_top_status)));
     }
 
-    private void checkToken() {
+    private void initView(View view) {
 
-        mAsyncCount = 0;
-        mFeedDataset.clear();
+        mSearch = (ImageButton) view.findViewById(R.id.button_search);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
+        mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
+        mRefreshLayout.setOnRefreshListener(this);
 
-        if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
-            getFacebookUserPages();
-        }
+        mLayoutTitle = (FrameLayout) view.findViewById(R.id.layout_title);
 
-        if (mFavoTokenManager.isTokenVaild(PLATFORM_YOUTUBE)) {
-            getYoutubeSubscriptionList();
-        }
+        // view for disconnection
+//        mLayoutDisconnection = (RelativeLayout) view.findViewById(R.id.layout_disconnection);
 
-        if (mFavoTokenManager.isTokenVaild(PLATFORM_PINTEREST)) {
-            getPinterestFollowingBoards();
-        }
+        // set feed recyclerView
+        mFeedList = (RecyclerView) view.findViewById(R.id.recyclerView_feed);
+        mFeedAdapter = new FeedListAdapter(getContext(), mFeedDataset, mRealm);
+        mFeedList.setAdapter(mFeedAdapter);
+        mFeedLayoutManager = new LinearLayoutManager(getContext());
+        mFeedLayoutManager.setItemPrefetchEnabled(true);
+        mFeedList.setLayoutManager(mFeedLayoutManager);
 
-        if (mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)) {
-            getTwitchUserInfo();
-        }
+        mPagingListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) mFeedLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+
+                Log.d("CHECK_PAGE", "page : " + page + "");
+                Log.d("CHECK_PAGE", "totalItemCount : " + totalItemsCount + "");
+                Log.d("CHECK_PAGE", "VisibleItemCount : " + view.getChildCount() + "");
+
+                loadMore();
+                Glide.get(getContext()).clearMemory();
+            }
+        };
+        mFeedList.addOnScrollListener(mPagingListener);
     }
 
     private void loadMore() {
 
         mAsyncCount = 0;
+        mRefreshLayout.setRefreshing(true);
         if (mFavoTokenManager.isTokenVaild(PLATFORM_FACEBOOK)) {
             getFacebookUserPages();
         }
@@ -267,13 +273,13 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         }
 
         if (mFavoTokenManager.isTokenVaild(PLATFORM_TWITCH)) {
-            getTwitchUserInfo();
+            getTwitchFollowingUserInfo();
         }
     }
 
     private void refreshDataset() {
 
-//        mFeedAdapter.notifyDataSetChanged();
+        mFeedAdapter.notifyDataSetChanged();
         if (mLastPosition > mFeedDataset.size() - 1) {
             mLastPosition = mFeedDataset.size() - 1;
         }
@@ -281,17 +287,25 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     }
 
     private void scrollToTopPosition(int position) {
-        if (position > 10) {
-            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 10);
-            mFeedLayoutManager.scrollToPosition(10);
+
+        if (position > 5) {
+            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 5);
+            mFeedLayoutManager.scrollToPosition(5);
         }
         mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, 0);
+//        mFeedLayoutManager.scrollToPosition(1);
     }
 
     private void scrollToLastPosition(int position) {
-        if (position >= 10) {
-            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position - 10);
-            mFeedLayoutManager.scrollToPosition(position - 10);
+
+        Log.d("POSITION", String.valueOf(position));
+        if (position < 0) {
+            return;
+        }
+
+        if (position > 5) {
+            mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position - 5);
+            mFeedLayoutManager.scrollToPosition(position - 5);
         }
         mFeedLayoutManager.smoothScrollToPosition(mFeedList, null, position);
     }
@@ -305,7 +319,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     // Facebook API Call
     private void getFacebookUserPages() {
 
-        mRefreshLayout.setRefreshing(true);
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         GraphRequest request = GraphRequest.newGraphPathRequest(
                 accessToken,
@@ -335,7 +348,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                 });
 
         Bundle parameters = new Bundle();
-        parameters.putString("limit", MAX_COUNTS+"");
+        parameters.putString("limit", MAX_PAGE_COUNT + "");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -356,7 +369,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                 FacebookFeedData result = new Gson().fromJson(response.getJSONObject().toString(), FacebookFeedData.class);
                                 if (result.getPaging() != null) {
                                     mPlatformPagingInfo.put(PLATFORM_FACEBOOK + pageId, result.getPaging().getCursors().getAfter());
-                                    Log.d("CHECK_NEXT", pageId);
                                 }
                                 FacebookFeedData.ArticleData article;
                                 for (int i = 0; i < result.getData().size(); i++) {
@@ -365,11 +377,25 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     FavoFeedData data = new FavoFeedData();
 
                                     data.setPlatformType(PLATFORM_FACEBOOK);
+
                                     if (!(article.getSource() == null)) {
                                         data.setContentsType(CONTENTS_VIDEO);
                                         data.setVideoUrl(article.getSource());
                                     } else {
-                                        data.setContentsType(CONTENTS_IMAGE);
+                                        if (article.getAttachments() == null) {
+                                            data.setContentsType(CONTENTS_IMAGE);
+                                        } else {
+                                            data.setContentsType(CONTENTS_MULTI_IMAGE);
+                                            ArrayList<Photo> imageset = new ArrayList<>();
+                                            for (FacebookFeedData.ArticleData.Attachments.PhotoSet.Subattachments.Photo item : article.getAttachments().getData().get(0).getSubattachments().getData()) {
+                                                Photo image = new Photo();
+                                                image.setHeight(item.getMedia().getImage().getHeight());
+                                                image.setWidth(item.getMedia().getImage().getWidth());
+                                                image.setSrc(item.getMedia().getImage().getSrc());
+                                                imageset.add(image);
+                                            }
+                                            data.setSubAttatchments(imageset);
+                                        }
                                     }
                                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                                     Date date = format.parse(article.getCreatedTime());
@@ -387,7 +413,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                                     data.setCommentCount(article.getComments().getSummary().getTotalCount());
 
                                     mFeedDataset.add(data);
-                                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+//                                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                                 }
                             } catch (ParseException e) {
                                 e.printStackTrace();
@@ -398,7 +424,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                             mAsyncCount = mAsyncCount - 1;
                         }
 
-                        if (mAsyncCount == 0) {
+                        if (mAsyncCount <= 0) {
                             sendAsyncStatus();
                         }
                     }
@@ -409,7 +435,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
             parameters.putString("after", mPlatformPagingInfo.get(PLATFORM_FACEBOOK + pageId));
         }
         parameters.putString("fields", "link,created_time,message,full_picture,likes.limit(0).summary(true),comments.limit(0).summary(true),from{name, picture.height(2048){url}},attachments{subattachments},source");
-        parameters.putString("limit", "1");
+        parameters.putString("limit", MAX_ARTICLE_COUNT+"");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -417,7 +443,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     // Pinterest API Call
     private void getPinterestFollowingBoards() {
 
-        mRefreshLayout.setRefreshing(true);
         mPinterestClient.getMyFollowedBoards(BOARD_FIELDS, new PDKCallback() {
             @Override
             public void onSuccess(PDKResponse response) {
@@ -463,12 +488,12 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     data.setDescription(pin.getNote());
 
                     mFeedDataset.add(data);
-                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+//                    mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
 
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
                     }
-                    if (mAsyncCount == 0) {
+                    if (mAsyncCount <= 0) {
                         sendAsyncStatus();
                     }
                 }
@@ -480,7 +505,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     synchronized ((Integer) mAsyncCount) {
                         mAsyncCount = mAsyncCount - 1;
                     }
-                    if (mAsyncCount == 0) {
+                    if (mAsyncCount <= 0) {
                         sendAsyncStatus();
                     }
                 }
@@ -498,8 +523,6 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
     // Youtube API Call
     private void getYoutubeSubscriptionList() {
 
-        mRefreshLayout.setRefreshing(true);
-
         // get google credential access token
         String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
 
@@ -511,7 +534,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
         // get 'subscriptions' from youtube data api v3
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_COUNTS, true);
+        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_PAGE_COUNT, true, null);
         call.enqueue(new Callback<YoutubeSubscriptionData>() {
             @Override
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
@@ -519,14 +542,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
                     mAsyncCount = mAsyncCount + response.body().getItems().size();
                     for (YoutubeSubscriptionData.Item item : response.body().getItems()) {
-
-                        String[] params = {item.getSnippet().getResourceId().getChannelId(), item.getSnippet().getThumbnails().getHigh().getUrl()};
-                        new GetYoutubeChannelVideos().executeOnExecutor(THREAD_POOL_EXECUTOR, params);
+                        getYoutubeChannelVideos(item.getSnippet().getResourceId().getChannelId(), item.getSnippet().getThumbnails().getHigh().getUrl());
                     }
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
-                    mFavoTokenManager.createToken(PLATFORM_YOUTUBE, "");
-//                    checkToken();
+                    mFavoTokenManager.removeToken(PLATFORM_YOUTUBE);
                 }
             }
 
@@ -538,207 +558,159 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
         });
     }
 
-    private class GetYoutubeChannelVideos extends AsyncTask<String, Void, Void> {
+    private void getYoutubeChannelVideos(final String channelId, final String profileUrl) {
 
-        @Override
-        protected Void doInBackground(final String... params) {
+        String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
+        Log.d("CHECK_PAGING", "youtube page id : " + channelId + " / " + mPlatformPagingInfo.get(PLATFORM_YOUTUBE + channelId));
 
-            String accessToken = String.format("Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_YOUTUBE));
-            final String profileUrl = params[1];
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(YOUTUBE_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(YOUTUBE_BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+        YoutubeService service = retrofit.create(YoutubeService.class);
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_ARTICLE_COUNT, channelId, mPlatformPagingInfo.get(PLATFORM_YOUTUBE + channelId), null, null, "date", "video", null, null, null);
+        call.enqueue(new Callback<YoutubeSearchVideoData>() {
+            @Override
+            public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
+                if (response.isSuccessful()) {
 
-            YoutubeService service = retrofit.create(YoutubeService.class);
-            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 1, params[0], null, null, null, "date", "video", null, null);
-            call.enqueue(new Callback<YoutubeSearchVideoData>() {
-                @Override
-                public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
-                    if (response.isSuccessful()) {
-
-                        for (YoutubeSearchVideoData.Item item : response.body().getItems()) {
-
-                            FavoFeedData data = new FavoFeedData();
-                            Date date = null;
-
-                            data.setPlatformType(PLATFORM_YOUTUBE);
-                            data.setContentsType(CONTENTS_VIDEO);
-
-                            try {
-                                date = mDateFormat.parse(item.getSnippet().getPublishedAt());
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                            data.setPubDate(date);
-
-                            data.setPageId(item.getSnippet().getChannelId());
-                            data.setFeedId(item.getId().getVideoId());
-                            data.setProfileImage(profileUrl);
-                            data.setUserName(item.getSnippet().getChannelTitle());
-                            data.setCreatedTime(mStringFormat.format(date));
-                            data.setPicture(item.getSnippet().getThumbnails().getHigh().getUrl());
-                            data.setVideoUrl(item.getId().getVideoId());
-                            data.setDescription(item.getSnippet().getTitle());
-
-                            mFeedDataset.add(data);
-                            mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
-                        }
+                    YoutubeSearchVideoData result = response.body();
+                    if (result.getNextPageToken() == null) {
+                        return;
                     } else {
-                        Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
+                        mPlatformPagingInfo.put(PLATFORM_YOUTUBE + channelId, result.getNextPageToken());
                     }
+                    for (YoutubeSearchVideoData.Item item : result.getItems()) {
 
-                    synchronized ((Integer) mAsyncCount) {
-                        mAsyncCount = mAsyncCount - 1;
+                        FavoFeedData data = new FavoFeedData();
+                        Date date = null;
+
+                        data.setPlatformType(PLATFORM_YOUTUBE);
+                        data.setContentsType(CONTENTS_VIDEO);
+
+                        try {
+                            date = mDateFormat.parse(item.getSnippet().getPublishedAt());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        data.setPubDate(date);
+
+                        data.setPageId(item.getSnippet().getChannelId());
+                        data.setFeedId(item.getId().getVideoId());
+                        data.setProfileImage(profileUrl);
+                        data.setUserName(item.getSnippet().getChannelTitle());
+                        data.setCreatedTime(mStringFormat.format(date));
+                        data.setPicture(item.getSnippet().getThumbnails().getHigh().getUrl());
+                        data.setVideoUrl(item.getId().getVideoId());
+                        data.setDescription(item.getSnippet().getTitle());
+
+                        mFeedDataset.add(data);
+//                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                     }
-                    if (mAsyncCount == 0) {
-                        sendAsyncStatus();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
-                    t.printStackTrace();
-                    Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
-
-                    synchronized ((Integer) mAsyncCount) {
-                        mAsyncCount = mAsyncCount - 1;
-                    }
-                    if (mAsyncCount == 0) {
-                        sendAsyncStatus();
-                    }
-                }
-            });
-            return null;
-        }
-    }
-
-    private void getTwitchUserInfo() {
-
-        String currentToken = "Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
-        Log.d("CHECK_TWITCH", currentToken);
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(TWITCH_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        TwitchService service = retrofit.create(TwitchService.class);
-
-        Call<TwitchUserData> call = service.getTwitchUserInfo(getString(R.string.twitch_client_id), currentToken, null);
-        call.enqueue(new Callback<TwitchUserData>() {
-            @Override
-            public void onResponse(Call<TwitchUserData> call, Response<TwitchUserData> response) {
-                if (response.isSuccessful()) {
-                    getTwitchFollowingList(response.body().getData().get(0).getId());
                 } else {
-                    Log.e("ERROR_TWITCH", "Feed Fragment >>>>> " + response.raw().toString());
+                    Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
+                }
+
+                synchronized ((Integer) mAsyncCount) {
+                    mAsyncCount = mAsyncCount - 1;
+                }
+                if (mAsyncCount <= 0) {
+                    sendAsyncStatus();
                 }
             }
 
             @Override
-            public void onFailure(Call<TwitchUserData> call, Throwable t) {
+            public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
                 t.printStackTrace();
-                Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to get user ");
+                Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
+
+                synchronized ((Integer) mAsyncCount) {
+                    mAsyncCount = mAsyncCount - 1;
+                }
+                if (mAsyncCount <= 0) {
+                    sendAsyncStatus();
+                }
             }
         });
     }
 
-    // call twitch api
-    private void getTwitchFollowingList(String userId) {
+    // twitch api v5
+    private void getTwitchFollowingUserInfo() {
+        Log.d("CHECK_ID", mFavoTokenManager.getUserId(PLATFORM_TWITCH+"_id"));
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
-
-        Call<TwitchFollowingData> call = service.getTwitchFollowingInfo(getString(R.string.twitch_client_id), userId, MAX_COUNTS);
-        call.enqueue(new Callback<TwitchFollowingData>() {
+        Call<TwitchUserFollowingData> call = service.getTwitchFollowingUser(TWITCH_ACCEPT_CODE, getString(R.string.twitch_client_id), mFavoTokenManager.getUserId(PLATFORM_TWITCH+"_id"), MAX_PAGE_COUNT);
+        call.enqueue(new Callback<TwitchUserFollowingData>() {
             @Override
-            public void onResponse(Call<TwitchFollowingData> call, Response<TwitchFollowingData> response) {
+            public void onResponse(Call<TwitchUserFollowingData> call, Response<TwitchUserFollowingData> response) {
+
                 if (response.isSuccessful()) {
-                    for (TwitchFollowingData.FollowingInfo result : response.body().getData()) {
-                        getTwitchStreamerInfo(result.getToId());
+                    String userName, userProfile, userId;
+                    mAsyncCount = mAsyncCount + response.body().getFollows().size();
+                    for (TwitchUserFollowingData.Follow data : response.body().getFollows()) {
+
+                        userName = data.getChannel().getDisplayName();
+                        userProfile = data.getChannel().getLogo();
+                        userId = data.getChannel().getId();
+                        getTwitchVideoList(userProfile, userName, userId);
                     }
-                } else {
-                    Log.e("ERROR_TWITCH", "get following list error " + response.raw().toString());
                 }
             }
 
             @Override
-            public void onFailure(Call<TwitchFollowingData> call, Throwable t) {
+            public void onFailure(Call<TwitchUserFollowingData> call, Throwable t) {
                 t.printStackTrace();
-                Log.e("ERROR_TWITCH", "get following list error !!!!!!!!!!!!!!");
             }
         });
     }
 
-    private void getTwitchStreamerInfo(String userId) {
-
-        String currentToken = "Bearer " + mFavoTokenManager.getCurrentToken(PLATFORM_TWITCH);
+    private void getTwitchVideoList(final String profileUrl, final String userName, final String userId) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITCH_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TwitchService service = retrofit.create(TwitchService.class);
 
-        Call<TwitchUserData> call = service.getTwitchUserInfo(getString(R.string.twitch_client_id), currentToken, userId);
-        call.enqueue(new Callback<TwitchUserData>() {
-            @Override
-            public void onResponse(Call<TwitchUserData> call, Response<TwitchUserData> response) {
-                if (response.isSuccessful()) {
-                    TwitchUserData.UserInfo result = response.body().getData().get(0);
-                    getTwitchVideoList(result.getProfileImageUrl(), result.getDisplayName(), result.getId());
-                } else {
-                    Log.e("ERROR_TWITCH", "Feed Fragment >>>>> " + response.raw().toString());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<TwitchUserData> call, Throwable t) {
-                t.printStackTrace();
-                Log.e("ERROR_TWITCH", "Feed Fragment >>>>> Fail to get user ");
-            }
-        });
-    }
-
-    private void getTwitchVideoList(final String profileUrl, final String userName, String userId) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(TWITCH_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        TwitchService service = retrofit.create(TwitchService.class);
-
-        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), userId, 1, null);
+        Call<TwitchVideoData> call = service.getTwitchVideoInfo(getString(R.string.twitch_client_id), userId, MAX_ARTICLE_COUNT, mPlatformPagingInfo.get(PLATFORM_TWITCH + userId));
         call.enqueue(new Callback<TwitchVideoData>() {
             @Override
             public void onResponse(Call<TwitchVideoData> call, Response<TwitchVideoData> response) {
                 if (response.isSuccessful()) {
 
-                    for (TwitchVideoData.VideoInfo result : response.body().getData()) {
+                    TwitchVideoData result = response.body();
+                    if (result.getPagination() != null) {
+                        mPlatformPagingInfo.put(PLATFORM_TWITCH + userId, result.getPagination().getCursor());
+                    }
+
+                    for (TwitchVideoData.VideoInfo item : result.getData()) {
 
                         FavoFeedData data = new FavoFeedData();
 
                         try {
-                            data.setPubDate(mDateFormat.parse(result.getPublishedAt()));
+                            data.setPubDate(mDateFormat.parse(item.getPublishedAt()));
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                        data.setFeedId(result.getId());
+                        data.setFeedId(item.getId());
                         data.setPlatformType(PLATFORM_TWITCH);
                         data.setContentsType(CONTENTS_VIDEO);
-                        data.setPageId(result.getUserId());
+                        data.setPageId(item.getUserId());
                         data.setProfileImage(profileUrl);
                         data.setUserName(userName);
                         data.setCreatedTime(mStringFormat.format(data.getPubDate()));
-                        int position = result.getThumbnailUrl().indexOf("{width}");
-                        String thumbnail = result.getThumbnailUrl().substring(0, position - 1) + "1280x720.jpg";
+                        int position = item.getThumbnailUrl().indexOf("{width}");
+                        String thumbnail = item.getThumbnailUrl().substring(0, position - 1) + "1280x720.jpg";
                         data.setPicture(thumbnail);
-                        data.setVideoUrl(result.getId());
-                        data.setDescription(result.getTitle());
+                        data.setVideoUrl(item.getId());
+                        data.setDescription(item.getTitle());
 
                         mFeedDataset.add(data);
-                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
+//                        mFeedAdapter.notifyItemInserted(mFeedAdapter.getItemCount() + 1);
                     }
 
                 } else {
@@ -749,7 +721,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     mAsyncCount = mAsyncCount - 1;
                 }
 
-                if (mAsyncCount == 0) {
+                if (mAsyncCount <= 0) {
                     sendAsyncStatus();
                 }
             }
@@ -763,7 +735,7 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
                     mAsyncCount = mAsyncCount - 1;
                 }
 
-                if (mAsyncCount == 0) {
+                if (mAsyncCount <= 0) {
                     sendAsyncStatus();
                 }
             }
@@ -772,10 +744,11 @@ public class FeedFragment extends Fragment implements SwipeRefreshLayout.OnRefre
 
     @Override
     public void onRefresh() {
-
+        Glide.get(getContext()).clearMemory();
+        mPagingListener.resetState();
         mPlatformPagingInfo.clear();
         mFeedDataset.clear();
         mFeedAdapter.notifyDataSetChanged();
-        checkToken();
+        loadMore();
     }
 }

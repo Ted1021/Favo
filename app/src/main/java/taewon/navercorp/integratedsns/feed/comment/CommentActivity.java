@@ -56,7 +56,7 @@ public class CommentActivity extends AppCompatActivity {
     private ArrayList<FavoCommentData> mCommentDataset = new ArrayList<>();
 
     private static final int MAX_COUNTS = 10;
-    private static final int TRANSITION_TIME = 700;
+    private static final int TRANSITION_TIME = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

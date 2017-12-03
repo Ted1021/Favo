@@ -111,6 +111,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
         mScrollListener = new EndlessRecyclerViewScrollListener((LinearLayoutManager) layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                mRefreshLayout.setRefreshing(true);
                 switch (mPlatformType) {
 
                     case PLATFORM_FACEBOOK:
@@ -122,6 +123,7 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
                         break;
 
                     case PLATFORM_TWITCH:
+                        mRefreshLayout.setRefreshing(false);
 //                        getTwitchVideoList();
                         break;
                 }
@@ -212,6 +214,8 @@ public class PageVideoFragment extends Fragment implements SwipeRefreshLayout.On
 
                     YoutubeChannelPlaylistData result = response.body();
                     if(result.getNextPageToken() == null){
+                        mRefreshLayout.setRefreshing(false);
+
                         return;
                     } else {
                         mNext = result.getNextPageToken();

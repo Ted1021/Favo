@@ -41,6 +41,7 @@ import taewon.navercorp.integratedsns.model.twitch.TwitchSearchChannelData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchChannelData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
+import taewon.navercorp.integratedsns.search.more.SearchDetailActivity;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static taewon.navercorp.integratedsns.util.AppController.PLATFORM_FACEBOOK;
@@ -264,6 +265,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
 
                         data.setPlatformType(PLATFORM_YOUTUBE);
                         data.setPageId(item.getSnippet().getChannelId());
+                        Log.d("CHECK_CHANNEL_ID", data.getPageId());
                         data.setProfileImage(item.getSnippet().getThumbnails().getHigh().getUrl());
                         data.setUserName(item.getSnippet().getChannelTitle());
                         data.setDescription(item.getSnippet().getDescription());
@@ -336,7 +338,7 @@ public class SearchFragment extends Fragment implements EditText.OnEditorActionL
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_VIDEO_COUNT, null, null, null, mQuery, "viewCount", "video", null, "KR");
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_VIDEO_COUNT, null, null, null, mQuery, "viewCount", "video", null, "KR", null);
         call.enqueue(new Callback<YoutubeSearchVideoData>() {
             @Override
             public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {

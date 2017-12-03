@@ -64,7 +64,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
     private SimpleDateFormat mDateConverter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     private SimpleDateFormat mFormat = new SimpleDateFormat("yyyy년 MM월 dd일");
 
-    private static final int MAX_COUNTS = 10;
+    private static final int MAX_COUNTS = 20;
 
     private static final String ARG_PARAM1 = "PAGE_ID";
     private static final String ARG_PARAM2 = "PLATFORM_TYPE";
@@ -151,6 +151,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
 
+                mRefreshLayout.setRefreshing(true);
                 if (page != 0) {
                     switch (mPlatformType) {
                         case PLATFORM_FACEBOOK:
@@ -251,7 +252,7 @@ public class PageFeedFragment extends Fragment implements SwipeRefreshLayout.OnR
                 .build();
 
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, mPageId, mNext, null, null,  "date", "video", null, null);
+        Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", MAX_COUNTS, mPageId, mNext, null, null,  "date", "video", null, null, null);
         call.enqueue(new Callback<YoutubeSearchVideoData>() {
             @Override
             public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {

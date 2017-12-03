@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.live;
 
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
@@ -34,6 +36,7 @@ import taewon.navercorp.integratedsns.model.favo.FavoFeedData;
 import taewon.navercorp.integratedsns.model.twitch.TwitchStreamingDataV5;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSearchVideoData;
 import taewon.navercorp.integratedsns.model.youtube.YoutubeSubscriptionData;
+import taewon.navercorp.integratedsns.search.SearchActivity;
 import taewon.navercorp.integratedsns.util.FavoTokenManager;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
@@ -53,6 +56,8 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
     private RecyclerView mLiveStreamingList;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutmanager;
+
+    private ImageButton mSearch;
 
     private SwipeRefreshLayout mRefreshLayout;
 
@@ -89,6 +94,15 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
 
     private void initView(View view) {
 
+        mSearch = (ImageButton) view.findViewById(R.id.button_search);
+        mSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
+
         mRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
         mRefreshLayout.setOnRefreshListener(this);
 
@@ -102,6 +116,7 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
 
     private void loadData() {
 
+        mRefreshLayout.setRefreshing(true);
         mFavoTokenManager = FavoTokenManager.getInstance();
 
         String facebookToken = mFavoTokenManager.getCurrentToken(PLATFORM_FACEBOOK);
@@ -140,7 +155,7 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
 
         // get 'subscriptions' from youtube data api v3
         YoutubeService service = retrofit.create(YoutubeService.class);
-        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_COUNTS, true);
+        Call<YoutubeSubscriptionData> call = service.getSubscriptionList(accessToken, "snippet", MAX_COUNTS, true, null);
         call.enqueue(new Callback<YoutubeSubscriptionData>() {
             @Override
             public void onResponse(Call<YoutubeSubscriptionData> call, Response<YoutubeSubscriptionData> response) {
@@ -152,10 +167,8 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                         new GetYoutubeChannelStreams().executeOnExecutor(THREAD_POOL_EXECUTOR, params);
                     }
 
-                    mRefreshLayout.setRefreshing(false);
                 } else {
                     Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> Token is expired" + response.toString());
-                    mRefreshLayout.setRefreshing(false);
                 }
             }
 
@@ -163,7 +176,6 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
             public void onFailure(Call<YoutubeSubscriptionData> call, Throwable t) {
                 Log.e("ERROR_YOUTUBE", "YoutubeFragment >>>>> fail to access youtube api server");
                 Toast.makeText(getContext(), "Fail to access youtube server", Toast.LENGTH_SHORT).show();
-                mRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -182,7 +194,7 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                     .build();
 
             YoutubeService service = retrofit.create(YoutubeService.class);
-            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 5, params[0], null, "live", null, "viewCount", "video", null, null);
+            Call<YoutubeSearchVideoData> call = service.getVideoList(accessToken, "snippet", 5, params[0], null, "live", null, "viewCount", "video", null, null, null);
             call.enqueue(new Callback<YoutubeSearchVideoData>() {
                 @Override
                 public void onResponse(Call<YoutubeSearchVideoData> call, Response<YoutubeSearchVideoData> response) {
@@ -218,12 +230,14 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                     } else {
                         Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to get json for video");
                     }
+                    mRefreshLayout.setRefreshing(false);
                 }
 
                 @Override
                 public void onFailure(Call<YoutubeSearchVideoData> call, Throwable t) {
                     t.printStackTrace();
                     Log.e("ERROR_YOUTUBE", "YoutubeDetailActivity >>>>> Fail to access youtube api server");
+                    mRefreshLayout.setRefreshing(false);
                 }
             });
             return null;
@@ -258,7 +272,7 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                         FavoFeedData data = new FavoFeedData();
 
                         data.setPlatformType(PLATFORM_TWITCH);
-                        data.setUserName(item.getChannel().getName());
+                        data.setUserName(item.getChannel().getDisplayName());
                         data.setDescription(item.getChannel().getStatus());
                         data.setPicture(item.getPreview().getLarge());
                         data.setProfileImage(item.getChannel().getLogo());
@@ -274,17 +288,23 @@ public class LiveStreamingFragment extends Fragment implements SwipeRefreshLayou
                 } else {
                     Log.e("ERROR_SEARCH", response.raw().toString());
                 }
+                mRefreshLayout.setRefreshing(false);
+
             }
 
             @Override
             public void onFailure(Call<TwitchStreamingDataV5> call, Throwable t) {
                 t.printStackTrace();
+                mRefreshLayout.setRefreshing(false);
             }
         });
     }
 
     @Override
     public void onRefresh() {
+
+        mDataset.clear();
+        mAdapter.notifyDataSetChanged();
         loadData();
     }
 }

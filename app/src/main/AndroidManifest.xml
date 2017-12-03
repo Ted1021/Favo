@@ -46,8 +46,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="pdk4928301781867311512" />
-                <data android:scheme="bandsdk219449230" />
+                <data android:scheme="pdk4935189783155589539" />
                 <data
                     android:host="174.138.18.90"
                     android:path="/message"
@@ -62,20 +61,23 @@
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
             android:name=".feed.comment.CommentActivity"
-            android:theme="@style/Theme.AppCompat.Translucent"
-            android:configChanges="orientation|screenSize|keyboard" />
+            android:configChanges="orientation|screenSize|keyboard"
+            android:theme="@style/Theme.AppCompat.Translucent" />
         <activity
             android:name=".page.PageDetailActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
-            android:name=".feed.VideoActivity"
+            android:name=".video.RecommendVideoActivity"
             android:configChanges="orientation|screenSize|keyboard" />
         <activity
-            android:name=".util.TwitchWebViewActivity"
+            android:name=".util.TwitchLoginActivity"
             android:configChanges="orientation|screenSize|keyboard" />
-
-        <activity android:name=".search.SearchDetailActivity"
-            android:configChanges="orientation|screenSize|keyboard"/>
+        <activity
+            android:name=".search.more.SearchDetailActivity"
+            android:configChanges="orientation|screenSize|keyboard" />
+        <activity android:name=".feed.MultiViewActivity" />
+        <activity android:name=".video.VideoActivity" />
+        <activity android:name=".search.SearchActivity"></activity>
     </application>
 
 </manifest>

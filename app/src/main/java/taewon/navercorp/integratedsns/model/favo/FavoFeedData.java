@@ -1,6 +1,7 @@
 package taewon.navercorp.integratedsns.model.favo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -22,7 +23,7 @@ public class FavoFeedData implements Serializable{
     private String link;
     private String videoUrl;
     private String description;
-    private String[] subattachments;
+    private ArrayList<Photo> subAttatchments = new ArrayList<>();
     private int likeCount;
     private int commentCount;
     private String nextCursor, beforeCursor;
@@ -107,14 +108,6 @@ public class FavoFeedData implements Serializable{
         this.videoUrl = videoUrl;
     }
 
-    public String[] getSubattatchments() {
-        return subattachments;
-    }
-
-    public void setSubattatchments(String[] subattatchments) {
-        this.subattachments = subattatchments;
-    }
-
     public String getCreatedTime() {
         return createdTime;
     }
@@ -147,14 +140,6 @@ public class FavoFeedData implements Serializable{
         this.feedId = feedId;
     }
 
-    public String[] getSubattachments() {
-        return subattachments;
-    }
-
-    public void setSubattachments(String[] subattachments) {
-        this.subattachments = subattachments;
-    }
-
     public String getNextCursor() {
         return nextCursor;
     }
@@ -169,5 +154,13 @@ public class FavoFeedData implements Serializable{
 
     public void setBeforeCursor(String beforeCursor) {
         this.beforeCursor = beforeCursor;
+    }
+
+    public ArrayList<Photo> getSubAttatchments() {
+        return subAttatchments;
+    }
+
+    public void setSubAttatchments(ArrayList<Photo> subAttatchments) {
+        this.subAttatchments = subAttatchments;
     }
 }

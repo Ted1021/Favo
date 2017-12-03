@@ -18,6 +18,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import taewon.navercorp.integratedsns.R;
+import taewon.navercorp.integratedsns.search.page.SearchPageListAdapter;
+import taewon.navercorp.integratedsns.search.photo.SearchPhotoListAdapter;
+import taewon.navercorp.integratedsns.search.video.SearchVideoListAdapter;
 
 /**
  * Created by USER on 2017-11-13.

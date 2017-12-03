@@ -104,6 +104,7 @@ public class PageVideoAdapter extends RecyclerView.Adapter<PageVideoAdapter.View
 
         if (mDataset.get(position).getPlatformType() == PLATFORM_FACEBOOK) {
             String videoUrl = mDataset.get(position).getVideoUrl();
+            Log.e("CHECK_VIDEO_URL", videoUrl);
             if (TextUtils.isEmpty(videoUrl)) {
                 return;
             }
