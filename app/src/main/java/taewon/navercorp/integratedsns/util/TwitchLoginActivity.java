@@ -34,7 +34,8 @@ public class TwitchLoginActivity extends AppCompatActivity {
     private void initView() {
         webView = (WebView) findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
-        Log.d("FAVO_TEST", "Local branch stream test, this is before");
+
+        Log.d("FAVO_TEST", "local branch stream, after one");
     }
 
     private void initData(){
