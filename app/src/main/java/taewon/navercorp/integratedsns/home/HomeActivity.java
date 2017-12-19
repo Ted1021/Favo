@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -96,6 +97,8 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.O
         mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
         mTabLayout.getTabAt(mTabLayout.getSelectedTabPosition()).getIcon().setColorFilter(ContextCompat.getColor(HomeActivity.this, android.R.color.white), PorterDuff.Mode.SRC_IN);
         mTabStrip = (LinearLayout) mTabLayout.getChildAt(0);
+        Log.d("FAVO_TEST", "it's too  late ! this is last test");
+
     }
 
     private void addFragmentOnTop() {
