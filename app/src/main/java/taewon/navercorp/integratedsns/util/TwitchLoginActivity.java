@@ -8,6 +8,8 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.util.logging.Logger;
+
 import retrofit2.http.HEAD;
 import taewon.navercorp.integratedsns.R;
 
@@ -32,7 +34,7 @@ public class TwitchLoginActivity extends AppCompatActivity {
     private void initView() {
         webView = (WebView) findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
-        Log.d("FAVO_TEST", "Check branch, Follow test after 3way merge");
+        Log.d("FAVO_TEST", "Local branch stream test, this is before");
     }
 
     private void initData(){
