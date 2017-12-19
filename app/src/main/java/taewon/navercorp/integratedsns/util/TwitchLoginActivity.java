@@ -41,6 +41,7 @@ public class TwitchLoginActivity extends AppCompatActivity {
 
         Log.d("FAVO_TEST", "it's too  late ! this is last test");
         Log.d("FAVO_TEST", "it's too  late ! this is last test");
+        Log.d("FAVO_TEST", "it's too  late ! this is last test");
 
         mReqType = getIntent().getStringExtra("REQ_TYPE");
         mReqUrl = getIntent().getStringExtra("REQ_URL");
