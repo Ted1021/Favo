@@ -35,10 +35,12 @@ public class TwitchLoginActivity extends AppCompatActivity {
         webView = (WebView) findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
 
-        Log.d("FAVO_TEST", "local branch stream, after one");
     }
 
     private void initData(){
+
+        Log.d("FAVO_TEST", "it's too  late ! this is last test");
+
 
         mReqType = getIntent().getStringExtra("REQ_TYPE");
         mReqUrl = getIntent().getStringExtra("REQ_URL");
